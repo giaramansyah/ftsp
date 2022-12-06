@@ -47,11 +47,58 @@ class DataController extends Controller
 
     public function edit($id)
     {
+        if(!$this->hasPrivilege($this->_readid)) {
+            return abort(404);
+        }
 
+        $plainId = SecureHelper::unsecure($id);
+
+        if(!$plainId) {
+            return abort(404);
+        }
+
+        $data = Data::find($plainId)->toArray();
+        
+        if(!$data) {
+            return abort(404);
+        }
+
+        if(!$this->hasPrivilege($this->_readid)) {
+            $data = array('ma_id' => $data['ma_id']);
+        }
+
+        $year = $this->getYears();
+        $division = $this->getDivisions();
+        $staff = $this->getStaffs();
+
+        $view = ['yearArr' => $year, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('master.data.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'mandatory' => $this->hasPrivilege($this->_readid)];
+
+        return view('contents.data.form', array_merge($data, $view));
     }
 
     public function view($id)
     {
+        if(!$this->hasPrivilege($this->_readid)) {
+            return abort(404);
+        }
+
+        $plainId = SecureHelper::unsecure($id);
+
+        if(!$plainId) {
+            return abort(404);
+        }
+
+        $data = Data::find($plainId)->toArray();
+        
+        if(!$data) {
+            return abort(404);
+        }
+
+        $data['id'] = $id;
+
+        $this->writeAppLog($this->_readid, 'Data : '.$data['ma_id']);
+
+        return view('contents.data.view', $data);
     }
 
     public function getList(Request $request)
@@ -149,9 +196,9 @@ class DataController extends Controller
                         $division = Str::lower(str_replace(" ", "", $collection['division']));
                         $data = Data::create([
                             'ma_id' => $collection['ma_id'],
-                            'description' => $collection['description'],
+                            'description' => trim($collection['description']),
                             'year' => $param['year'],
-                            'division_id' => $arrDivision[$division],
+                            'division_id' => isset($arrDivision[$division]) ? $arrDivision[$division] : 0,
                             'amount' => $collection['amount'],
                             'filename' => $filename,
                             'created_by' => Auth::user()->username,
@@ -162,7 +209,7 @@ class DataController extends Controller
                             foreach($arr as $value) {
                                 MapData::create([
                                     'data_id' => $data->id,
-                                    'staff_id' => $arrStaff[$value]
+                                    'staff_id' => isset($arrStaff[$value]) ? $arrStaff[$value] : 0
                                 ]);
                             }
                         }

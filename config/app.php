@@ -52,9 +52,9 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://compro.io'),
+    'url' => env('APP_URL', 'http://ftsp.localhost'),
 
-    'asset_url' => env('ASSET_URL', 'http://compro.io/assets'),
+    'asset_url' => env('ASSET_URL', 'http://ftsp.localhost/assets'),
 
     /*
     |--------------------------------------------------------------------------

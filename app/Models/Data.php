@@ -56,7 +56,9 @@ class Data extends Model
         $arrStaff = array_combine(config('global.staff.code'), config('global.staff.desc'));
         $descStaff = array();
         foreach($staffs as $staff) {
-            $descStaff[] = $arrStaff[$staff['staff_id']];
+            if(isset($staff['staff_id']) && $staff['staff_id'] != 0) {
+                $descStaff[] = $arrStaff[$staff['staff_id']];
+            }
         }
 
         return implode(', ', $descStaff);
