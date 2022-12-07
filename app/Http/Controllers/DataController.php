@@ -6,9 +6,11 @@ use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Data;
 use App\Models\MapData;
+use App\Models\Offer;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -23,18 +25,30 @@ class DataController extends Controller
     protected $_readall = 'DARA';
     protected $_readid = 'DARD';
 
-    public function index() 
+    public function index($year = null)
     {
-        if(!$this->hasPrivilege($this->_readall)) {
+        if (!$this->hasPrivilege($this->_readall)) {
             return abort(404);
         }
 
-        return view('contents.data.index');
+        $currYear = date('Y');
+        if ($year) {
+            $plainYear = SecureHelper::unsecure($year);
+
+            if ($plainYear) {
+                $currYear = $plainYear;
+            }
+        }
+
+        $years = $this->getYears();
+        $division = $this->getDivisions();
+
+        return view('contents.data.index', ['divisionArr' =>  $division, 'yearArr' =>  $years, 'year' => $currYear, 'is_create' => $this->hasPrivilege($this->_create)]);
     }
 
     public function add()
     {
-        if(!$this->hasPrivilege($this->_create)) {
+        if (!$this->hasPrivilege($this->_create)) {
             return abort(404);
         }
 
@@ -47,29 +61,30 @@ class DataController extends Controller
 
     public function edit($id)
     {
-        if(!$this->hasPrivilege($this->_readid)) {
+        if (!$this->hasPrivilege($this->_readid)) {
             return abort(404);
         }
 
         $plainId = SecureHelper::unsecure($id);
 
-        if(!$plainId) {
+        if (!$plainId) {
             return abort(404);
         }
 
         $data = Data::find($plainId)->toArray();
-        
-        if(!$data) {
+
+        if (!$data) {
             return abort(404);
         }
-
-        if(!$this->hasPrivilege($this->_readid)) {
+        
+        if (!$this->hasPrivilege($this->_readid)) {
             $data = array('ma_id' => $data['ma_id']);
         }
 
         $year = $this->getYears();
         $division = $this->getDivisions();
         $staff = $this->getStaffs();
+        $staff = Arr::except($staff, 0);
 
         $view = ['yearArr' => $year, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('master.data.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'mandatory' => $this->hasPrivilege($this->_readid)];
 
@@ -78,25 +93,39 @@ class DataController extends Controller
 
     public function view($id)
     {
-        if(!$this->hasPrivilege($this->_readid)) {
+        if (!$this->hasPrivilege($this->_readid)) {
             return abort(404);
         }
 
         $plainId = SecureHelper::unsecure($id);
 
-        if(!$plainId) {
+        if (!$plainId) {
             return abort(404);
         }
 
         $data = Data::find($plainId)->toArray();
-        
-        if(!$data) {
+
+        if (!$data) {
             return abort(404);
         }
 
         $data['id'] = $id;
 
-        $this->writeAppLog($this->_readid, 'Data : '.$data['ma_id']);
+        $offer =  Offer::selectRaw('sum(amount) as amount')->where('ma_id', 'ma_id')->first()->toArray();
+        if ($offer) {
+            $used = $this->convertAmount($offer['amount'], true);
+        } else {
+            $used = 0;
+        }
+        $total = $this->convertAmount($data['amount'], true);
+        $remain = ($total - $used);
+        $percent = round(($used / $total) * 100, 2);
+
+        $data['used'] = $this->convertAmount($used);
+        $data['remain'] = $this->convertAmount($remain);
+        $data['percent'] = $percent . '%';
+
+        $this->writeAppLog($this->_readid, 'Data : ' . $data['ma_id']);
 
         return view('contents.data.view', $data);
     }
@@ -104,19 +133,73 @@ class DataController extends Controller
     public function getList(Request $request)
     {
         if ($request->ajax()) {
-            $data = Data::select(['id', 'ma_id', 'description', 'year', 'division_id', 'amount', 'updated_at'])->where('is_trash', 0)->orderBy('id');
+            $param = $request->input('id');
+
+            if (!isset($param)) {
+                $year = 0;
+                $division = 0;
+            } else {
+                $param = SecureHelper::unpack($param);
+
+                if (!is_array($param)) {
+                    $year = 0;
+                    $division = 0;
+                } else {
+                    $year = $param['year'];
+                    $division = $param['id'];
+                }
+            }
+
+            $offer =  Offer::groupBy('ma_id')->selectRaw('ma_id, sum(amount) as amount')->get()->toArray();
+            $offer = array_combine(array_column($offer, 'ma_id'), array_column($offer, 'amount'));
+
+            $data = Data::select(['id', 'ma_id', 'description', 'amount', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('id');
             $table = DataTables::eloquent($data);
-            $rawColumns = array('ma');
+            $rawColumns = array('ma', 'used', 'remain', 'percent');
             $table->addIndexColumn();
 
-            $table->addColumn('ma', function($row) {
-                if($this->hasPrivilege($this->_readid)) {
-                    $column = '<a href="'.route('master.data.view', ['id' => SecureHelper::secure($row->id)]).'">' . $row->ma_id . '</a>';
+            $table->addColumn('ma', function ($row) {
+                if ($this->hasPrivilege($this->_readid)) {
+                    $column = '<a href="' . route('master.data.view', ['id' => SecureHelper::secure($row->id)]) . '">' . $row->ma_id . '</a>';
                 } else {
                     $column = $row->ma_id();
                 }
 
                 return $column;
+            });
+
+            $table->addColumn('used', function ($row) {
+                if (isset($offer[$row->ma_id])) {
+                    $column = $offer[$row->ma_id];
+                } else {
+                    $column = '0';
+                }
+
+                return $column;
+            });
+
+            $table->addColumn('remain', function ($row) {
+                if (isset($offer[$row->ma_id])) {
+                    $used = $this->convertAmount($offer[$row->ma_id], true);
+                    $total = $this->convertAmount($row->amount, true);
+                    $column = ($total - $used);
+                } else {
+                    $column = $row->amount;
+                }
+
+                return $column;
+            });
+
+            $table->addColumn('percent', function ($row) {
+                if (isset($offer[$row->ma_id])) {
+                    $used = $this->convertAmount($offer[$row->ma_id], true);
+                    $total = $this->convertAmount($row->amount, true);
+                    $column = round(($used / $total) * 100, 2);
+                } else {
+                    $column = '0.00';
+                }
+
+                return $column . '%';
             });
 
             $table->rawColumns($rawColumns);
@@ -140,28 +223,28 @@ class DataController extends Controller
             }
         } else {
             $file = $request->file('file');
-            $filename = date('d_M_Y_H_i_s').'_'.$file->getClientOriginalName();
+            $filename = date('d_M_Y_H_i_s') . '_' . $file->getClientOriginalName();
             $descMonth = config('global.months');
 
             $today = Carbon::now();
             $year = $today->year;
             $month = $today->month;
-            $month = $month < 10 ? '0'.$month : $month;
+            $month = $month < 10 ? '0' . $month : $month;
 
-            $pathYear = public_path('upload').'/'.$year;
-            $pathMonth = public_path('upload').'/'.$year.'/'.$descMonth[$month];
+            $pathYear = public_path('upload') . '/' . $year;
+            $pathMonth = public_path('upload') . '/' . $year . '/' . $descMonth[$month];
 
-            if(!File::exists($pathYear)) {
+            if (!File::exists($pathYear)) {
                 File::makeDirectory($pathYear, 0777, true, true);
             }
 
-            if(!File::exists($pathMonth)) {
+            if (!File::exists($pathMonth)) {
                 File::makeDirectory($pathMonth, 0777, true, true);
             }
 
-            if($file->move($pathMonth,$filename)) {
+            if ($file->move($pathMonth, $filename)) {
                 $this->writeDataLog($filename);
-                $filepath = $pathMonth.'/'.$filename;
+                $filepath = $pathMonth . '/' . $filename;
 
                 $reader = ReaderEntityFactory::createXLSXReader();
                 $reader->open($filepath);
@@ -170,14 +253,14 @@ class DataController extends Controller
                 foreach ($reader->getSheetIterator() as $sheet) {
                     if ($sheet->getIndex() === 0) {
                         foreach ($sheet->getRowIterator() as $index => $row) {
-                            if($index == 1) {
-                                if($this->validateColumn($row->toArray(), $validator) === false) {
+                            if ($index == 1) {
+                                if ($this->validateColumn($row->toArray(), $validator) === false) {
                                     $error = true;
                                     break;
                                 }
                             } else {
                                 $collection = $this->collectColumn($row->toArray(), $validator);
-                                if($collection !== false) {
+                                if ($collection !== false) {
                                     $collections[] = $collection;
                                 }
                             }
@@ -186,12 +269,12 @@ class DataController extends Controller
                     }
                 }
 
-                if($error) {
+                if ($error) {
                     $response = new Response(false, 'Kolom Tabel Excel Tidak Sesuai Format');
                 } else {
                     $arrDivision = config('global.division.code');
                     $arrStaff = array_combine(config('global.staff.raw'), config('global.staff.code'));
-                    foreach($collections as $collection){
+                    foreach ($collections as $collection) {
                         $staff = Str::lower(str_replace(" ", "", $collection['staff']));
                         $division = Str::lower(str_replace(" ", "", $collection['division']));
                         $data = Data::create([
@@ -204,9 +287,9 @@ class DataController extends Controller
                             'created_by' => Auth::user()->username,
                             'updated_by' => Auth::user()->username,
                         ]);
-                        if($data->id) {
+                        if ($data->id) {
                             $arr = explode(',', $staff);
-                            foreach($arr as $value) {
+                            foreach ($arr as $value) {
                                 MapData::create([
                                     'data_id' => $data->id,
                                     'staff_id' => isset($arrStaff[$value]) ? $arrStaff[$value] : 0
@@ -215,10 +298,10 @@ class DataController extends Controller
                         }
                     }
 
-                    $response = new Response(true, __('Privilege group created successfuly'), 1);
+                    $response = new Response(true, __('File Uploaded successfuly'), 1);
                     $response->setRedirect(route('master.data.index'));
 
-                    $this->writeAppLog($this->_create, 'Upload File : '.$file->getClientOriginalName());
+                    $this->writeAppLog($this->_create, 'Upload File : ' . $file->getClientOriginalName());
                 }
             } else {
                 $response = new Response(false, 'Gagal Mengunggah File Ke Server');
@@ -228,15 +311,129 @@ class DataController extends Controller
         return response()->json($response->responseJson());
     }
 
-    private function collectColumn($row) 
+    public function post(Request $request, $action, $id)
+    {
+        if(!in_array($action, config('global.action.form'))) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        if($action === config('global.action.form.edit')) {
+            $param = SecureHelper::unpack($request->input('json'));
+
+            if (!is_array($param)) {
+                $response = new Response();
+                return response()->json($response->responseJson());
+            }
+
+            if(!$this->hasPrivilege($this->_update)) {
+                $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
+                return response()->json($response->responseJson());
+            }
+
+            $plainId = SecureHelper::unsecure($id);
+
+            if(!$plainId) {
+                $response = new Response();
+                return response()->json($response->responseJson());
+            }
+
+            if(!$this->hasPrivilege($this->_readid)) {
+                $data = Data::find($plainId);
+
+                if(isset($param['year']) && $param['year'] != '') $data->year = $param['year'];
+                if(isset($param['description']) && $param['description'] != '') $data->description = $param['description'];
+                if(isset($param['division_id']) && $param['division_id'] != '') $data->division_id = $param['division_id'];
+                if(!is_array($param['staff_id'])) $param['staff_id'] = array($param['staff_id']);
+                $data->updated_by = Auth::user()->username;
+
+                if($data->save()) {
+                    $map = MapData::where('data_id', $plainId);
+                    $map->forceDelete();
+                    foreach($param['staff_id'] as $value) {
+                        MapData::create([
+                            'data_id' => $plainId,
+                            'staff_id' => $value
+                        ]);
+                    }
+
+                    $response = new Response(true, __('Data updated successfuly'), 1);
+                    $response->setRedirect(route('master.data.index'));
+
+                    $this->writeAppLog($this->_update, 'Data : '.$param['ma_id']);
+                } else {
+                    $response = new Response(false, __('Data update failed. Please try again'));
+                }
+            } else {
+                $data = Data::find($plainId);
+                $data->year = $param['year'];
+                $data->description = $param['description'];
+                $data->division_id = $param['division_id'];
+                $data->updated_by = Auth::user()->username;
+
+                if(!is_array($param['staff_id'])) $param['staff_id'] = array($param['staff_id']);
+
+                if($data->save()) {
+                    $map = MapData::where('data_id', $plainId);
+                    $map->forceDelete();
+                    foreach($param['staff_id'] as $value) {
+                        MapData::create([
+                            'data_id' => $plainId,
+                            'staff_id' => $value
+                        ]);
+                    }
+                    
+                    $response = new Response(true, __('Data updated successfuly'), 1);
+                    $response->setRedirect(route('master.data.index'));
+
+                    $this->writeAppLog($this->_update, 'Data : '.$param['ma_id']);
+                } else {
+                    $response = new Response(false, __('Data update failed. Please try again'));
+                }
+            }
+
+        }
+
+        if($action === config('global.action.form.delete')) {
+
+
+            if(!$this->hasPrivilege($this->_delete)) {
+                $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
+                return response()->json($response->responseJson());
+            }
+
+            $plainId = SecureHelper::unsecure($id);
+
+            if(!$plainId) {
+                $response = new Response();
+                return response()->json($response->responseJson());
+            }
+
+            $data = Data::find($plainId);
+            $data->is_trash = 1;
+
+            if($data->save()) {
+                $response = new Response(true, __('Data deleted successfuly'), 1);
+                $response->setRedirect(route('master.data.index'));
+
+                $this->writeAppLog($this->_delete, 'Data Account : '.$data->ma_id);
+            } else {
+                $response = new Response(false, __('Account delete failed. Please try again'));
+            }
+        }
+
+        return response()->json($response->responseJson());
+    }
+
+    private function collectColumn($row)
     {
         $validator = config('global.validation');
         $collection = array();
         $index = 0;
-        foreach($validator['columns'] as $key => $column) {
+        foreach ($validator['columns'] as $key => $column) {
             $string = preg_replace($validator['regex'][$key], '', strval($row[$index]));
             $string = substr($string, 0, $validator['limitter'][$key]);
-            if($string == '') {
+            if ($string == '') {
                 return false;
             }
             $collection[$key] = $string;
@@ -250,8 +447,8 @@ class DataController extends Controller
     {
         $validator = array_values(config('global.validation.columns'));
         $valid = true;
-        foreach($validator as $key => $value) {
-            if(Str::upper($header[$key]) != Str::upper($value)) {
+        foreach ($validator as $key => $value) {
+            if (Str::upper($header[$key]) != Str::upper($value)) {
                 $valid = false;
                 break;
             }

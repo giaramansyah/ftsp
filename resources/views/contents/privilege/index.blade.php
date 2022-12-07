@@ -1,12 +1,14 @@
 @extends('layouts/main')
-@section('title', 'Privilege')
+@section('title', $header)
 @section('content')
 <div class="container-fluid">
   <div class="card">
     <div class="card-header">
+      @if($is_create)
       <div class="card-tools">
         @include('partials.button.add', ['action' => route('settings.privilege.add')])
       </div>
+      @endif
     </div>
     <div class="card-body">
       <table class="table table-striped table-sm table-data" width="100%">

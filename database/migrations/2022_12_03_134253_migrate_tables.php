@@ -132,6 +132,32 @@ class MigrateTables extends Migration
                 $table->timestamps();
             });
         }
+
+        if (!Schema::hasTable('ts_offer')) {
+            Schema::create('ts_offer', function (Blueprint $table) {
+                $table->id();
+                $table->string('offer_no', 15)->nullable(false);
+                $table->string('letter_no', 15)->nullable(false);
+                $table->date('date_offer')->nullable(false);
+                $table->date('date_letter')->nullable(false);
+                $table->date('date_apply')->nullable(false);
+                $table->string('ma_id', 20)->nullable(false);
+                $table->string('changed_ma_id', 20)->nullable(false);
+                $table->tinyInteger('type_id')->nullable(false);
+                $table->string('name', 50)->nullable(false);
+                $table->bigInteger('staff_id')->nullable(false);
+                $table->string('description', 100)->nullable(false);
+                $table->string('subdescription', 200)->nullable(true);
+                $table->bigInteger('amount')->nullable(false);
+                $table->string('text_amount', 150)->nullable(false);
+                $table->string('account_number', 20)->nullable(false);
+                $table->string('file_responsibility', 50)->nullable(true);
+                $table->string('file_acceptence', 50)->nullable(true);
+                $table->string('created_by', 100)->nullable(false);
+                $table->string('updated_by', 100)->nullable(false);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -151,5 +177,6 @@ class MigrateTables extends Migration
         Schema::dropIfExists('ms_data');
         Schema::dropIfExists('map_data');
         Schema::dropIfExists('log_data');
+        Schema::dropIfExists('ts_offer');
     }
 }

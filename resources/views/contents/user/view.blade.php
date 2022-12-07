@@ -1,5 +1,5 @@
 @extends('layouts/main')
-@section('title', 'User')
+@section('title', $header)
 @section('content')
 <div class="container-fluid">
   <div class="row">
@@ -13,33 +13,29 @@
           <p class="text-muted text-center">{{ $username }}</p>
           <ul class="list-group list-group-unbordered mb-3">
             <li class="list-group-item">
-              <b>{{ __('Email') }}</b>
+              <b>Email</b>
               <p class="float-right mb-0">{{ $email }}</p>
             </li>
             <li class="list-group-item">
-              <b>{{ __('Divsion') }}</b>
+              <b>Unit</b>
               <p class="float-right mb-0">{{ $division }}</p>
             </li>
             <li class="list-group-item">
-              <b>{{ __('Staff') }}</b>
+              <b>PIC</b>
               <p class="float-right mb-0">{{ $staff }}</p>
             </li>
             <li class="list-group-item">
-              <b>{{ __('Linked Account') }}</b>
+              <b>Akun Terhubung</b>
               <p class="float-right mb-0">
                 @if ($is_login)
-                  <i class="fas fa-check-circle text-success"></i> {{ __('Linked') }}
+                <i class="fas fa-check-circle text-success"></i> {{ __('Linked') }}
                 @else
-                  <i class="fas fa-times-circle text-danger"></i> {{ __('Unlinked') }}
+                <i class="fas fa-times-circle text-danger"></i> {{ __('Unlinked') }}
                 @endif
               </p>
             </li>
             <li class="list-group-item">
-              <b>{{ __('Created By') }}</b>
-              <p class="float-right mb-0">{{ $created_by }} On {{ $created_at }}</p>
-            </li>
-            <li class="list-group-item">
-              <b>{{ __('Last Updated') }}</b>
+              <b>Tgl. Diubah</b>
               <p class="float-right mb-0">{{ $updated_by }} On {{ $updated_at }}</p>
             </li>
           </ul>
@@ -49,16 +45,23 @@
             <div class="col-auto">
               @include('partials.button.back', array('class' => 'btn-sm', 'action' => route('settings.user.index')))
             </div>
+            @if($is_update)
             <div class="col-auto">
-              @include('partials.button.edit', array('class' => 'btn-sm', 'action' => route('settings.user.edit', ['id' => $id])))
+              @include('partials.button.edit', array('class' => 'btn-sm', 'action' => route('settings.user.edit', ['id'
+              => $id])))
             </div>
+            @endif
+            @if($is_delete)
             <div class="col-auto">
-              @include('partials.button.delete', array('class' => 'btn-sm', 'action' => route('settings.user.post', ['action' => config('global.action.form.delete'), 'id' => $id])))
+              @include('partials.button.delete', array('class' => 'btn-sm', 'source' => 'database', 'action' => route('settings.user.post',
+              ['action' => config('global.action.form.delete'), 'id' => $id])))
             </div>
-            @if($is_login)
-              <div class="col-auto">
-                @include('partials.button.forcelogout', array('class' => 'btn-sm', 'action' => route('settings.user.post', ['action' => 'force_logout', 'id' => $id])))
-              </div>
+            @endif
+            @if($is_login && $is_update)
+            <div class="col-auto">
+              @include('partials.button.forcelogout', array('class' => 'btn-sm', 'action' => route('settings.user.post',
+              ['action' => 'force_logout', 'id' => $id])))
+            </div>
             @endif
           </div>
         </div>
@@ -83,23 +86,23 @@
               <tr>
                 <th class="text-center">{{ __('Modules') }}</th>
                 @foreach ($modulesArr as $value)
-                  <th class="text-center">{{ __($value) }}</th>
+                <th class="text-center">{{ __($value) }}</th>
                 @endforeach
               </tr>
             </thead>
             <tbody>
-              @foreach ($privilegeArr as $key => $value) 
-                  <tr>
-                    <td>{{ __($value['label']) }}</td>
-                    @foreach ($value['privileges'] as $index => $val)
-                      <td class="text-center">
-                        @if(isset($val['id']) && in_array($val['id'], $privileges))
-                          <i class="fas fa-check-circle text-success"></i>
-                        @endif
-                      </td>
-                    @endforeach
-                  </tr>
+              @foreach ($privilegeArr as $key => $value)
+              <tr>
+                <td>{{ __($value['label']) }}</td>
+                @foreach ($value['privileges'] as $index => $val)
+                <td class="text-center">
+                  @if(isset($val['id']) && in_array($val['id'], $privileges))
+                  <i class="fas fa-check-circle text-success"></i>
+                  @endif
+                </td>
                 @endforeach
+              </tr>
+              @endforeach
             </tbody>
           </table>
         </div>
@@ -129,20 +132,11 @@
     </div>
   </div>
 </div>
-@endsection
-@section('push-css')
-  <!-- DataTables -->
-  <link rel="stylesheet" href="{{asset('plugins')}}/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="{{asset('plugins')}}/datatables-responsive/css/responsive.bootstrap4.min.css">
+@include('partials.modal.modaldelete')
 @endsection
 @section('push-js')
-  <!-- DataTables -->
-  <script src="{{asset('plugins')}}/datatables/jquery.dataTables.min.js"></script>
-  <script src="{{asset('plugins')}}/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-  <script src="{{asset('plugins')}}/datatables-responsive/js/dataTables.responsive.min.js"></script>
-  <script src="{{asset('plugins')}}/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-  <script type="text/javascript">
-    $('.table-data').DataTable(
+<script type="text/javascript">
+  $('.table-data').DataTable(
         {
             responsive: true,
             autoWidth: true,
@@ -158,5 +152,5 @@
             ],
         }
     );
-  </script>
+</script>
 @endsection

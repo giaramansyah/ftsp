@@ -69,14 +69,14 @@ return [
             'driver' => 'local',
             'root' => storage_path('app/public/upload'),
             'url' => env('APP_URL').'/public/upload',
-            'visibility' => 'public',
+            'visibility' => 'private',
         ],
 
         'download' => [
             'driver' => 'local',
             'root' => storage_path('app/public/download'),
             'url' => env('APP_URL').'/public/download',
-            'visibility' => 'public',
+            'visibility' => 'private',
         ],
 
     ],

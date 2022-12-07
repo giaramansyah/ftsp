@@ -1,5 +1,5 @@
 @extends('layouts/main')
-@section('title', 'Privigroup')
+@section('title', $header)
 @section('content')
 <div class="container-fluid">
   <div class="card">
@@ -7,19 +7,19 @@
       <div class="card-body">
         <div class="alert hidden" role="alert"></div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Group Name') }}<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Nama Grup<code>*</code></label>
           <div class="col-sm-2">
             <input type="text" class="form-control form-control-sm text-uppercase" maxlength="20" name="name" value="{{ isset($name) ? $name : '' }}" required>
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Description') }}</label>
+          <label class="col-sm-2 col-form-label">Keterangan</label>
           <div class="col-sm-6">
             <input type="text" class="form-control form-control-sm" maxlength="100" name="description" value="{{ isset($description) ? $description : '' }}">
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Privilege') }}<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Hak Akses<code>*</code></label>
           <div class="col-sm-9">
             <table class="table table-sm" width="100%">
               <thead>
@@ -55,7 +55,7 @@
         <div class="form-button">
           <div class="row justify-content-center">
             <div class="col-sm-1">
-              @include('partials.button.back', ['class' => 'btn-sm', 'action' => route('settings.privigroup.index')])
+              @include('partials.button.back', ['class' => 'btn-sm btn-block', 'action' => route('settings.privigroup.index')])
             </div>
             <div class="col-sm-1">
               @include('partials.button.submit')

@@ -33,56 +33,40 @@ class Authenticate extends Middleware
 
         $currentRoute = Route::currentRouteName();
 
-        $aliases = explode('.', $currentRoute);
-
-        $header = Str::ucfirst($aliases[0]);
         $appender = '';
+        $header = Str::ucfirst(config('global.home'));
         $breadcrumb = array(
-            array('label' => Str::ucfirst($aliases[0]), 'active' => true), 
+            array('label' => Str::ucfirst(config('global.home')), 'active' => true), 
         );
 
-        if(count($aliases) > 1) {
-            $header = Str::ucfirst($aliases[1]);
-            $appender = '';
-            $breadcrumb = array(
-                array('label' => Str::ucfirst($aliases[0]), 'active' => false), 
-                array('label' => Str::ucfirst($aliases[1]), 'active' => true), 
-            );
-
-            if(in_array('add', $aliases)) {
-                $appender = 'Add New';
-                $breadcrumb[1]['active'] = false;
-                $breadcrumb[] = array('label' => $appender, 'active' => true);
-            }
-
-            if(in_array('edit', $aliases)) {
-                $appender = 'Edit';
-                $breadcrumb[1]['active'] = false;
-                $breadcrumb[] = array('label' => $appender, 'active' => true);
-            }
-            
-            if(in_array('view', $aliases)) {
-                $appender = 'Detail';
-                $breadcrumb[1]['active'] = false;
-                $breadcrumb[] = array('label' => $appender, 'active' => true);
-            }
-        }
+        $aliases = explode('.', $currentRoute);
 
         $group = PrivilegeGroup::find(Auth::user()->privilege_group_id)->privileges()->get()->toArray();
         $group = array_column($group, 'menu_id');
         $menus = ParentMenu::where('is_active', 1)->orderBy('order', 'asc')->get()->toArray();
-        $aliases = explode('.', Route::currentRouteName());
         $side_nav = array();
         foreach($menus as $value) {
             foreach($value['menu'] as $val) {
                 if(in_array($val['id'], $group)) {
                     if(!array_key_exists($value['alias'], $side_nav)) {
+                        $active = count($aliases) > 0 && Str::is($aliases[0], $value['alias']);
+
                         $side_nav[$value['alias']] = array(
                             'label' => $value['label'],
                             'alias' => $value['alias'],
                             'icon' => $value['icon'],
-                            'active' => count($aliases) > 0 && Str::is($aliases[0], $value['alias']),
+                            'active' => $active,
                             'menus' => array()
+                        );
+                    }
+
+                    $active = count($aliases) > 1 && Str::is($aliases[1], $val['alias']);
+
+                    if($active) {
+                        $header = $val['label'];
+                        $breadcrumb = array(
+                            array('label' => $value['label'], 'active' => false), 
+                            array('label' => $val['label'], 'active' => true), 
                         );
                     }
 
@@ -90,11 +74,31 @@ class Authenticate extends Middleware
                         'label' => $val['label'],
                         'alias' => $val['label'],
                         'url' => $val['url'],
-                        'active' => count($aliases) > 1 && Str::is($aliases[1], $val['alias']),
+                        'active' => $active,
                     );
                 }
             }
         }
+
+        if(in_array('add', $aliases)) {
+            $appender = 'Tambah Baru';
+            $breadcrumb[1]['active'] = false;
+            $breadcrumb[] = array('label' => $appender, 'active' => true);
+        }
+
+        if(in_array('edit', $aliases)) {
+            $appender = 'Ubah';
+            $breadcrumb[1]['active'] = false;
+            $breadcrumb[] = array('label' => $appender, 'active' => true);
+        }
+        
+        if(in_array('view', $aliases)) {
+            $appender = 'Detil';
+            $breadcrumb[1]['active'] = false;
+            $breadcrumb[] = array('label' => $appender, 'active' => true);
+        }
+
+        
 
         View::share('header', $header);
         View::share('appender', $appender);

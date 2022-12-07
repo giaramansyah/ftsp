@@ -71,3 +71,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td.child,table.dataTable.dtr-inlin
     border-bottom: 1px solid #dee2e6;
     white-space: nowrap !important;
 }
+
+.table th {
+    text-transform: uppercase !important;
+}

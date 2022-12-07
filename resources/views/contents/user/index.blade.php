@@ -1,23 +1,25 @@
 @extends('layouts/main')
-@section('title', 'User')
+@section('title', $header)
 @section('content')
 <div class="container-fluid">
   <div class="card">
     <div class="card-header">
+      @if($is_create)
       <div class="card-tools">
         @include('partials.button.add', ['action' => route('settings.user.add')])
       </div>
+      @endif
     </div>
     <div class="card-body">
       <table class="table table-striped table-sm table-data" width="100%">
         <thead>
           <tr>
-            <th>{{ __('No') }}</th>
-            <th>{{ __('Account') }}</th>
-            <th>{{ __('Email') }}</th>
-            <th>{{ __('Linked Account') }}</th>
-            <th>{{ __('Updated') }}</th>
-            <th>{{ __('Action') }}</th>
+            <th>No</th>
+            <th>Akun</th>
+            <th>Email</th>
+            <th>Akun Terhubung</th>
+            <th>Tgl. Diubah</th>
+            <th>Opsi</th>
           </tr>
         </thead>
         <tbody>
@@ -30,8 +32,8 @@
 @include('partials.modal.modalforcelogout')
 @endsection
 @section('push-js')
-  <script type="text/javascript">
-    $('.table-data').DataTable(
+<script type="text/javascript">
+  $('.table-data').DataTable(
         {
             responsive: true,
             autoWidth: true,
@@ -53,5 +55,5 @@
             }
         }
     );
-  </script>
+</script>
 @endsection

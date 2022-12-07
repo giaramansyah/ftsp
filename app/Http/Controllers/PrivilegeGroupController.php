@@ -28,7 +28,7 @@ class PrivilegeGroupController extends Controller
             return abort(404);
         }
 
-        return view('contents.privigroup.index');
+        return view('contents.privigroup.index', ['is_create' => $this->hasPrivilege($this->_create)]);
     }
 
     public function add()
@@ -46,15 +46,14 @@ class PrivilegeGroupController extends Controller
                 continue;
             }
 
+            $items = array_map(function($val) { array(); }, $modules);
             $privilege = Privilege::select(['id','code', 'modules'])->where('menu_id', $value['id'])->orderBy('modules')->get()->toArray();
-            if(count($privilege) < count($modules)) {
-                $diff = count($privilege);
-                while($diff < count($modules)) {
-                    $privilege[] = array();
-                    $diff++;
-                }
+            
+            foreach($privilege as $value) {
+                $items[$value['modules']] = $value;
             }
-            $menu[$key]['privileges'] = $privilege;
+
+            $menu[$key]['privileges'] = $items;
         }
 
         $view = ['modulesArr' => $modules, 'privilegeArr' => $menu, 'action' => route('settings.privigroup.post', ['action' => config('global.action.form.add'), 'id' => 0 ])];
@@ -117,7 +116,7 @@ class PrivilegeGroupController extends Controller
                     }
 
                     if($this->hasPrivilege($this->_delete)) {
-                        $param = array('class' => 'btn-xs', 'action' => route('settings.privigroup.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
+                        $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.privigroup.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
                         $column .= view('partials.button.delete', $param)->render();
                     }
 

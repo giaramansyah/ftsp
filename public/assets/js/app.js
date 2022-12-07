@@ -349,13 +349,24 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
                 Defaults,
                 settings
             );
-            this._appender = [
+            this._toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+            });
+        }
+
+        var _proto = PostForm.prototype;
+
+        _proto._generate = function _generate() {
+            var _appender = [
                 [0, 0, 1, 1, 0, 0, 0, 0],
                 [0, 1, 1, 1, 1, 0, 0, 0],
                 [0, 0, 1, 1, 0, 0, 0, 0],
                 [0, 0, 1, 1, 0, 0, 0, 0],
             ];
-            this._secret = [
+            var _secret = [
                 ["7", "5", "31"],
                 ["7", "1", "27"],
                 ["7", "5", "34"],
@@ -408,31 +419,21 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
                 ["6", "6", "42"],
                 ["5", "1", "40"],
             ];
-            this._toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-            });
-        }
 
-        var _proto = PostForm.prototype;
-
-        _proto._generate = function _generate() {
-            var append = this._appender
+            var append =_appender
                 .map((char) => {
                     var elem = char.join("");
                     return String.fromCharCode(parseInt(elem, 2));
                 })
                 .join("");
             var arr = [];
-            for (var i = 0; i < this._secret.length; i++) {
-                var j = parseInt(this._secret[i].at(2));
-                this._secret[i].pop();
-                arr[j] = append + this._secret[i].join("");
-                arr[j] = String.fromCharCode(parseInt(arr[j], '16'));
+            for (var i = 0; i < _secret.length; i++) {
+                var j = parseInt( _secret[i].at(2));
+                _secret[i].pop();
+                arr[j] = append + _secret[i].join("");
+                arr[j] = String.fromCharCode(parseInt(arr[j], "16"));
             }
-            
+
             return arr.join("").substring(7);
         };
 
@@ -593,21 +594,25 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
                                 .find("p.text-center")
                                 .removeClass("text-info");
                             if (response.status) {
-                                $_default["default"](_this._element)
-                                    .find(FORM_LOADING)
-                                    .hide();
-                                $_default["default"](_this._element)
-                                    .find(FORM_BUTTON)
-                                    .show();
-                                $_default["default"](_this._element)
-                                    .find("input,select")
-                                    .val("");
-                                $_default["default"](_this._element)
-                                    .find("input,select")
-                                    .trigger("change");
-                                $_default["default"](_this._element)
-                                    .find(".custom-file-label")
-                                    .text("");
+                                if (response.redirect.length) {
+                                    window.location.href = response.redirect;
+                                } else {
+                                    $_default["default"](_this._element)
+                                        .find(FORM_LOADING)
+                                        .hide();
+                                    $_default["default"](_this._element)
+                                        .find(FORM_BUTTON)
+                                        .show();
+                                    $_default["default"](_this._element)
+                                        .find("input,select")
+                                        .val("");
+                                    $_default["default"](_this._element)
+                                        .find("input,select")
+                                        .trigger("change");
+                                    $_default["default"](_this._element)
+                                        .find(".custom-file-label")
+                                        .text("");
+                                }
                             } else {
                                 $_default["default"](_this._element)
                                     .find(FORM_LOADING)
@@ -658,6 +663,12 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
                     $_default["default"](element).removeClass(ERR_SPAN_CLASS);
                 },
                 submitHandler: function () {
+                    if ($_default["default"](_this2._element).data(DATA_ACTION) !== "undefined") {
+                        _this2._settings.action = $_default["default"](_this2._element).data(DATA_ACTION);
+                    } else {
+                        _this2._settings.action = $_default["default"](location).attr("href");
+                    }
+
                     if (_this2._settings.method === Static.post) {
                         _this2._settings.json = _this2._serializeObject();
                         _this2._ajaxFrom();
@@ -710,21 +721,12 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
             _this2._element.validate(options);
         };
 
-        $_default['default'].validator.addMethod("alphanum", function(value) {
-            return /[a-zA-Z]/.test(value) && /\d/.test(value)
+        $_default["default"].validator.addMethod("alphanum", function (value) {
+            return /[a-zA-Z]/.test(value) && /\d/.test(value);
         });
 
         PostForm._jQueryInterface = function _jQueryInterface() {
             var options = {};
-
-            if (
-                $_default["default"](this).data(DATA_ACTION) !==
-                "undefined"
-            ) {
-                options.action = $_default["default"](this).data(DATA_ACTION);
-            } else {
-                options.action = $_default["default"](location).attr("href");
-            }
 
             if (
                 typeof $_default["default"](this).data(DATA_METHOD) !==
@@ -827,6 +829,7 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
         download : "download",
         modal : "modal",
         table : "table",
+        database : "database",
         form : "form"
     };
 
@@ -857,6 +860,10 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
 
             if(this._settings.intent == null) {
                 this._settings.intent = this.createModal();
+            }
+
+            if(this._settings.dial === Static.form) {
+                $_default['default'](this._settings.intent).find(this._settings.dial).data(DATA_ACTION, this._settings.action)
             }
 
             $_default["default"](this._settings.intent).find(".modal-body").html(data);
@@ -907,6 +914,8 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
 
             if(this._settings.source == Static.table) {
                 data = this.tableData();
+            } else if(this._settings.source == Static.database) {
+                data = this.baseData();
             } else {
                 throw new Error(
                     "Data source not supported. supported data source [table, database]."
@@ -936,6 +945,13 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
 
             return _rows;
         };
+
+        _proto.baseData = function baseData() {
+            var _card = this._element.closest("div.card");
+            var _body = _card.find('.card-body').clone();
+
+            return _body;
+        }
 
 
         _proto._init = function _init() {
@@ -1013,3 +1029,49 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
     exports.ButtonAction = ButtonAction;
     Object.defineProperty(exports, "__esModule", { value: true });
 });
+
+function preventAlpha(event) {
+    var regex = new RegExp("^[a-zA-Z]+$");
+    var str = String.fromCharCode(
+        !event.charCode ? event.which : event.charCode
+    );
+    if (!regex.test(str)) {
+        return true;
+    }
+
+    event.preventDefault();
+    return false;
+}
+
+function numberFormat(element, currency = false, decimal = false) {
+    $(element).val(function (index, value) {
+        value = value.replace(/[^0-9\.]/g, "");
+        if (decimal) {
+            if (value.length > 0) {
+                var split = value.split(".");
+                if (split.length > 1) {
+                    value = parseFloat(value).toFixed(2);
+                } else {
+                    value += ".00";
+                }
+            } else {
+                value = "0.00";
+            }
+        }
+        if (currency) {
+            var split = value.split(".");
+            value = split[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+            if (split.length > 1) {
+                value += "." + split[1];
+            }
+        }
+        return value;
+    });
+
+    return element;
+}
+
+function formatCurrency(value) {
+    value += ""
+    return value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+}

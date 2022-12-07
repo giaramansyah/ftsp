@@ -8,6 +8,7 @@ use App\Http\Controllers\PrivilegeController;
 use App\Http\Controllers\PrivilegeGroupController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\OfferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,11 +61,19 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/logs/activity/list/{id}', [LogsController::class, 'getUser'])->name('logs.activity.user');
     
     //data
-    Route::get('/data', [DataController::class, 'index'])->name('master.data.index');
+    Route::get('/data/anggaran/{year?}', [DataController::class, 'index'])->name('master.data.index');
     Route::get('/data/list', [DataController::class, 'getList'])->name('master.data.list');
     Route::get('/data/view/{id}', [DataController::class, 'view'])->name('master.data.view');
     Route::get('/data/add', [DataController::class, 'add'])->name('master.data.add');
     Route::get('/data/edit/{id}', [DataController::class, 'edit'])->name('master.data.edit');
     Route::post('/data/upload', [DataController::class, 'upload'])->name('master.data.upload');
     Route::post('/data/post/{action}/{id}', [DataController::class, 'post'])->name('master.data.post');
+
+    //offer
+    Route::get('/offer/anggaran/{year?}', [OfferController::class, 'index'])->name('transaction.offer.index');
+    Route::get('/offer/list', [OfferController::class, 'getList'])->name('transaction.offer.list');
+    // Route::get('/data/view/{id}', [OfferController::class, 'view'])->name('master.data.view');
+    Route::get('/offer/add', [OfferController::class, 'add'])->name('transaction.offer.add');
+    Route::get('/offer/edit/{id}', [OfferController::class, 'edit'])->name('transaction.offer.edit');
+    // Route::post('/data/post/{action}/{id}', [DataController::class, 'post'])->name('master.data.post');
 });

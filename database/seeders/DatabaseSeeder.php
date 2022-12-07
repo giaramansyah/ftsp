@@ -44,36 +44,36 @@ class DatabaseSeeder extends Seeder
                 'order' => 1,
                 'child' => array(
                     array(
-                        'label' => 'Data',
-                        'alias' => 'dara',
+                        'label' => 'Rencana Anggaran',
+                        'alias' => 'data',
                         'url' => 'master.data.index',
                         'order' => 1,
                     )
                 )
             ),
             array(
-                'label' => 'Settings',
+                'label' => 'Pengaturan',
                 'alias' => 'settings',
                 'icon' => 'fa-cog',
-                'order' => 2,
+                'order' => 3,
                 'child' => array(
                     array(
-                        'label' => 'Privilege',
+                        'label' => 'Hak Akses',
                         'alias' => 'privilege',
                         'url' => 'settings.privilege.index',
-                        'order' => 4,
+                        'order' => 3,
                     ),
                     array(
-                        'label' => 'Privilege Group',
+                        'label' => 'Grup Akses',
                         'alias' => 'privigroup',
                         'url' => 'settings.privigroup.index',
-                        'order' => 2,
+                        'order' => 1,
                     ),
                     array(
-                        'label' => 'User',
+                        'label' => 'Akun',
                         'alias' => 'user',
                         'url' => 'settings.user.index',
-                        'order' => 3,
+                        'order' => 2,
                     )
                 )
             ),
@@ -81,12 +81,26 @@ class DatabaseSeeder extends Seeder
                 'label' => 'Logs',
                 'alias' => 'logs',
                 'icon' => 'fa-keyboard',
-                'order' => 3,
+                'order' => 4,
                 'child' => array(
                     array(
-                        'label' => 'User Activity',
+                        'label' => 'Aktivitas Akun',
                         'alias' => 'activity',
                         'url' => 'logs.activity.index',
+                        'order' => 1,
+                    )
+                )
+            ),
+            array(
+                'label' => 'Transaksi',
+                'alias' => 'transaction',
+                'icon' => 'fa-book',
+                'order' => 2,
+                'child' => array(
+                    array(
+                        'label' => 'Pengajuan Anggaran',
+                        'alias' => 'offer',
+                        'url' => 'transaction.offer.index',
                         'order' => 1,
                     )
                 )
@@ -94,22 +108,53 @@ class DatabaseSeeder extends Seeder
         );
 
         $privilege = array(
+            //rencana anggaran
+            array(
+                'code' => 'DACR',
+                'menu_id' => 1,
+                'modules' => Config::get('global.modules.code.create'),
+                'desc' => 'Add new master data'
+            ),
+            array(
+                'code' => 'DAUP',
+                'menu_id' => 1,
+                'modules' => Config::get('global.modules.code.update'),
+                'desc' => 'Update existing master data'
+            ),
+            array(
+                'code' => 'DARM',
+                'menu_id' => 1,
+                'modules' => Config::get('global.modules.code.delete'),
+                'desc' => 'Remove existing master data'
+            ),
+            array(
+                'code' => 'DARA',
+                'menu_id' => 1,
+                'modules' => Config::get('global.modules.code.readall'),
+                'desc' => 'Read list of master data'
+            ),
+            array(
+                'code' => 'DARD',
+                'menu_id' => 1,
+                'modules' => Config::get('global.modules.code.readid'),
+                'desc' => 'Read detail of master data'
+            ),
             //privilege
             array(
                 'code' => 'PRCR',
-                'menu_id' => 1,
+                'menu_id' => 2,
                 'modules' => Config::get('global.modules.code.create'),
                 'desc' => 'Add new privilege data'
             ),
             array(
                 'code' => 'PRUP',
-                'menu_id' => 1,
+                'menu_id' => 2,
                 'modules' => Config::get('global.modules.code.update'),
                 'desc' => 'Update existing privilege data'
             ),
             array(
                 'code' => 'PRRM',
-                'menu_id' => 1,
+                'menu_id' => 2,
                 'modules' => Config::get('global.modules.code.delete'),
                 'desc' => 'Remove existing privilege data'
             ),
@@ -122,96 +167,90 @@ class DatabaseSeeder extends Seeder
             //privilege group
             array(
                 'code' => 'PGCR',
-                'menu_id' => 1,
+                'menu_id' => 3,
                 'modules' => Config::get('global.modules.code.create'),
                 'desc' => 'Add new privilege group data'
             ),
             array(
                 'code' => 'PGUP',
-                'menu_id' => 2,
+                'menu_id' => 3,
                 'modules' => Config::get('global.modules.code.update'),
                 'desc' => 'Update existing privilege group data'
             ),
             array(
                 'code' => 'PGRM',
-                'menu_id' => 2,
+                'menu_id' => 3,
                 'modules' => Config::get('global.modules.code.delete'),
                 'desc' => 'Remove existing privilege group data'
             ),
             array(
                 'code' => 'PGRA',
-                'menu_id' => 2,
+                'menu_id' => 3,
                 'modules' => Config::get('global.modules.code.readall'),
                 'desc' => 'Read list of privilege group data'
             ),
             //user account
             array(
                 'code' => 'USCR',
-                'menu_id' => 3,
+                'menu_id' => 4,
                 'modules' => Config::get('global.modules.code.create'),
                 'desc' => 'Add new user account data'
             ),
             array(
                 'code' => 'USUP',
-                'menu_id' => 3,
+                'menu_id' => 4,
                 'modules' => Config::get('global.modules.code.update'),
                 'desc' => 'Update existing user account data'
             ),
             array(
                 'code' => 'USRM',
-                'menu_id' => 3,
+                'menu_id' => 4,
                 'modules' => Config::get('global.modules.code.delete'),
                 'desc' => 'Remove existing user account data'
             ),
             array(
                 'code' => 'USRA',
-                'menu_id' => 3,
+                'menu_id' => 4,
                 'modules' => Config::get('global.modules.code.readall'),
                 'desc' => 'Read list of user account data'
             ),
             array(
                 'code' => 'USRD',
-                'menu_id' => 3,
+                'menu_id' => 4,
                 'modules' => Config::get('global.modules.code.readid'),
                 'desc' => 'Read detail of user account data'
             ),
             //user log
             array(
                 'code' => 'LURA',
-                'menu_id' => 4,
+                'menu_id' => 5,
                 'modules' => Config::get('global.modules.code.readall'),
                 'desc' => 'Read list of user activity data'
             ),
-            //Master Data
+            //pengajuan anggaran
             array(
-                'code' => 'DACR',
-                'menu_id' => 5,
+                'code' => 'TRCR',
+                'menu_id' => 6,
                 'modules' => Config::get('global.modules.code.create'),
-                'desc' => 'Add new master data'
+                'desc' => 'Add new transaction data'
             ),
             array(
-                'code' => 'DAUP',
-                'menu_id' => 5,
+                'code' => 'TRUP',
+                'menu_id' => 6,
                 'modules' => Config::get('global.modules.code.update'),
-                'desc' => 'Update existing master data'
+                'desc' => 'Update existing transaction data'
             ),
             array(
-                'code' => 'DARM',
-                'menu_id' => 5,
-                'modules' => Config::get('global.modules.code.delete'),
-                'desc' => 'Remove existing master data'
-            ),
-            array(
-                'code' => 'DARA',
-                'menu_id' => 5,
+                'code' => 'TRRA',
+                'menu_id' => 6,
                 'modules' => Config::get('global.modules.code.readall'),
-                'desc' => 'Read list of master data'
+                'desc' => 'Read list of transaction data'
             ),
             array(
-                'code' => 'DARD',
-                'menu_id' => 5,
+                'code' => 'TRRD',
+                'menu_id' => 6,
                 'modules' => Config::get('global.modules.code.readid'),
-                'desc' => 'Read detail of master data'
+                'desc' => 'Read detail of transaction data'
             ),
         );
 

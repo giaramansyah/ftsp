@@ -12,10 +12,10 @@
       </a>
       <div class="dropdown-menu dropdown-menu-right">
         <a href="#" class="dropdown-item">
-          {{ __('My Account') }}
+          Akun Saya
         </a>
         <a href="{{ route('logout') }}" class="dropdown-item">
-          {{ __('Logout') }}
+          Keluar
         </a>
       </div>
     </li>

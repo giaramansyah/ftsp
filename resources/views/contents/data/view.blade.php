@@ -1,5 +1,5 @@
 @extends('layouts/main')
-@section('title', 'Detail Data')
+@section('title', $header)
 @section('content')
 <div class="container-fluid">
   <div class="row">
@@ -25,7 +25,19 @@
             </li>
             <li class="list-group-item">
               <b>{{ __('Total Dana') }}</b>
-              <p class="float-right mb-0">Rp {{ $amount }}</p>
+              <p class="float-right mb-0 text-bold">Rp {{ $amount }}</p>
+            </li>
+            <li class="list-group-item">
+              <b>{{ __('Dana Terpakai') }}</b>
+              <p class="float-right mb-0 text-bold">Rp {{ $used }}</p>
+            </li>
+            <li class="list-group-item">
+              <b>{{ __('Sisa Dana') }}</b>
+              <p class="float-right mb-0 text-bold">Rp {{ $remain }}</p>
+            </li>
+            <li class="list-group-item">
+              <b>{{ __('Realisasi') }}</b>
+              <p class="float-right mb-0 text-bold">{{ $percent }}</p>
             </li>
           </ul>
           <p class="float-right mb-0 small text-muted">last updated {{ $updated_at }}</p>
@@ -39,7 +51,7 @@
               @include('partials.button.edit', array('class' => 'btn-sm', 'action' => route('master.data.edit', ['id' => $id])))
             </div>
             <div class="col-auto">
-              @include('partials.button.delete', array('class' => 'btn-sm', 'action' => route('master.data.post', ['action' => config('global.action.form.delete'), 'id' => $id])))
+              @include('partials.button.delete', array('class' => 'btn-sm', 'source' => 'database', 'action' => route('master.data.post', ['action' => config('global.action.form.delete'), 'id' => $id])))
             </div>
           </div>
         </div>
@@ -58,4 +70,5 @@
     </div>
   </div>
 </div>
+@include('partials.modal.modaldelete')
 @endsection

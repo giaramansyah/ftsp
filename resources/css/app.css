@@ -43,3 +43,7 @@
     border-bottom: 1px solid #dee2e6;
     white-space: nowrap !important;
 }
+
+.table th {
+    text-transform: uppercase !important;
+}

@@ -12,7 +12,7 @@
           <a href="{{ route('home') }}" class="nav-link{{ Route::currentRouteName() == 'home' ? ' active' : '' }}">
             <i class="nav-icon fas fa-home"></i>
             <p>
-              {{ __('Home') }}
+              {{ config('global.home') }}
             </p>
           </a>
         </li>

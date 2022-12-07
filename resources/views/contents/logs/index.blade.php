@@ -1,5 +1,5 @@
 @extends('layouts/main')
-@section('title', 'Logs')
+@section('title', $header)
 @section('content')
 <div class="container-fluid">
   <div class="card">

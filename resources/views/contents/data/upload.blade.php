@@ -1,5 +1,5 @@
 @extends('layouts/main')
-@section('title', 'Data')
+@section('title', $header)
 @section('content')
 <div class="container-fluid">
   <div class="card">
@@ -7,10 +7,10 @@
       <div class="card-body">
         <div class="alert hidden" role="alert"></div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Tahun Ajaran') }}<code>*</code></label>
+          <label class="col-sm-2 col-form-label">{{ __('Tahun Ajaran') }}<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="year" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
-              <option value="">-- {{ __('Please Select') }} --</option>
+              <option value="">-- Silakan Pilih --</option>
               @foreach ($yearArr as $key => $value)
                 <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
               @endforeach
@@ -18,7 +18,7 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Upload File') }}<code>*</code></label>
+          <label class="col-sm-2 col-form-label">{{ __('Upload File') }}<code>*</code></label>
           <div class="col-sm-6">
             <div class="input-group">
               <div class="custom-file">
@@ -36,7 +36,7 @@
         <div class="form-button">
           <div class="row justify-content-center">
             <div class="col-sm-1">
-              @include('partials.button.back', ['class' => 'btn-sm', 'action' => route('master.data.index')])
+              @include('partials.button.back', ['class' => 'btn-sm btn-block', 'action' => route('master.data.index')])
             </div>
             <div class="col-sm-1">
               @include('partials.button.submit')

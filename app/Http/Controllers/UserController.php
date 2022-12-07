@@ -28,7 +28,7 @@ class UserController extends Controller
             return abort(404);
         }
 
-        return view('contents.user.index');
+        return view('contents.user.index', ['is_create' => $this->hasPrivilege($this->_create)]);
     }
 
     public function add()
@@ -43,7 +43,6 @@ class UserController extends Controller
         }
 
         $division = $this->getDivisions();
-        $division = Arr::except($division, 0);
         $staff = $this->getStaffs();
 
         $view = ['groupArr' => $group, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('settings.user.post', ['action' => config('global.action.form.add'), 'id' => 0 ]), 'mandatory' => $this->hasPrivilege($this->_create)];
@@ -120,7 +119,7 @@ class UserController extends Controller
                     }
 
                     if($this->hasPrivilege($this->_delete)) {
-                        $param = array('class' => 'btn-xs', 'action' => route('settings.user.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
+                        $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.user.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
                         $column .= view('partials.button.delete', $param)->render();
                     }
 
@@ -200,7 +199,7 @@ class UserController extends Controller
         $user['privilege_desc'] = $privigroup['description'];
         $user['username_enc'] = SecureHelper::secure($user['username']);
 
-        $view = ['modulesArr' => $modules, 'privilegeArr' => $menu, 'privileges' => $privileges];
+        $view = ['modulesArr' => $modules, 'privilegeArr' => $menu, 'privileges' => $privileges, 'is_update' => $this->hasPrivilege($this->_update), 'is_update' => $this->hasPrivilege($this->_delete)];
 
         $this->writeAppLog($this->_readid, 'User Account : '.$user['username']);
 

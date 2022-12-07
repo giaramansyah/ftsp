@@ -44,6 +44,7 @@ mix.scripts(
         plugins + "bs-custom-file-input/bs-custom-file-input.min.js",
         plugins + "lazy-control/postform.js",
         plugins + "lazy-control/buttonaction.js",
+        "resources/js/app.js",
     ],
     "public/assets/js/app.js"
 ).version();

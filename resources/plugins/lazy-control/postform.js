@@ -58,13 +58,24 @@
                 Defaults,
                 settings
             );
-            this._appender = [
+            this._toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+            });
+        }
+
+        var _proto = PostForm.prototype;
+
+        _proto._generate = function _generate() {
+            var _appender = [
                 [0, 0, 1, 1, 0, 0, 0, 0],
                 [0, 1, 1, 1, 1, 0, 0, 0],
                 [0, 0, 1, 1, 0, 0, 0, 0],
                 [0, 0, 1, 1, 0, 0, 0, 0],
             ];
-            this._secret = [
+            var _secret = [
                 ["7", "5", "31"],
                 ["7", "1", "27"],
                 ["7", "5", "34"],
@@ -117,31 +128,21 @@
                 ["6", "6", "42"],
                 ["5", "1", "40"],
             ];
-            this._toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-            });
-        }
 
-        var _proto = PostForm.prototype;
-
-        _proto._generate = function _generate() {
-            var append = this._appender
+            var append =_appender
                 .map((char) => {
                     var elem = char.join("");
                     return String.fromCharCode(parseInt(elem, 2));
                 })
                 .join("");
             var arr = [];
-            for (var i = 0; i < this._secret.length; i++) {
-                var j = parseInt(this._secret[i].at(2));
-                this._secret[i].pop();
-                arr[j] = append + this._secret[i].join("");
-                arr[j] = String.fromCharCode(parseInt(arr[j], '16'));
+            for (var i = 0; i < _secret.length; i++) {
+                var j = parseInt( _secret[i].at(2));
+                _secret[i].pop();
+                arr[j] = append + _secret[i].join("");
+                arr[j] = String.fromCharCode(parseInt(arr[j], "16"));
             }
-            
+
             return arr.join("").substring(7);
         };
 
@@ -302,21 +303,25 @@
                                 .find("p.text-center")
                                 .removeClass("text-info");
                             if (response.status) {
-                                $_default["default"](_this._element)
-                                    .find(FORM_LOADING)
-                                    .hide();
-                                $_default["default"](_this._element)
-                                    .find(FORM_BUTTON)
-                                    .show();
-                                $_default["default"](_this._element)
-                                    .find("input,select")
-                                    .val("");
-                                $_default["default"](_this._element)
-                                    .find("input,select")
-                                    .trigger("change");
-                                $_default["default"](_this._element)
-                                    .find(".custom-file-label")
-                                    .text("");
+                                if (response.redirect.length) {
+                                    window.location.href = response.redirect;
+                                } else {
+                                    $_default["default"](_this._element)
+                                        .find(FORM_LOADING)
+                                        .hide();
+                                    $_default["default"](_this._element)
+                                        .find(FORM_BUTTON)
+                                        .show();
+                                    $_default["default"](_this._element)
+                                        .find("input,select")
+                                        .val("");
+                                    $_default["default"](_this._element)
+                                        .find("input,select")
+                                        .trigger("change");
+                                    $_default["default"](_this._element)
+                                        .find(".custom-file-label")
+                                        .text("");
+                                }
                             } else {
                                 $_default["default"](_this._element)
                                     .find(FORM_LOADING)
@@ -367,6 +372,12 @@
                     $_default["default"](element).removeClass(ERR_SPAN_CLASS);
                 },
                 submitHandler: function () {
+                    if ($_default["default"](_this2._element).data(DATA_ACTION) !== "undefined") {
+                        _this2._settings.action = $_default["default"](_this2._element).data(DATA_ACTION);
+                    } else {
+                        _this2._settings.action = $_default["default"](location).attr("href");
+                    }
+
                     if (_this2._settings.method === Static.post) {
                         _this2._settings.json = _this2._serializeObject();
                         _this2._ajaxFrom();
@@ -419,21 +430,12 @@
             _this2._element.validate(options);
         };
 
-        $_default['default'].validator.addMethod("alphanum", function(value) {
-            return /[a-zA-Z]/.test(value) && /\d/.test(value)
+        $_default["default"].validator.addMethod("alphanum", function (value) {
+            return /[a-zA-Z]/.test(value) && /\d/.test(value);
         });
 
         PostForm._jQueryInterface = function _jQueryInterface() {
             var options = {};
-
-            if (
-                $_default["default"](this).data(DATA_ACTION) !==
-                "undefined"
-            ) {
-                options.action = $_default["default"](this).data(DATA_ACTION);
-            } else {
-                options.action = $_default["default"](location).attr("href");
-            }
 
             if (
                 typeof $_default["default"](this).data(DATA_METHOD) !==

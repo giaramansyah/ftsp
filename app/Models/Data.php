@@ -12,7 +12,7 @@ class Data extends Model
 
     protected $table = 'ms_data';
 
-    protected $appends = ['staff', 'division', 'years'];
+    protected $appends = ['staff', 'division', 'years', 'staff_id'];
     
     protected $fillable = [
         'ma_id',
@@ -47,7 +47,15 @@ class Data extends Model
 
     public function getYearsAttribute()
     {
-        return $this->attributes['year'] . '/' . ($this->attributes['year']+1);
+        if(isset($this->attributes['year'])) {
+            return $this->attributes['year'] . '/' . ($this->attributes['year']+1);
+        }
+    }
+
+    public function getStaffIdAttribute()
+    {
+        $staffs = self::find($this->id)->staffs()->get()->toArray();
+        return array_column($staffs, 'staff_id');
     }
 
     public function getStaffAttribute()

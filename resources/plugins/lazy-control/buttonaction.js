@@ -42,6 +42,7 @@
         download : "download",
         modal : "modal",
         table : "table",
+        database : "database",
         form : "form"
     };
 
@@ -72,6 +73,10 @@
 
             if(this._settings.intent == null) {
                 this._settings.intent = this.createModal();
+            }
+
+            if(this._settings.dial === Static.form) {
+                $_default['default'](this._settings.intent).find(this._settings.dial).data(DATA_ACTION, this._settings.action)
             }
 
             $_default["default"](this._settings.intent).find(".modal-body").html(data);
@@ -122,6 +127,8 @@
 
             if(this._settings.source == Static.table) {
                 data = this.tableData();
+            } else if(this._settings.source == Static.database) {
+                data = this.baseData();
             } else {
                 throw new Error(
                     "Data source not supported. supported data source [table, database]."
@@ -151,6 +158,13 @@
 
             return _rows;
         };
+
+        _proto.baseData = function baseData() {
+            var _card = this._element.closest("div.card");
+            var _body = _card.find('.card-body').clone();
+
+            return _body;
+        }
 
 
         _proto._init = function _init() {

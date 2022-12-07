@@ -26,7 +26,7 @@ class PrivilegeController extends Controller
             return abort(404);
         }
 
-        return view('contents.privilege.index');
+        return view('contents.privilege.index', ['is_create' => $this->hasPrivilege($this->_create)]);
     }
 
     public function add()
@@ -92,7 +92,7 @@ class PrivilegeController extends Controller
                     }
 
                     if($this->hasPrivilege($this->_delete)) {
-                        $param = array('class' => 'btn-xs', 'action' => route('settings.privilege.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
+                        $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.privilege.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
                         $column .= view('partials.button.delete', $param)->render();
                     }
 

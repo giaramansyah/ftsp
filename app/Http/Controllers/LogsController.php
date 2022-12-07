@@ -11,7 +11,7 @@ use Yajra\DataTables\Facades\DataTables;
 class LogsController extends Controller
 {
     
-    protected $_readid = 'LURA';
+    protected $_readall = 'LURA';
 
     public function index()
     {

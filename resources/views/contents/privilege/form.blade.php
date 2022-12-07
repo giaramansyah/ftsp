@@ -1,5 +1,5 @@
 @extends('layouts/main')
-@section('title', 'Privilege')
+@section('title', $header)
 @section('content')
 <div class="container-fluid">
   <div class="card">
@@ -7,16 +7,16 @@
       <div class="card-body">
         <div class="alert hidden" role="alert"></div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Code') }}<code>*</code></label>
+          <label class="col-sm-2 col-form-label">{{ __('Code') }}<code>*</code></label>
           <div class="col-sm-1">
             <input type="text" class="form-control form-control-sm text-uppercase" maxlength="4" name="code" value="{{ isset($code) ? $code : '' }}" {{ isset($code) ? 'readonly' : '' }} required>
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Menu') }}<code>*</code></label>
+          <label class="col-sm-2 col-form-label">{{ __('Menu') }}<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="menu_id" required>
-              <option value="">-- {{ __('Please Select') }} --</option>
+              <option value="">-- Silakan Pilih --</option>
               @foreach ($menuArr as $value)
                 <optgroup label="{{ __($value['label']) }}">
                   @foreach ($value['menu'] as $val)
@@ -28,10 +28,10 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Modules') }}<code>*</code></label>
+          <label class="col-sm-2 col-form-label">{{ __('Modules') }}<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="modules" required>
-              <option value="">-- {{ __('Please Select') }} --</option>
+              <option value="">-- Silakan Pilih --</option>
               @foreach ($modulesArr as $key => $value)
                 <option value="{{ $key }}" {{ isset($modules) && $modules == $key ? 'selected' : '' }}>{{ __($value) }}</option>
               @endforeach
@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-1 col-form-label">{{ __('Description') }}</label>
+          <label class="col-sm-2 col-form-label">{{ __('Description') }}</label>
           <div class="col-sm-6">
             <input type="text" class="form-control form-control-sm" maxlength="100" name="desc" value="{{ isset($desc) ? $desc : '' }}">
           </div>
@@ -49,7 +49,7 @@
         <div class="form-button">
           <div class="row justify-content-center">
             <div class="col-sm-1">
-              @include('partials.button.back', ['class' => 'btn-sm', 'action' => route('settings.privilege.index')])
+              @include('partials.button.back', ['class' => 'btn-sm btn-block', 'action' => route('settings.privilege.index')])
             </div>
             <div class="col-sm-1">
               @include('partials.button.submit')

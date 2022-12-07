@@ -1,5 +1,7 @@
 <?php
 return [
+    'home' => 'Beranda',
+    
     'sysadmin' => [
         'username' => 'sysadmin',
         'privilege' => 1
@@ -156,4 +158,17 @@ return [
             'division' => 20,
         ]
     ],
+
+    'type' => [
+        'code' => [
+            'white' => 1,
+            'green' => 2,
+            'red' => 3,
+        ],
+        'desc' => [
+            'white' => 'Bon Putih',
+            'green' => 'Bon Hijau',
+            'red' => 'Bon Merah',
+        ]
+    ]
 ];
