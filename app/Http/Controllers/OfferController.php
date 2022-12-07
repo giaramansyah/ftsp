@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Library\Response;
 use App\Library\SecureHelper;
+use App\Models\Offer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class OfferController extends Controller
 {
@@ -55,5 +58,45 @@ class OfferController extends Controller
     public function getList(Request $request)
     {
         
+    }
+
+    public function generate(Request $request)
+    {
+        $param = SecureHelper::unpack($request->input('json'));
+
+        if (!is_array($param)) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $year = Str::after($param['year'], '20');
+        if($param['type_id'] == config('global.type.code.green')) {
+            $prefix = 'I';
+        } else if($param['type_id'] == config('global.type.code.white') || $param['type_id'] == config('global.type.code.red')) {
+            $prefix = 'PM';
+        } else {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+        $number = '0001';
+
+        $offer = Offer::select('offer_no')->where('offer_no', 'like', "%$$prefix$year%")->orderBy('offer_no', 'desc')->first();
+        if($offer) {
+            $currentNumber = Str::after($offer->offer_no, $prefix.$year);
+            $currentNumber++;
+            $currentNumber = strval($currentNumber);
+            $temp = '';
+            for($i = 0; $i < 4 - strlen($currentNumber); $i++) {
+                $temp .= '0';
+            }
+
+            $number = $temp.$currentNumber;
+        } 
+
+        $id = $prefix.$year.$number;
+
+        $response = new Response(true, __('ID generated successfuly'), 1);
+        $response->setData(['id' => $id]);
+        return response()->json($response->responseJson());
     }
 }
