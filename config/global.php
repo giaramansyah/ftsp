@@ -105,7 +105,7 @@ return [
             'wd2' => 'Wakil Dekan 2',
             'wd3' => 'Wakil Dekan 3',
             'wd4' => 'Wakil Dekan 4',
-            'kaprodis1' => 'kepala Program Studi S1',
+            'kaprodis1' => 'Kepala Program Studi S1',
             'kaprodis2' => 'Kepala Program Studi S2',
         ],
         'raw' => [
@@ -170,5 +170,17 @@ return [
             'green' => 'Bon Hijau',
             'red' => 'Bon Merah',
         ]
-    ]
+    ],
+
+    'transaction' => [
+        'code' => [
+            'debet' => 1,
+            'credit' => 2
+        ], 
+        'desc' => [
+            'debet' => 'Debit',
+            'credit' => 'Kredit'
+        ]
+    ],
+
 ];

@@ -16,9 +16,17 @@ class MapData extends Model
     public $timestamps = false;
     
     public $incrementing = false;
+    
+    protected $appends = ['staff'];
 
     protected $fillable = [
         'data_id',
         'staff_id',
     ];
+
+    public function getStaffAttribute()
+    {
+        $arrStaff = array_combine(config('global.staff.code'), config('global.staff.desc'));
+        return $arrStaff[$this->attributes['staff_id']];
+    }
 }

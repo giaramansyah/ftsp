@@ -29,6 +29,7 @@ $.extend( $.validator.messages, {
 	rangelength: $.validator.format( "Panjang karakter yg diizinkan antara {0} dan {1} karakter." ),
 	range: $.validator.format( "Harap masukkan nilai antara {0} dan {1}." ),
 	max: $.validator.format( "Harap masukkan nilai lebih kecil atau sama dengan {0}." ),
+	max_amount: $.validator.format( "Harap masukkan nilai lebih kecil atau sama dengan {0}." ),
 	min: $.validator.format( "Harap masukkan nilai lebih besar atau sama dengan {0}." ),
 	extension: $.validator.format( "Ekstensi file yang bisa di upload hanya .{0}, .{1} dan .{2}." ),
 } );

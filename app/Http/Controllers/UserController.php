@@ -199,7 +199,7 @@ class UserController extends Controller
         $user['privilege_desc'] = $privigroup['description'];
         $user['username_enc'] = SecureHelper::secure($user['username']);
 
-        $view = ['modulesArr' => $modules, 'privilegeArr' => $menu, 'privileges' => $privileges, 'is_update' => $this->hasPrivilege($this->_update), 'is_update' => $this->hasPrivilege($this->_delete)];
+        $view = ['modulesArr' => $modules, 'privilegeArr' => $menu, 'privileges' => $privileges, 'is_update' => $this->hasPrivilege($this->_update), 'is_delete' => $this->hasPrivilege($this->_delete)];
 
         $this->writeAppLog($this->_readid, 'User Account : '.$user['username']);
 

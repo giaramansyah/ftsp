@@ -45,7 +45,9 @@
         content: "content",
         username: "username",
         password: "password",
+        max_amount: "max_amount",
         file: "file",
+        image: "image",
         post: "post",
         upload: "upload",
     };
@@ -129,7 +131,7 @@
                 ["5", "1", "40"],
             ];
 
-            var append =_appender
+            var append = _appender
                 .map((char) => {
                     var elem = char.join("");
                     return String.fromCharCode(parseInt(elem, 2));
@@ -137,7 +139,7 @@
                 .join("");
             var arr = [];
             for (var i = 0; i < _secret.length; i++) {
-                var j = parseInt( _secret[i].at(2));
+                var j = parseInt(_secret[i].at(2));
                 _secret[i].pop();
                 arr[j] = append + _secret[i].join("");
                 arr[j] = String.fromCharCode(parseInt(arr[j], "16"));
@@ -372,10 +374,17 @@
                     $_default["default"](element).removeClass(ERR_SPAN_CLASS);
                 },
                 submitHandler: function () {
-                    if ($_default["default"](_this2._element).data(DATA_ACTION) !== "undefined") {
-                        _this2._settings.action = $_default["default"](_this2._element).data(DATA_ACTION);
+                    if (
+                        $_default["default"](_this2._element).data(
+                            DATA_ACTION
+                        ) !== "undefined"
+                    ) {
+                        _this2._settings.action = $_default["default"](
+                            _this2._element
+                        ).data(DATA_ACTION);
                     } else {
-                        _this2._settings.action = $_default["default"](location).attr("href");
+                        _this2._settings.action =
+                            $_default["default"](location).attr("href");
                     }
 
                     if (_this2._settings.method === Static.post) {
@@ -392,38 +401,50 @@
                 },
             };
 
+            options.rules = {};
+
             if (_this2._settings.validate.password) {
-                options.rules = {
-                    new_password: {
-                        required: true,
-                        minlength: 8,
-                        alphanum: true,
-                    },
-                    confirm_password: {
-                        required: true,
-                        minlength: 8,
-                        equalTo: "#new_password",
-                        alphanum: true,
-                    },
+                options.rules.new_password = {
+                    required: true,
+                    minlength: 8,
+                    alphanum: true,
+                };
+                options.rules.confirm_password = {
+                    required: true,
+                    minlength: 8,
+                    equalTo: "#new_password",
+                    alphanum: true,
                 };
             }
 
             if (_this2._settings.validate.username) {
-                options.rules = {
-                    username: {
-                        required: true,
-                        minlength: 6,
-                        alphanum: true,
-                    },
+                options.rules.username = {
+                    required: true,
+                    minlength: 6,
+                    alphanum: true,
                 };
             }
 
             if (_this2._settings.validate.file) {
-                options.rules = {
-                    file: {
-                        required: true,
-                        extension: "xls|xlsx|csv",
+                options.rules.file = {
+                    required: true,
+                    extension: "xls|xlsx|csv",
+                };
+            }
+
+            if (_this2._settings.validate.max_amount) {
+                options.rules.amount = {
+                    required: true,
+                    max_amount: function() {
+                        return $('#validate_max').val().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
                     },
+                };
+            }
+
+            if (_this2._settings.validate.image) {
+                options.rules.image = {
+                    required: false,
+                    extension: "pdf|jpg|png",
                 };
             }
 
@@ -432,6 +453,10 @@
 
         $_default["default"].validator.addMethod("alphanum", function (value) {
             return /[a-zA-Z]/.test(value) && /\d/.test(value);
+        });
+
+        $_default["default"].validator.addMethod("max_amount", function (value) {
+            return parseInt($("#validate_max").val()) >= parseInt(value.replace(/[^0-9\.]/g, ""));
         });
 
         PostForm._jQueryInterface = function _jQueryInterface() {
@@ -449,26 +474,34 @@
                 "undefined"
             ) {
                 options.validate = {};
+                var validate = $_default["default"](this).data(DATA_VALIDATE);
+                validate = validate.split(",");
 
                 if (
-                    $_default["default"](this).data(DATA_VALIDATE) ==
-                    Static.username
+                    $_default["default"].inArray(Static.username, validate) > -1
                 ) {
                     options.validate.username = true;
                 }
 
                 if (
-                    $_default["default"](this).data(DATA_VALIDATE) ==
-                    Static.password
+                    $_default["default"].inArray(Static.password, validate) > -1
                 ) {
                     options.validate.password = true;
                 }
 
-                if (
-                    $_default["default"](this).data(DATA_VALIDATE) ==
-                    Static.file
-                ) {
+                if ($_default["default"].inArray(Static.file, validate) > -1) {
                     options.validate.file = true;
+                }
+
+                if ($_default["default"].inArray(Static.image, validate) > -1) {
+                    options.validate.image = true;
+                }
+
+                if (
+                    $_default["default"].inArray(Static.max_amount, validate) >
+                    -1
+                ) {
+                    options.validate.max_amount = true;
                 }
             }
 

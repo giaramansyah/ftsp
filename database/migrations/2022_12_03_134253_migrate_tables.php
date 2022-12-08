@@ -133,26 +133,48 @@ class MigrateTables extends Migration
             });
         }
 
-        if (!Schema::hasTable('ts_offer')) {
-            Schema::create('ts_offer', function (Blueprint $table) {
+        if (!Schema::hasTable('ms_balance')) {
+            Schema::create('ms_balance', function (Blueprint $table) {
                 $table->id();
-                $table->string('offer_no', 15)->nullable(false);
-                $table->string('letter_no', 15)->nullable(false);
-                $table->date('date_offer')->nullable(false);
-                $table->date('date_letter')->nullable(false);
-                $table->date('date_apply')->nullable(false);
-                $table->string('ma_id', 20)->nullable(false);
-                $table->string('changed_ma_id', 20)->nullable(false);
-                $table->tinyInteger('type_id')->nullable(false);
-                $table->string('name', 50)->nullable(false);
-                $table->bigInteger('staff_id')->nullable(false);
-                $table->string('description', 100)->nullable(false);
-                $table->string('subdescription', 200)->nullable(true);
+                $table->tinyInteger('division_id')->nullable(false);
                 $table->bigInteger('amount')->nullable(false);
-                $table->string('text_amount', 150)->nullable(false);
-                $table->string('account_number', 20)->nullable(false);
-                $table->string('file_responsibility', 50)->nullable(true);
-                $table->string('file_acceptence', 50)->nullable(true);
+                $table->tinyInteger('is_trash')->nullable(false)->default(0);
+                $table->string('created_by', 100)->nullable(false);
+                $table->string('updated_by', 100)->nullable(false);
+                $table->timestamps();
+            });
+        }
+        
+        if (!Schema::hasTable('ts_history_balance')) {
+            Schema::create('ts_history_balance', function (Blueprint $table) {
+                $table->id();
+                $table->bigInteger('balance_id')->nullable(false);
+                $table->string('description')->nullable(false);
+                $table->tinyInteger('transaction_id')->nullable(false);
+                $table->bigInteger('amount')->nullable(false);
+                $table->timestamps();
+            });
+        }
+
+        if (!Schema::hasTable('ts_expense')) {
+            Schema::create('ts_expense', function (Blueprint $table) {
+                $table->id();
+                $table->string('expense_id', 15)->nullable(false);
+                $table->date('expense_date')->nullable(false);
+                $table->string('reff_no', 50)->nullable(false);
+                $table->date('reff_date')->nullable(false);
+                $table->string('description', 100)->nullable(false);
+                $table->string('sub_description', 250)->nullable(true);
+                $table->string('data_id', 20)->nullable(false);
+                $table->string('name', 50)->nullable(false);
+                $table->tinyInteger('staff_id')->nullable(false);
+                $table->bigInteger('amount')->nullable(false);
+                $table->string('text_amount', 100)->nullable(false);
+                $table->string('account', 20)->nullable(false);
+                $table->date('apply_date')->nullable(true);
+                $table->string('image', 50)->nullable(true);
+                $table->tinyInteger('status')->nullable(false)->default(0);
+                $table->tinyInteger('type')->nullable(false);
                 $table->string('created_by', 100)->nullable(false);
                 $table->string('updated_by', 100)->nullable(false);
                 $table->timestamps();
@@ -177,6 +199,8 @@ class MigrateTables extends Migration
         Schema::dropIfExists('ms_data');
         Schema::dropIfExists('map_data');
         Schema::dropIfExists('log_data');
-        Schema::dropIfExists('ts_offer');
+        Schema::dropIfExists('ms_balance');
+        Schema::dropIfExists('ts_history_balance');
+        Schema::dropIfExists('ts_expense');
     }
 }

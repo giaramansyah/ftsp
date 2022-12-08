@@ -139,6 +139,20 @@ class Controller extends BaseController
         return $result;
     }
 
+    public function getTransactions()
+    {
+        $transaction = array_combine(config('global.transaction.code'), config('global.transaction.desc'));
+        $result = array();
+        foreach($transaction as $key => $value) {
+            $result[] = array(
+                'id' => $key,
+                'name' => $value,
+            );
+        }
+
+        return $result;
+    }
+
     public function convertAmount($value, $resverse = false) 
     {
         if($resverse) {

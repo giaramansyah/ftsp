@@ -6,7 +6,7 @@ use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Data;
 use App\Models\MapData;
-use App\Models\Offer;
+use App\Models\Expense;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -43,7 +43,9 @@ class DataController extends Controller
         $years = $this->getYears();
         $division = $this->getDivisions();
 
-        return view('contents.data.index', ['divisionArr' =>  $division, 'yearArr' =>  $years, 'year' => $currYear, 'is_create' => $this->hasPrivilege($this->_create)]);
+        $view = ['divisionArr' =>  $division, 'yearArr' =>  $years, 'year' => $currYear, 'is_create' => $this->hasPrivilege($this->_create)];
+
+        return view('contents.data.index', $view);
     }
 
     public function add()
@@ -111,9 +113,9 @@ class DataController extends Controller
 
         $data['id'] = $id;
 
-        $offer =  Offer::selectRaw('sum(amount) as amount')->where('ma_id', 'ma_id')->first()->toArray();
-        if ($offer) {
-            $used = $this->convertAmount($offer['amount'], true);
+        $expense =  Expense::selectRaw('sum(amount) as amount')->where('ma_id', 'ma_id')->first()->toArray();
+        if ($expense) {
+            $used = $this->convertAmount($expense['amount'], true);
         } else {
             $used = 0;
         }
@@ -150,9 +152,6 @@ class DataController extends Controller
                 }
             }
 
-            $offer =  Offer::groupBy('ma_id')->selectRaw('ma_id, sum(amount) as amount')->get()->toArray();
-            $offer = array_combine(array_column($offer, 'ma_id'), array_column($offer, 'amount'));
-
             $data = Data::select(['id', 'ma_id', 'description', 'amount', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('id');
             $table = DataTables::eloquent($data);
             $rawColumns = array('ma', 'used', 'remain', 'percent');
@@ -169,8 +168,9 @@ class DataController extends Controller
             });
 
             $table->addColumn('used', function ($row) {
-                if (isset($offer[$row->ma_id])) {
-                    $column = $offer[$row->ma_id];
+                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                if ($expense) {
+                    $column = $expense->amount;
                 } else {
                     $column = '0';
                 }
@@ -179,10 +179,11 @@ class DataController extends Controller
             });
 
             $table->addColumn('remain', function ($row) {
-                if (isset($offer[$row->ma_id])) {
-                    $used = $this->convertAmount($offer[$row->ma_id], true);
+                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                if ($expense) {
+                    $used = $this->convertAmount($expense->amount, true);
                     $total = $this->convertAmount($row->amount, true);
-                    $column = ($total - $used);
+                    $column = $this->convertAmount($total - $used);
                 } else {
                     $column = $row->amount;
                 }
@@ -191,8 +192,9 @@ class DataController extends Controller
             });
 
             $table->addColumn('percent', function ($row) {
-                if (isset($offer[$row->ma_id])) {
-                    $used = $this->convertAmount($offer[$row->ma_id], true);
+                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                if ($expense) {
+                    $used = $this->convertAmount($expense->amount, true);
                     $total = $this->convertAmount($row->amount, true);
                     $column = round(($used / $total) * 100, 2);
                 } else {

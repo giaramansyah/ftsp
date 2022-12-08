@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BalanceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LandingController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\PrivilegeController;
 use App\Http\Controllers\PrivilegeGroupController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\OfferController;
 
 /*
@@ -61,7 +63,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/logs/activity/list/{id}', [LogsController::class, 'getUser'])->name('logs.activity.user');
     
     //data
-    Route::get('/data/anggaran/{year?}', [DataController::class, 'index'])->name('master.data.index');
+    Route::get('/data/reff/{year?}', [DataController::class, 'index'])->name('master.data.index');
     Route::get('/data/list', [DataController::class, 'getList'])->name('master.data.list');
     Route::get('/data/view/{id}', [DataController::class, 'view'])->name('master.data.view');
     Route::get('/data/add', [DataController::class, 'add'])->name('master.data.add');
@@ -69,11 +71,32 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/data/upload', [DataController::class, 'upload'])->name('master.data.upload');
     Route::post('/data/post/{action}/{id}', [DataController::class, 'post'])->name('master.data.post');
 
+    //balance
+    Route::get('/balance', [BalanceController::class, 'index'])->name('master.balance.index');
+    Route::get('/balance/list', [BalanceController::class, 'getList'])->name('master.balance.list');
+    Route::get('/balance/view/{id}', [BalanceController::class, 'view'])->name('master.balance.view');
+    Route::get('/balance/add', [BalanceController::class, 'add'])->name('master.balance.add');
+    Route::get('/balance/edit/{id}', [BalanceController::class, 'edit'])->name('master.balance.edit');
+    Route::post('/balance/post/{action}/{id}', [BalanceController::class, 'post'])->name('master.balance.post');
+
     //offer
     Route::get('/offer/anggaran/{year?}', [OfferController::class, 'index'])->name('transaction.offer.index');
     Route::get('/offer/list', [OfferController::class, 'getList'])->name('transaction.offer.list');
     // Route::get('/data/view/{id}', [OfferController::class, 'view'])->name('master.data.view');
     Route::get('/offer/add', [OfferController::class, 'add'])->name('transaction.offer.add');
     Route::get('/offer/edit/{id}', [OfferController::class, 'edit'])->name('transaction.offer.edit');
-    // Route::post('/data/post/{action}/{id}', [DataController::class, 'post'])->name('master.data.post');
+    Route::post('/offer/generate', [OfferController::class, 'generate'])->name('transaction.offer.generate');
+
+    //reception
+    Route::get('/reception', function(){})->name('transaction.reception.index');
+
+    //expense
+    Route::get('/expense/reff/{year?}', [ExpenseController::class, 'index'])->name('transaction.expense.index');
+    Route::get('/expense/list', [ExpenseController::class, 'getList'])->name('transaction.expense.list');
+    Route::get('/expense/data', [ExpenseController::class, 'getData'])->name('transaction.expense.data');
+    Route::get('/expense/pic', [ExpenseController::class, 'getPic'])->name('transaction.expense.pic');
+    Route::get('/expense/add/{type}', [ExpenseController::class, 'add'])->name('transaction.expense.add');
+    Route::get('/expense/edit/{id}', [ExpenseController::class, 'edit'])->name('transaction.expense.edit');
+    Route::post('/expense/post/{action}/{id}', [ExpenseController::class, 'post'])->name('transaction.expense.post');
+    //Route::post('/expense/generate', [ExpenseController::class, 'generate'])->name('transaction.offer.generate');
 });
