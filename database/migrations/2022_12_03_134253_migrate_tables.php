@@ -173,7 +173,6 @@ class MigrateTables extends Migration
                 $table->string('account', 20)->nullable(false);
                 $table->date('apply_date')->nullable(true);
                 $table->string('image', 50)->nullable(true);
-                $table->tinyInteger('status')->nullable(false)->default(0);
                 $table->tinyInteger('type')->nullable(false);
                 $table->string('created_by', 100)->nullable(false);
                 $table->string('updated_by', 100)->nullable(false);

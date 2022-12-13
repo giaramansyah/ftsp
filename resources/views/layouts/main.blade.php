@@ -18,19 +18,19 @@
   </script>
 </head>
 
-<body class="hold-transition sidebar-mini text-sm">
+<body class="layout-fixed sidebar-mini text-sm">
   <div class="wrapper">
     @include('layouts.nav-top')
     @include('layouts.nav-side')
     <div class="content-wrapper">
-      <section class="content-header">
+      <div class="content-header">
         @include('layouts.header')
-      </section>
+      </div>
       <section class="content">
         @yield('content')
       </section>
     </div>
-    @include('layouts.footer')
+    {{-- @include('layouts.footer') --}}
   </div>
   <script type="text/javascript" src="{{asset('js/app.js')}}"></script>
   @yield('push-js')

@@ -169,6 +169,11 @@ return [
             'white' => 'Bon Putih',
             'green' => 'Bon Hijau',
             'red' => 'Bon Merah',
+        ],
+        'status' => [
+            'white' => 'UMD',
+            'green' => 'Masuk',
+            'red' => 'Selesai',
         ]
     ],
 

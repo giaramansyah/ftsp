@@ -63,7 +63,7 @@ class DataController extends Controller
 
     public function edit($id)
     {
-        if (!$this->hasPrivilege($this->_readid)) {
+        if (!$this->hasPrivilege($this->_update)) {
             return abort(404);
         }
 
@@ -113,7 +113,7 @@ class DataController extends Controller
 
         $data['id'] = $id;
 
-        $expense =  Expense::selectRaw('sum(amount) as amount')->where('ma_id', 'ma_id')->first()->toArray();
+        $expense =  Expense::selectRaw('sum(amount) as amount')->where('id', $plainId)->first()->toArray();
         if ($expense) {
             $used = $this->convertAmount($expense['amount'], true);
         } else {
@@ -152,7 +152,7 @@ class DataController extends Controller
                 }
             }
 
-            $data = Data::select(['id', 'ma_id', 'description', 'amount', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('id');
+            $data = Data::select(['id', 'ma_id', 'description', 'amount', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('ma_id');
             $table = DataTables::eloquent($data);
             $rawColumns = array('ma', 'used', 'remain', 'percent');
             $table->addIndexColumn();
