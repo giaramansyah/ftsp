@@ -92,34 +92,40 @@ class ExpenseController extends Controller
             return abort(404);
         }
 
-        $ma = Data::find($data['data_id'])->toArray();
-        $year = $ma['year'];
-        $division_id = $ma['division_id'];
-        $ma_id = $ma['ma_id'];
+        $data['data'] = Data::find($data['data_id'])->toArray();
         $map = MapData::where('data_id', $data['data_id'])->get()->toArray();
         $staffArr = array();
         foreach ($map as $value) {
-            $data[] = array(
+            $staffArr[] = array(
                 'id' => $value['staff_id'],
-                'text' => $value['staff'],
+                'name' => $value['staff'],
             );
         }
 
+        $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $data['data_id'])->whereNotIn('id', [$plainId])->groupBy('data_id')->first();
+        $data['data']['available'] = $this->convertAmount($data['data']['amount'], true);
+        if($expense) {
+            $data['data']['available'] = $this->convertAmount($data['data']['amount'], true) - $this->convertAmount($expense->amount, true);
+        }
+        $data['data']['remain'] = $this->convertAmount($data['data']['available']);
+
+        
         $types = array_combine(config('global.type.code'), config('global.type.desc'));
         $typeDesc = $types[$data['type']];
-        $years = $this->getYears();
-        $divisions = $this->getDivisions();
-
+        
         $is_red = false;
         if ($data['type'] == config('global.type.code.red')) {
             $is_red = true;
+            $file = $this->getFile($data['image']);
+            $data['image'] = $file->name; 
+            $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::secure($data['image'])]);
         }
 
         if (!$this->hasPrivilege($this->_readid)) {
             $data = array('expense_id' => $data['expense_id']);
         }
 
-        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'staffArr' => $staffArr, 'action' => route('transaction.expense.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'is_red' => $is_red, 'typeDesc' => $typeDesc, 'year' => $year, 'division_id' => $division_id, 'ma_id' => $ma_id, 'mandatory' => $this->hasPrivilege($this->_update)];
+        $view = ['staffArr' => $staffArr, 'action' => route('transaction.expense.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'is_red' => $is_red, 'typeDesc' => $typeDesc, 'mandatory' => $this->hasPrivilege($this->_update)];
 
         return view('contents.expense.edit', array_merge($view, $data));
     }
@@ -146,7 +152,7 @@ class ExpenseController extends Controller
 
             $data = Data::select(['id'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('id')->get()->toArray();
             $data = array_column($data, 'id');
-            $expense = Expense::select(['id', 'expense_id', 'expense_date', 'reff_no', 'reff_date', 'staff_id', 'amount', 'type', 'updated_at'])->whereIn('data_id', $data)->orderBY('updated_at', 'desc');
+            $expense = Expense::select(['id', 'expense_id', 'ma_id', 'expense_date', 'reff_no', 'reff_date', 'staff_id', 'amount', 'type', 'updated_at'])->whereIn('data_id', $data)->orderBY('updated_at', 'desc');
             $table = DataTables::eloquent($expense);
             $rawColumns = array('expense', 'status_desc');
             $table->addIndexColumn();
@@ -217,7 +223,7 @@ class ExpenseController extends Controller
                     $amount = $this->convertAmount($row->amount, true) - $this->convertAmount($expense->amount, true);
                 }
                 $column = '<div class="form-check">
-                <input class="form-check-input" type="radio" name="ma" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->id) . '" data-available="' . $amount . '" data-amount="' . $this->convertAmount($row->amount, true) . '">
+                <input class="form-check-input" type="radio" name="ma" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->id) . '" data-ma="' . $row->ma_id . '" data-available="' . $amount . '" data-amount="' . $this->convertAmount($row->amount, true) . '">
                 <label class="form-check-label">&nbsp;</label>
                 </div>';
 
@@ -294,7 +300,15 @@ class ExpenseController extends Controller
 
         $data['data'] = Data::find($data['data_id'])->toArray();
 
-        $view = ['is_update' => $this->hasPrivilege($this->_update)];
+        $is_red = false;
+        if ($data['type'] == config('global.type.code.red')) {
+            $is_red = true;
+            $file = $this->getFile($data['image']);
+            $data['image'] = $file->name; 
+            $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::secure($data['image'])]);
+        }
+
+        $view = ['is_red' => $is_red, 'is_update' => $this->hasPrivilege($this->_update)];
 
         $this->writeAppLog($this->_readid, 'Expense : ' . $data['ma_id']);
 
@@ -408,6 +422,7 @@ class ExpenseController extends Controller
                         'description' => $param['description'],
                         'sub_description' => $param['sub_description'],
                         'data_id' => $data_id,
+                        'ma_id' => $param['ma_id'],
                         'name' => $param['name'],
                         'staff_id' => $param['staff_id'],
                         'amount' => $param['amount'],
@@ -420,20 +435,20 @@ class ExpenseController extends Controller
                     ]);
 
                     if ($expense->id) {
-                        $division_id = SecureHelper::unsecure($param['data_id']);
-                        $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
-                        if ($balance) {
-                            $balance->amount = ($this->convertAmount($balance->amount, true) - $this->convertAmount($param['amount'], true));
-                            $balance->updated_by = Auth::user()->username;
-                            if ($balance->save()) {
-                                HistoryBalance::create([
-                                    'balance_id' => $balance->id,
-                                    'amount' => $param['amount'],
-                                    'description' => $param['description'],
-                                    'transaction_id' => config('global.transaction.code.debet')
-                                ]);
-                            }
-                        }
+                        // $division_id = SecureHelper::unsecure($param['data_id']);
+                        // $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
+                        // if ($balance) {
+                        //     $balance->amount = ($this->convertAmount($balance->amount, true) - $this->convertAmount($param['amount'], true));
+                        //     $balance->updated_by = Auth::user()->username;
+                        //     if ($balance->save()) {
+                        //         HistoryBalance::create([
+                        //             'balance_id' => $balance->id,
+                        //             'amount' => $param['amount'],
+                        //             'description' => $param['description'],
+                        //             'transaction_id' => config('global.transaction.code.debet')
+                        //         ]);
+                        //     }
+                        // }
 
                         $response = new Response(true, __('Expense created successfuly'), 1);
                         $response->setRedirect(route('transaction.expense.view', ['id' => SecureHelper::secure($expense->id)]));
@@ -458,33 +473,30 @@ class ExpenseController extends Controller
                 }
 
                 if (!$this->hasPrivilege($this->_readid)) {
+                    $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
+                    return response()->json($response->responseJson());
                 } else {
                     if ($param['type'] == config('global.type.code.red')) {
                         $validateParams = [
-                            'type' => 'required',
-                            'expense_id' => 'required',
                             'expense_date' => 'required',
                             'reff_no' => 'required',
                             'reff_date' => 'required',
                             'description' => 'required',
-                            'data_id' => 'required',
+                            'ma_id' => 'required',
                             'name' => 'required',
                             'staff_id' => 'required',
                             'amount' => 'required',
                             'text_amount' => 'required',
-                            'apply_date' => 'required',
                             'account' => 'required',
-                            'image' => 'mimes:pdf,png,jpg',
+                            'apply_date' => 'required',
                         ];
                     } else {
                         $validateParams = [
-                            'type' => 'required',
-                            'expense_id' => 'required',
                             'expense_date' => 'required',
                             'reff_no' => 'required',
                             'reff_date' => 'required',
                             'description' => 'required',
-                            'data_id' => 'required',
+                            'ma_id' => 'required',
                             'name' => 'required',
                             'staff_id' => 'required',
                             'amount' => 'required',
@@ -545,6 +557,8 @@ class ExpenseController extends Controller
                         $expense->reff_no = $param['reff_no'];
                         $expense->reff_date = $param['reff_date'];
                         $expense->description = $param['description'];
+                        $expense->sub_description = $param['sub_description'];
+                        $expense->ma_id = $param['ma_id'];
                         $expense->name = $param['name'];
                         $expense->staff_id = $param['staff_id'];
                         $expense->amount = $param['amount'];
@@ -553,12 +567,46 @@ class ExpenseController extends Controller
                         $expense->apply_date = $apply_date;
                         $expense->image = $image;
                         $expense->updated_by = Auth::user()->username;
+
+                        if ($expense->save()) {
+                            $response = new Response(true, __('Expense updated successfuly'), 1);
+                            $response->setRedirect(route('transaction.expense.view', ['id' => SecureHelper::secure($expense->id)]));
+    
+                            $this->writeAppLog($this->_create, 'Expense : ' . $param['expense_id']);
+                        } else {
+                            $response = new Response(false, __('Expense updated failed. Please try again'));
+                        }
                     }
                 }
             }
         }
 
         return response()->json($response->responseJson());
+    }
+
+    public function download($id)
+    {
+        if (!$this->hasPrivilege($this->_readid)) {
+            return abort(404);
+        }
+
+        $plainId = SecureHelper::unsecure($id);
+
+        if(!$plainId) {
+            return abort(404);
+        }
+
+        $file = $this->getFile($plainId);
+        
+        $headers = array(
+            'Content-Type: application/pdf',
+            'Content-Disposition: attachment;filename='.$file->name,
+            'Cache-Control: max-age=0',
+            'Pragma: no-cache',
+            'Expires: 0'
+        );
+
+        return response()->download($file->path, $file->name, $headers);
     }
 
     private function generate()

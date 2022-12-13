@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\OfferController;
+use App\Http\Controllers\ReceptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,7 +89,14 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/offer/generate', [OfferController::class, 'generate'])->name('transaction.offer.generate');
 
     //reception
-    Route::get('/reception', function(){})->name('transaction.reception.index');
+    Route::get('/reception/reff/{year?}', [ReceptionController::class, 'index'])->name('transaction.reception.index');
+    Route::get('/reception/list', [ReceptionController::class, 'getList'])->name('transaction.reception.list');
+    Route::get('/reception/data', [ReceptionController::class, 'getData'])->name('transaction.reception.data');
+    Route::get('/reception/pic', [ReceptionController::class, 'getPic'])->name('transaction.reception.pic');
+    Route::get('/reception/view/{id}', [ReceptionController::class, 'view'])->name('transaction.reception.view');
+    Route::get('/reception/add', [ReceptionController::class, 'add'])->name('transaction.reception.add');
+    Route::get('/reception/edit/{id}', [ReceptionController::class, 'edit'])->name('transaction.reception.edit');
+    Route::post('/reception/post/{action}/{id}', [ReceptionController::class, 'post'])->name('transaction.reception.post');
 
     //expense
     Route::get('/expense/reff/{year?}', [ExpenseController::class, 'index'])->name('transaction.expense.index');
@@ -98,6 +106,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/expense/view/{id}', [ExpenseController::class, 'view'])->name('transaction.expense.view');
     Route::get('/expense/add/{type}', [ExpenseController::class, 'add'])->name('transaction.expense.add');
     Route::get('/expense/edit/{id}', [ExpenseController::class, 'edit'])->name('transaction.expense.edit');
+    Route::get('/expense/download/{id}', [ExpenseController::class, 'download'])->name('transaction.expense.download');
     Route::post('/expense/post/{action}/{id}', [ExpenseController::class, 'post'])->name('transaction.expense.post');
     //Route::post('/expense/generate', [ExpenseController::class, 'generate'])->name('transaction.offer.generate');
 });

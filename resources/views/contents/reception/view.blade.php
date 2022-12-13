@@ -6,31 +6,29 @@
     <div class="col-sm-6">
       <div class="card">
         <div class="card-body box-profile">
-          <h3 class="profile-username text-center mb-0">No. Surat</h3>
-          <h3 class="profile-username text-center">{{ $reff_no }}</h3>
-          <p class="text-muted text-center mb-0">No. Kas</p>
-          <p class="text-muted text-center">{{ $expense_id }}</p>
-          <p class="text-md badge {{ $is_red ? 'badge-danger' : 'badge-secondary' }}">{{
-            $status }}</p>
+          <h3 class="profile-username text-center mb-0">No. Kas</h3>
+          <h3 class="profile-username text-center">{{ $reception_id }}</h3>
+          <p class="text-muted text-center mb-0">Tahun Ajaran</p>
+          <p class="text-muted text-center">{{ $years }}</p>
           <ul class="list-group list-group-unbordered mb-3">
             <li class="list-group-item">
-              <b>Tgl. Transaksi</b>
-              <p class="float-right mb-0">{{ $expense_date_format }}</p>
+              <b>Tgl. Penerimaan</b>
+              <p class="float-right mb-0">{{ $reception_date_format }}</p>
             </li>
             <li class="list-group-item">
-              <b>Tgl. Surat</b>
-              <p class="float-right mb-0">{{ $reff_date_format }}</p>
+              <b>Unit</b>
+              <p class="float-right mb-0">{{ $division }}</p>
             </li>
-            @if($ma_id != $data['ma_id'])
+            @if($from_ma)
             <li class="list-group-item">
-              <b>No. M.A. (Perubahan)</b>
+              <b>No. M.A.</b>
               <p class="float-right mb-0">{{ $ma_id }}</p>
             </li>
-            @endif
             <li class="list-group-item">
               <b>PIC</b>
               <p class="float-right mb-0">{{ $staff }}</p>
             </li>
+            @endif
             <li class="list-group-item">
               <b>Deskripsi</b>
               <p class="float-right mb-0">{{ $description }}</p>
@@ -44,26 +42,9 @@
               <p class="float-right mb-0">{{ $name }}</p>
             </li>
             <li class="list-group-item">
-              <b>No. Rekening</b>
-              <p class="float-right mb-0">{{ $account }}</p>
-            </li>
-            <li class="list-group-item">
-              <b>Jml. Transaksi</b>
+              <b>Jml. Penerimaan</b>
               <p class="float-right mb-0 text-bold">Rp {{ $amount }}</p>
             </li>
-            @if($is_red)
-            <li class="list-group-item">
-              <b>Tgl. Penyerahan</b>
-              <p class="float-right mb-0">{{ $apply_date_format }}</p>
-            </li>
-            <li class="list-group-item">
-              <b>Lap. Pertaggung Jawaban</b>
-              <p class="float-right mb-0">
-                <a href="{{ $download }}" rel="noopener noreferrer nofollow" target="_blank"
-                  title="Download File LPJ">{{ $image }}</a>
-              </p>
-            </li>
-            @endif
             <li class="list-group-item">
               <b>Tgl. Diubah</b>
               <p class="float-right mb-0">{{ $updated_by }} On {{ $updated_at }}</p>
@@ -74,23 +55,24 @@
           <div class="row justify-content-center">
             <div class="col-auto">
               @include('partials.button.back', array('class' => 'btn-sm', 'action' =>
-              route('transaction.expense.index')))
+              route('transaction.reception.index')))
             </div>
             @if($is_update)
             <div class="col-auto">
-              @include('partials.button.edit', array('class' => 'btn-sm', 'action' => route('transaction.expense.edit',
+              @include('partials.button.edit', array('class' => 'btn-sm', 'action' => route('transaction.reception.edit',
               ['id'
               => $id])))
             </div>
             <div class="col-auto">
               @include('partials.button.print', array('class' => 'btn-sm', 'action' =>
-              route('transaction.expense.index')))
+              route('transaction.reception.index')))
             </div>
             @endif
           </div>
         </div>
       </div>
     </div>
+    @if($from_ma)
     <div class="col-sm-6">
       <div class="card">
         <div class="card-body box-profile">
@@ -119,6 +101,7 @@
         </div>
       </div>
     </div>
+    @endif
   </div>
 </div>
 @endsection

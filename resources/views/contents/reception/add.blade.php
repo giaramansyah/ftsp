@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
   <div class="card">
-    <form class="form-lazy-control" data-action="{{ $action }}" data-method="upload" data-validate="max_amount,image">
+    <form class="form-lazy-control" data-action="{{ $action }}" data-method="post">
       <div class="card-body">
         <input type="hidden" name="type" value="{{ isset($type) ? $type : '' }}">
         <div class="form-group row">
@@ -33,33 +33,28 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">No. Kas<code>*</code></label>
           <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" name="expense_id"
-              value="{{ isset($expense_id) ? $expense_id : '' }}" readonly {{ isset($mandatory) &&
+            <input type="text" class="form-control form-control-sm" name="reception_id"
+              value="{{ isset($reception_id) ? $reception_id : '' }}" readonly {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
-          <label class="col-sm-2 offset-sm-1 col-form-label">Tgl. Transaksi<code>*</code></label>
+          <label class="col-sm-2 offset-sm-1 col-form-label">Tgl. Penerimaan<code>*</code></label>
           <div class="col-sm-2">
-            <input type="date" class="form-control form-control-sm" name="expense_date" {{ isset($mandatory) &&
+            <input type="date" class="form-control form-control-sm" name="reception_date" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">No. Surat<code>*</code></label>
-          <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" name="reff_no" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
-          </div>
-          <label class="col-sm-2 offset-sm-1 col-form-label">Tgl. Surat<code>*</code></label>
-          <div class="col-sm-2">
-            <input type="date" class="form-control form-control-sm" name="reff_date" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
-          </div>
-        </div>
-        <div class="form-group row mb-0">
           <label class="col-sm-2 col-form-label">Mata Anggaran<code>*</code></label>
           <div class="col-sm-2">
+            <div class="form-check pt-2">
+              <input class="form-check-input" type="checkbox" name="from_ma_id" value="1" onchange="getData()">
+              <label class="form-check-label">Penerimaan UMD</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row mb-0 form-ma-input">
+          <div class="offset-sm-2 col-sm-2">
             <input type="hidden" name="data_id">
-            <input type="hidden" name="validate_max" id="validate_max">
             <input type="text" class="form-control form-control-sm" name="ma_id" readonly {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
@@ -70,7 +65,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row form-ma-table">
           <div class="offset-sm-2 col-sm-10">
             <table class="table table-sm table-bordered" width="100%">
               <thead>
@@ -78,8 +73,6 @@
                   <th class="text-center">#</th>
                   <th class="text-center">No. M.A.</th>
                   <th class="text-center">Deskripsi</th>
-                  <th class="text-center">Total Dana</th>
-                  <th class="text-center">Sisa Dana</th>
                 </tr>
               </thead>
               <tbody>
@@ -106,8 +99,8 @@
             <input type="text" class="form-control form-control-sm" name="name" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
-          <label class="col-sm-2 offset-sm-1 col-form-label">PIC<code>*</code></label>
-          <div class="col-sm-2">
+          <label class="col-sm-2 offset-sm-1 col-form-label form-pic-label">PIC<code>*</code></label>
+          <div class="col-sm-2 form-pic-select">
             <select class="form-control form-control-sm select2" name="staff_id" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
               <option value="">-- Silakan Pilih --</option>
@@ -115,7 +108,7 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Nilai Transaksi<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Nilai Penerimaan<code>*</code></label>
           <div class="col-sm-2">
             <div class="input-group input-group-sm">
               <div class="input-group-prepend">
@@ -126,12 +119,6 @@
                 isset($mandatory) && $mandatory? 'required' : '' }}>
             </div>
           </div>
-          <label class="col-sm-2 offset-sm-1 col-form-label">No. Rekening<code>*</code></label>
-          <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" maxlength="20" name="account"
-              onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, false)" onblur="numberFormat(this, false)" {{
-              isset($mandatory) && $mandatory? 'required' : '' }}>
-          </div>
         </div>
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Terbilang<code>*</code></label>
@@ -140,36 +127,13 @@
               $mandatory? 'required' : '' }}>
           </div>
         </div>
-        @if($is_red)
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Tgl. Penyerahan<code>*</code></label>
-          <div class="col-sm-2">
-            <input type="date" class="form-control form-control-sm" name="apply_date" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Upload LPJ</label>
-          <div class="col-sm-7">
-            <div class="input-group input-group-sm">
-              <div class="custom-file">
-                <input type="file" name="image" id="image" class="custom-file-input"
-                  accept="application/pdf, image/jpg, image/png" {{ isset($mandatory) && $mandatory &&
-                  !isset($image)? 'required' : '' }}>
-                <label class="custom-file-label" for="file">Pilih File</label>
-              </div>
-            </div>
-            <span class="font-italic small">*ekstensi file hanya .pdf, .jpg dan .png</span>
-          </div>
-        </div>
-        @endif
       </div>
       <div class="card-footer">
         <div class="form-button">
           <div class="row justify-content-center">
             <div class="col-sm-1">
               @include('partials.button.back', ['class' => 'btn-sm btn-block', 'action' =>
-              route('transaction.expense.index')])
+              route('transaction.reception.index')])
             </div>
             <div class="col-sm-1">
               @include('partials.button.submit')
@@ -188,18 +152,25 @@
 <script type="text/javascript">
   $('.select2').select2({theme: 'bootstrap4'});
   $('.table').DataTable({dom: 'rf'});
-  bsCustomFileInput.init();
 
   $('select[name="year"]').trigger('change')
   $('select[name="division_id"]').trigger('change')
+  $('input[name="from_ma_id"]').trigger('change')
 
   function getData() {
     var year = $('select[name="year"]').val();
     var division_id = $('select[name="division_id"]').val();
+    var from_ma = $('input[name="from_ma_id"]').is(":checked");
 
-    if(year != '' && division_id != '') {
+    if(year != '' && division_id != '' && from_ma) {
       $('.table').dataTable().fnClearTable();
       $('.table').dataTable().fnDestroy();
+      $('.form-ma-input').show()
+      $('.form-ma-input').find('input[type="text"]').attr('required', true)
+      $('.form-ma-table').show()
+      $('.form-pic-label').show()
+      $('.form-pic-select').show()
+      $('.form-pic-select').find('select').attr('required', true)
       var data = {
         year : year,
         division_id : division_id
@@ -213,7 +184,7 @@
           info: false,
           ajax : {
             method : 'get',
-            url : "{{ route('transaction.expense.data') }}",
+            url : "{{ route('transaction.reception.data') }}",
             data: data
           },
           dom: 'rf',
@@ -222,8 +193,6 @@
             {data: 'input', name: 'input', orderable: false, searchable: false, class: "text-center"},
             {data: 'ma_id', name: 'ma_id', orderable: true, searchable: true},
             {data: 'description', name: 'description', orderable: true, searchable: true},
-            {data: 'amount', name: 'amount', orderable: true, searchable: true, class: "text-right"},
-            {data: 'remain', name: 'remain', orderable: true, searchable: true, class: "text-right"},
           ],
           fnInitComplete : function() {
             $('.table').off().on('click', 'input[name="ma"]', function() {
@@ -239,13 +208,20 @@
           }
         }
       );
+    } else {
+      $('.form-ma-input').hide()
+      $('.form-ma-input').find('input[type="text"]').attr('required', false)
+      $('.form-ma-table').hide()
+      $('.form-pic-label').hide()
+      $('.form-pic-select').hide()
+      $('.form-pic-select').find('select').attr('required', false)
     }
   }
 
   function getPic(data_id) {
     $.ajax({
       method: 'get',
-      url: "{{ route('transaction.expense.pic') }}",
+      url: "{{ route('transaction.reception.pic') }}",
       data: {data_id : data_id},
       dataType: 'json',
       beforeSend: function() {

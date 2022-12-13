@@ -2,24 +2,24 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 
-class Expense extends Model
+class Reception extends Model
 {
     use HasFactory;
 
-    protected $table = 'ts_expense';
+    protected $table = 'ts_reception';
     
-    protected $appends = ['staff', 'status', 'expense_date_format', 'apply_date_format', 'reff_date_format'];
+    protected $appends = ['staff', 'division', 'years', 'reception_date_format'];
 
     protected $fillable = [
-        'expense_id',
-        'expense_date',
-        'reff_no',
-        'reff_date',
+        'reception_id',
+        'reception_date',
+        'year',
+        'division_id',
         'description',
         'sub_description',
         'data_id',
@@ -28,10 +28,6 @@ class Expense extends Model
         'staff_id',
         'amount',
         'text_amount',
-        'account',
-        'apply_date',
-        'image',
-        'type',
         'created_by',
         'updated_by',
     ];
@@ -65,40 +61,29 @@ class Expense extends Model
         return '';
     }
 
-    public function getStatusAttribute()
+    public function getReceptionDateFormatAttribute()
     {
-        if(isset($this->attributes['type']) && $this->attributes['type'] != 0) {
-            $arrType = array_combine(config('global.type.code'), config('global.type.status'));
-            return $arrType[$this->attributes['type']];
-        }
-        return '';
-    }
-
-    public function getExpenseDateFormatAttribute()
-    {
-        if(isset($this->attributes['expense_date'])) {
-            $date = Carbon::createFromFormat('Y-m-d', $this->attributes['expense_date']);
+        if(isset($this->attributes['reception_date'])) {
+            $date = Carbon::createFromFormat('Y-m-d', $this->attributes['reception_date']);
             return $date->format('d M Y');
         }
         return '';
     }
 
-    public function getReffDateFormatAttribute()
+    public function getYearsAttribute()
     {
-        if(isset($this->attributes['reff_date'])) {
-            $date = Carbon::createFromFormat('Y-m-d', $this->attributes['reff_date']);
-            return $date->format('d M Y');
+        if(isset($this->attributes['year'])) {
+            return $this->attributes['year'] . '/' . ($this->attributes['year']+1);
+        }
+    }
+
+    public function getDivisionAttribute()
+    {
+        if(isset($this->attributes['division_id']) && $this->attributes['division_id'] != 0) {
+            $arrDivision = array_combine(config('global.division.code'), config('global.division.desc'));
+            return $arrDivision[$this->attributes['division_id']];
         }
         return '';
     }
-
-    public function getApplyDateFormatAttribute()
-    {
-        if(isset($this->attributes['apply_date'])) {
-            $date = Carbon::createFromFormat('Y-m-d', $this->attributes['apply_date']);
-            return $date->format('d M Y');
-        }
-        return '';
-    }
-
+    
 }

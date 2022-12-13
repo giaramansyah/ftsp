@@ -166,14 +166,36 @@ class MigrateTables extends Migration
                 $table->string('description', 100)->nullable(false);
                 $table->string('sub_description', 250)->nullable(true);
                 $table->string('data_id', 20)->nullable(false);
+                $table->string('ma_id', 20)->nullable(true);
                 $table->string('name', 50)->nullable(false);
                 $table->tinyInteger('staff_id')->nullable(false);
                 $table->bigInteger('amount')->nullable(false);
                 $table->string('text_amount', 100)->nullable(false);
                 $table->string('account', 20)->nullable(false);
                 $table->date('apply_date')->nullable(true);
-                $table->string('image', 50)->nullable(true);
+                $table->string('image', 200)->nullable(true);
                 $table->tinyInteger('type')->nullable(false);
+                $table->string('created_by', 100)->nullable(false);
+                $table->string('updated_by', 100)->nullable(false);
+                $table->timestamps();
+            });
+        }
+
+        if (!Schema::hasTable('ts_reception')) {
+            Schema::create('ts_reception', function (Blueprint $table) {
+                $table->id();
+                $table->string('reception_id', 15)->nullable(false);
+                $table->date('reception_date')->nullable(false);
+                $table->integer('year')->nullable(false);
+                $table->tinyInteger('division_id')->nullable(false);
+                $table->string('description', 100)->nullable(false);
+                $table->string('sub_description', 250)->nullable(true);
+                $table->string('data_id', 20)->nullable(true);
+                $table->string('ma_id', 20)->nullable(true);
+                $table->string('name', 50)->nullable(false);
+                $table->tinyInteger('staff_id')->nullable(true);
+                $table->bigInteger('amount')->nullable(false);
+                $table->string('text_amount', 100)->nullable(false);
                 $table->string('created_by', 100)->nullable(false);
                 $table->string('updated_by', 100)->nullable(false);
                 $table->timestamps();
@@ -195,11 +217,12 @@ class MigrateTables extends Migration
         Schema::dropIfExists('ms_privilege');
         Schema::dropIfExists('ms_privilege_group');
         Schema::dropIfExists('map_privilege');
-        Schema::dropIfExists('ms_data');
-        Schema::dropIfExists('map_data');
+        // Schema::dropIfExists('ms_data');
+        // Schema::dropIfExists('map_data');
         Schema::dropIfExists('log_data');
         Schema::dropIfExists('ms_balance');
         Schema::dropIfExists('ts_history_balance');
-        Schema::dropIfExists('ts_expense');
+        // Schema::dropIfExists('ts_expense');
+        // Schema::dropIfExists('ts_reception');
     }
 }

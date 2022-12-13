@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use hisorange\BrowserDetect\Parser as Browser;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 
 class Controller extends BaseController
 {
@@ -160,6 +161,19 @@ class Controller extends BaseController
         } else {
             return number_format($value, 0, null, ',');
         }
+    }
+
+    public function getFile($filename) {
+        $arr = explode('_', $filename);
+        $arrDate = Arr::only($arr, [0, 1, 2]);
+        $arrName = Arr::except($arr, [0, 1, 2, 3, 4, 5]);
+
+        $year = Carbon::createFromFormat('d M Y', implode(' ', $arrDate))->year;
+        $month = Carbon::createFromFormat('d M Y', implode(' ', $arrDate))->month;
+        $name = implode('_', $arrName);
+        $descMonth = config('global.months');
+
+        return (object) array('name' => $name, 'path' => public_path('upload').'/'.$year.'/'.$descMonth[$month].'/'.$filename);
     }
     
 }
