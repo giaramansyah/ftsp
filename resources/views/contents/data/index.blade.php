@@ -103,7 +103,7 @@
         columns : [
           {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
           {data: 'ma', name: 'ma', orderable: true, searchable: true},
-          {data: 'description', name: 'description', orderable: true, searchable: true},
+          {data: 'description', name: 'description', orderable: true, searchable: true, class: 'text-wrap'},
           {data: 'staff', name: 'staff', orderable: true, searchable: true},
           {data: 'amount', name: 'amount', orderable: true, searchable: true, class: 'text-right text-bold'},
           {data: 'used', name: 'used', orderable: true, searchable: true, class: 'text-right text-bold'},

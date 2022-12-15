@@ -108,6 +108,29 @@ class DatabaseSeeder extends Seeder
                                 'desc' => 'Read detail of master balance'
                             ),
                         )
+                    ),
+                    array(
+                        'label' => 'Tahun Ajaran',
+                        'alias' => 'years',
+                        'url' => 'master.years.index',
+                        'order' => 0,
+                        'privilege' => array(
+                            array(
+                                'code' => 'YRCR',
+                                'modules' => Config::get('global.modules.code.create'),
+                                'desc' => 'Add new master years'
+                            ),
+                            array(
+                                'code' => 'YRRM',
+                                'modules' => Config::get('global.modules.code.delete'),
+                                'desc' => 'Remove existing master years'
+                            ),
+                            array(
+                                'code' => 'YRRA',
+                                'modules' => Config::get('global.modules.code.readall'),
+                                'desc' => 'Read list of master years'
+                            ),
+                        )
                     )
                 )
             ),
@@ -315,7 +338,7 @@ class DatabaseSeeder extends Seeder
 
         $idPrivigroup = DB::table('ms_privilege_group')->insertGetId($privilegegroup);
 
-        foreach($menus as $value) {
+        foreach ($menus as $value) {
             $idParent = DB::table('ms_parent_menus')->insertGetId([
                 'label' => $value['label'],
                 'alias' => $value['alias'],
@@ -323,7 +346,7 @@ class DatabaseSeeder extends Seeder
                 'order' => $value['order'],
             ]);
 
-            foreach($value['child'] as $val) {
+            foreach ($value['child'] as $val) {
                 $idMenu = DB::table('ms_menus')->insertGetId([
                     'parent_id' => $idParent,
                     'label' => $val['label'],
@@ -332,7 +355,7 @@ class DatabaseSeeder extends Seeder
                     'order' => $val['order']
                 ]);
 
-                foreach($val['privilege'] as $v) {
+                foreach ($val['privilege'] as $v) {
                     $idPrivi = DB::table('ms_privilege')->insertGetId([
                         'code' => $v['code'],
                         'menu_id' => $idMenu,
@@ -341,7 +364,7 @@ class DatabaseSeeder extends Seeder
                     ]);
 
                     DB::table('map_privilege')->insert([
-                        'privilege_group_id' => $idPrivigroup, 
+                        'privilege_group_id' => $idPrivigroup,
                         'privilege_id' => $idPrivi
                     ]);
                 }

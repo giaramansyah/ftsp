@@ -858,13 +858,13 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
     };
     var Static = {
         content: "content",
-        redirect : "redirect",
-        view : "view",
-        download : "download",
-        modal : "modal",
-        table : "table",
-        database : "database",
-        form : "form"
+        redirect: "redirect",
+        view: "view",
+        download: "download",
+        modal: "modal",
+        table: "table",
+        database: "database",
+        form: "form",
     };
 
     var ButtonAction = (function () {
@@ -884,7 +884,7 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
         };
 
         _proto._view = function _view() {
-            if(this._settings.source == null) {
+            if (this._settings.source == null) {
                 throw new Error(
                     "Data source was not defined. Please specify a action in your button data-source option."
                 );
@@ -892,15 +892,19 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
 
             var data = this.populateData();
 
-            if(this._settings.intent == null) {
+            if (this._settings.intent == null) {
                 this._settings.intent = this.createModal();
             }
 
-            if(this._settings.dial === Static.form) {
-                $_default['default'](this._settings.intent).find(this._settings.dial).data(DATA_ACTION, this._settings.action)
+            if (this._settings.dial === Static.form) {
+                $_default["default"](this._settings.intent)
+                    .find(this._settings.dial)
+                    .data(DATA_ACTION, this._settings.action);
             }
 
-            $_default["default"](this._settings.intent).find(".modal-body").html(data);
+            $_default["default"](this._settings.intent)
+                .find(".modal-body")
+                .html(data);
 
             $_default["default"](this._settings.intent).modal({
                 backdrop: "static",
@@ -909,9 +913,17 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
         };
 
         _proto.createModal = function createModal() {
-            var modal = dialog = content = header = body = footer = $_default["default"]("<div>");
+            var modal =
+                (dialog =
+                content =
+                header =
+                body =
+                footer =
+                    $_default["default"]("<div>"));
             var title = $_default["default"]("<h4>");
-            var close = $_default["default"]('<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">');
+            var close = $_default["default"](
+                '<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">'
+            );
 
             modal.addClass("modal fade");
             modal.attr("id", "viewModal");
@@ -928,7 +940,7 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
             header.append(title);
 
             content.append(header);
-            
+
             body.addClass("modal-body p-2");
             body.append($_default["default"]('<div class="row">'));
             content.append(body);
@@ -946,9 +958,9 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
         _proto.populateData = function populateData() {
             var data = "";
 
-            if(this._settings.source == Static.table) {
+            if (this._settings.source == Static.table) {
                 data = this.tableData();
-            } else if(this._settings.source == Static.database) {
+            } else if (this._settings.source == Static.database) {
                 data = this.baseData();
             } else {
                 throw new Error(
@@ -977,16 +989,15 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
                 }
             }
 
-            return _rows;
+            return '<div class="row">' + _rows + "</div>";
         };
 
         _proto.baseData = function baseData() {
             var _card = this._element.closest("div.card");
-            var _body = _card.find('.card-body').clone();
+            var _body = _card.find(".card-body").clone();
 
             return _body;
-        }
-
+        };
 
         _proto._init = function _init() {
             if (this._settings.method == Static.redirect) {
@@ -1005,23 +1016,22 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
         ButtonAction._jQueryInterface = function _jQueryInterface() {
             var options = {};
 
-            if (
-                $_default["default"](this).data(DATA_ACTION) !==
-                "undefined"
-            ) {
+            if ($_default["default"](this).data(DATA_ACTION) !== "undefined") {
                 options.action = $_default["default"](this).data(DATA_ACTION);
             } else {
                 options.action = $_default["default"](location).attr("href");
             }
 
             if (
-                typeof $_default["default"](this).data(DATA_METHOD) !== "undefined"
+                typeof $_default["default"](this).data(DATA_METHOD) !==
+                "undefined"
             ) {
                 options.method = $_default["default"](this).data(DATA_METHOD);
             }
 
             if (
-                typeof $_default["default"](this).data(DATA_SOURCE) !== "undefined"
+                typeof $_default["default"](this).data(DATA_SOURCE) !==
+                "undefined"
             ) {
                 options.source = $_default["default"](this).data(DATA_SOURCE);
             }
@@ -1043,7 +1053,6 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
             var _options = $_default["default"].extend({}, Defaults, options);
             var data = new ButtonAction($_default["default"](this), _options);
             data._init();
-
         };
 
         return ButtonAction;

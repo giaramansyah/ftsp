@@ -201,6 +201,17 @@ class MigrateTables extends Migration
                 $table->timestamps();
             });
         }
+
+        if (!Schema::hasTable('ms_year')) {
+            Schema::create('ms_year', function (Blueprint $table) {
+                $table->id();
+                $table->integer('year')->nullable(false);
+                $table->string('created_by', 100)->nullable(false);
+                $table->string('updated_by', 100)->nullable(false);
+                $table->tinyInteger('is_trash')->nullable(false)->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -217,12 +228,13 @@ class MigrateTables extends Migration
         Schema::dropIfExists('ms_privilege');
         Schema::dropIfExists('ms_privilege_group');
         Schema::dropIfExists('map_privilege');
-        // Schema::dropIfExists('ms_data');
-        // Schema::dropIfExists('map_data');
+        Schema::dropIfExists('ms_data');
+        Schema::dropIfExists('map_data');
         Schema::dropIfExists('log_data');
         Schema::dropIfExists('ms_balance');
         Schema::dropIfExists('ts_history_balance');
-        // Schema::dropIfExists('ts_expense');
-        // Schema::dropIfExists('ts_reception');
+        Schema::dropIfExists('ts_expense');
+        Schema::dropIfExists('ts_reception');
+        Schema::dropIfExists('ms_year');
     }
 }

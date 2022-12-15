@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DataLog;
 use App\Models\Privilege;
 use App\Models\UserLog;
+use App\Models\Year;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -116,13 +117,13 @@ class Controller extends BaseController
     public function getYears()
     {
         $result = array();
-        for($i = 2022; $i < 2029; $i++) {
+        $years = Year::where('is_trash', 0)->orderBy('year')->get();
+        foreach($years as $value) {
             $result[] = array(
-                'id' => $i,
-                'name' => $i.'/'.($i+1),
+                'id' => $value->year,
+                'name' => $value->years,
             );
         }
-
         return $result;
     }
 

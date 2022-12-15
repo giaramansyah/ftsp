@@ -12,6 +12,7 @@ use App\Http\Controllers\DataController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ReceptionController;
+use App\Http\Controllers\YearController;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,5 +109,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/expense/edit/{id}', [ExpenseController::class, 'edit'])->name('transaction.expense.edit');
     Route::get('/expense/download/{id}', [ExpenseController::class, 'download'])->name('transaction.expense.download');
     Route::post('/expense/post/{action}/{id}', [ExpenseController::class, 'post'])->name('transaction.expense.post');
-    //Route::post('/expense/generate', [ExpenseController::class, 'generate'])->name('transaction.offer.generate');
+
+    //years
+    Route::get('/years', [YearController::class, 'index'])->name('master.years.index');
+    Route::get('/years/list', [YearController::class, 'getList'])->name('master.years.list');
+    Route::post('/years/post/{action}/{id}', [YearController::class, 'post'])->name('master.years.post');
 });

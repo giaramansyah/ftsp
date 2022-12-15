@@ -172,8 +172,9 @@ class ReceptionController extends Controller
             $rawColumns = array('input');
 
             $table->addColumn('input', function ($row) {
+                $expense = Expense::where('type', config('global.type.code.white'))->where('data_id', $row->id)->first();
                 $column = '<div class="form-check">
-                <input class="form-check-input" type="radio" name="ma" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->id) . '" data-ma="' . $row->ma_id . '">
+                <input class="form-check-input" type="radio" name="ma" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->id) . '" data-ma="' . $row->ma_id . '" data-desc="' . $expense->description . '" data-subdesc="' . $expense->sub_description . '" data-name="' . $expense->name . '" data-pic="' . $expense->staff_id . '" data-amount="' . $expense->amount . '" data-textamount="' . $expense->text_amount . '">
                 <label class="form-check-label">&nbsp;</label>
                 </div>';
 

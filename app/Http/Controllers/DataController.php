@@ -113,7 +113,7 @@ class DataController extends Controller
 
         $data['id'] = $id;
 
-        $expense =  Expense::selectRaw('sum(amount) as amount')->where('id', $plainId)->first()->toArray();
+        $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $plainId)->first()->toArray();
         if ($expense) {
             $used = $this->convertAmount($expense['amount'], true);
         } else {
@@ -126,10 +126,13 @@ class DataController extends Controller
         $data['used'] = $this->convertAmount($used);
         $data['remain'] = $this->convertAmount($remain);
         $data['percent'] = $percent . '%';
+        $data['history'] =  Expense::where('data_id', $plainId)->get()->toArray();
+
+        $view = ['is_update' => $this->hasPrivilege($this->_update), 'is_delete' => $this->hasPrivilege($this->_delete)];
 
         $this->writeAppLog($this->_readid, 'Data : ' . $data['ma_id']);
 
-        return view('contents.data.view', $data);
+        return view('contents.data.view', array_merge($data, $view));
     }
 
     public function getList(Request $request)

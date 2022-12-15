@@ -198,12 +198,20 @@
             $('.table').off().on('click', 'input[name="ma"]', function() {
               var data_id = $(this).val();
               var amount = $(this).data('amount')
-              var available = $(this).data('available')
               var ma = $(this).data('ma')
+              var desc = $(this).data('desc')
+              var subdesc = $(this).data('subdesc')
+              var name = $(this).data('name')
+              var pic = $(this).data('pic')
+              var textamount = $(this).data('textamount')
               $('input[name="ma_id"]').val(ma)
               $('input[name="data_id"]').val(data_id)
-              $('input[name="validate_max"]').val(available)
-              getPic(data_id)
+              $('input[name="description"]').val(desc)
+              $('input[name="sub_escription"]').val(subdesc)
+              $('input[name="name"]').val(name)
+              $('input[name="amount"]').val(amount)
+              $('input[name="text_amount"]').val(textamount)
+              getPic(data_id, pic)
             })
           }
         }
@@ -218,7 +226,7 @@
     }
   }
 
-  function getPic(data_id) {
+  function getPic(data_id, pic = null) {
     $.ajax({
       method: 'get',
       url: "{{ route('transaction.reception.pic') }}",
@@ -229,6 +237,9 @@
       },
       success: function(response) {
         $('select[name="staff_id"]').select2({data: response.data});
+        if(pic != null) {
+          $('select[name="staff_id"]').select2().val(pic).trigger("change");
+        }
       }
     });
   }
