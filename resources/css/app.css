@@ -41,7 +41,7 @@
 .table td {
     border-top: 0;
     border-bottom: 1px solid #dee2e6;
-    white-space: nowrap !important;
+    white-space: nowrap;
 }
 
 .table th {
