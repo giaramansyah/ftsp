@@ -47,3 +47,16 @@
 .table th {
     text-transform: uppercase !important;
 }
+
+.bg-login {
+    background-image: url("../img/background.jpg");
+    background-position: center;
+	background-repeat: no-repeat;
+	background-size: auto;
+}
+
+/* .login-box {
+	width: 100%;
+	padding-left: 7%;
+	padding-right: 7%;
+} */

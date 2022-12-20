@@ -1,6 +1,6 @@
 <aside class="main-sidebar sidebar-light-lightblue elevation-1">
   <a href="index3.html" class="brand-link">
-    <img src="{{ asset('img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle"
+    <img src="{{ asset('img/logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle"
       style="opacity: .8">
     <span class="brand-text font-weight-light">MOKU FTSP</span>
   </a>

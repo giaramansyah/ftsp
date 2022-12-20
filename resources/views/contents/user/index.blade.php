@@ -17,7 +17,6 @@
             <th>No</th>
             <th>Akun</th>
             <th>Email</th>
-            <th>Akun Terhubung</th>
             <th>Tgl. Diubah</th>
             <th>Opsi</th>
           </tr>
@@ -44,7 +43,6 @@
               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
               {data: 'user_fullname', name: 'user_fullname', orderable: true, searchable: true},
               {data: 'email', name: 'email', orderable: true, searchable: true},
-              {data: 'login', name: 'login', orderable: true, searchable: true},
               {data: 'updated_at', name: 'updated_at', orderable: true, searchable: true},
               {data: 'action', name: 'action', orderable: false, searchable: false},
             ],

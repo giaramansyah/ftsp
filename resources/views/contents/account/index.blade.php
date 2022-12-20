@@ -32,29 +32,7 @@
         </div>
         <div class="card-footer">
           <div class="row justify-content-center">
-            <div class="col-auto">
-              @include('partials.button.back', array('class' => 'btn-sm', 'action' => route('settings.user.index')))
-            </div>
-            @if($is_update)
-            <div class="col-auto">
-              @include('partials.button.edit', array('class' => 'btn-sm', 'action' => route('settings.user.edit', ['id'
-              => $id])))
-            </div>
-            @endif
-            @if($is_delete)
-            <div class="col-auto">
-              @include('partials.button.delete', array('class' => 'btn-sm', 'source' => 'database', 'action' =>
-              route('settings.user.post',
-              ['action' => config('global.action.form.delete'), 'id' => $id])))
-            </div>
-            @endif
-            @if($is_update)
-            <div class="col-auto">
-              @include('partials.button.forcelogout', array('class' => 'btn-sm', 'source' => 'database', 'action' =>
-              route('settings.user.reset',
-              ['id' => $id])))
-            </div>
-            @endif
+            
           </div>
         </div>
       </div>

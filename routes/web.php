@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountabilityController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BalanceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\YearController;
+use App\Http\Controllers\PasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,14 +31,19 @@ use App\Http\Controllers\YearController;
 Route::group(['middleware' => ['guest']], function() {
     Route::get('/auth', [LandingController::class, 'index'])->name('landing');
     Route::post('/auth', [LandingController::class, 'auth'])->name('auth');
+    Route::get('/password/{action}/{id}', [PasswordController::class, 'index'])->name('password.guest');
+    Route::post('/password/{action}/{id}', [PasswordController::class, 'post'])->name('password.guest.post');
 });
 
 Route::group(['middleware' => ['auth']], function() {
     //logout
     Route::get('/logout', [LandingController::class, 'logout'])->name('logout');
 
-    //homeDashboard
+    //home
     Route::get('/', [HomeController::class, 'index'])->name('home');
+
+    //myaccount
+    Route::get('/myaccount', [AccountController::class, 'index'])->name('myaccount');
 
     //privilege
     Route::get('/privilege', [PrivilegeController::class, 'index'])->name('settings.privilege.index');
@@ -59,6 +66,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/user/add', [UserController::class, 'add'])->name('settings.user.add');
     Route::get('/user/edit/{id}', [UserController::class, 'edit'])->name('settings.user.edit');
     Route::post('/user/post/{action}/{id}', [UserController::class, 'post'])->name('settings.user.post');
+    Route::post('/user/reset/{id}', [UserController::class, 'reset'])->name('settings.user.reset');
 
     //logs
     Route::get('/logs/activity', [LogsController::class, 'index'])->name('logs.activity.index');

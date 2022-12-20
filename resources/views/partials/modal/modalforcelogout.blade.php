@@ -1,9 +1,9 @@
-<div class="modal fade" id="modalDelete">
+<div class="modal fade" id="modalForceLogout">
   <div class="modal-dialog">
     <div class="modal-content">
       <form class="form-lazy-control">
         <div class="modal-header p-2 justify-content-center">
-          <h4 class="modal-title">Lepas Akun Ini Dari Perangkat Terhubung?</h4>
+          <h4 class="modal-title">Reset Kata Sandi Akun ini?</h4>
         </div>
         <div class="modal-body p-2">
           <div class="alert hidden" role="alert"></div>

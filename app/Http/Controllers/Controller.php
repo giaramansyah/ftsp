@@ -42,7 +42,7 @@ class Controller extends BaseController
         return $param;
     }
 
-    public function writeAppLog($privilege, $description = '') 
+    public function writeAppLog($privilege, $description = '', $username = null) 
     {
         $staticId = array_combine(config('global.privilege.static.code'), config('global.privilege.static.id'));
         $staticDesc = array_combine(config('global.privilege.static.code'), config('global.privilege.static.desc'));
@@ -63,7 +63,7 @@ class Controller extends BaseController
         }
 
         UserLog::create([
-            'username' => Auth::user()->username,
+            'username' => isset(Auth::user()->username) ? Auth::user()->username : $username,
             'privilege_id' => $id,
             'description' => $desc . ($description != '' ? ' : ' .  $description : ''),
             'ip_address' => Request::getClientIp(true),

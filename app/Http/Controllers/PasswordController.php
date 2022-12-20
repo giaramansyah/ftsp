@@ -29,7 +29,7 @@ class PasswordController extends Controller
 
         if($action === config('global.action.password.add')) {
             $view = ['action' => route('password.guest.post', ['action' => config('global.action.password.add'), 'id' => $id])];
-            return view('contents.user.password.new', $view);
+            return view('contents.password.new', $view);
         }
 
         if($action === config('global.action.password.forget')) {
@@ -66,7 +66,7 @@ class PasswordController extends Controller
                     $response = new Response(true, __('Password created successfuly, Please login to continue'), 1);
                     $response->setRedirect(route('landing'));
 
-                    $this->writeAppLog('NPWD');
+                    $this->writeAppLog('NPWD', '', $user->username);
                 } else {
                     $response = new Response(false, __('Create password failed. Please try again'));
                 }

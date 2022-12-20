@@ -7,6 +7,7 @@ use App\Library\SecureHelper;
 use App\Library\Response;
 use App\Models\MapPrivilege;
 use App\Models\Menu;
+use App\Models\ParentMenu;
 use App\Models\Privilege;
 use App\Models\PrivilegeGroup;
 use App\Models\User;
@@ -95,7 +96,7 @@ class UserController extends Controller
         if ($request->ajax()) {
             $data = User::select(['id', 'username', 'email', 'is_login', 'updated_at', 'first_name', 'last_name'])->where('username', '!=', config('global.sysadmin.username'))->where('is_trash', 0)->orderBy('id');
             $table = DataTables::eloquent($data);
-            $rawColumns = array('user_fullname', 'login');
+            $rawColumns = array('user_fullname');
             $table->addIndexColumn();
 
             $table->addColumn('user_fullname', function($row) {
@@ -123,26 +124,11 @@ class UserController extends Controller
                         $column .= view('partials.button.delete', $param)->render();
                     }
 
-                    if($row->is_login) {
-                        $param = array('class' => 'btn-xs', 'action' => route('settings.user.post', ['action' => 'force_logout', 'id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.forcelogout', $param)->render();
-                    }
-
                     return $column;
                 });
 
                 $rawColumns[] = 'action';
             }
-
-            $table->addColumn('login', function($row) {
-                if($row->is_login) {
-                    $column = '<i class="fas fa-check-circle text-success"></i> '.__('Linked');
-                } else {
-                    $column = '<i class="fas fa-times-circle text-danger"></i> '.__('Unlinked');
-                }
-
-                return $column;
-            });
 
             $table->rawColumns($rawColumns);
 
@@ -172,22 +158,25 @@ class UserController extends Controller
 
         $modules = array_combine(config('global.modules.code'), config('global.modules.desc'));
 
-        $menu = Menu::select(['id','label', 'alias'])->where('is_active', 1)->orderBy('id')->get()->toArray();
-        foreach($menu as $key => $value) {
-            if(in_array($value['alias'], config('global.privilege.hidden'))) {
-                unset($menu[$key]);
-                continue;
+        $parent = ParentMenu::select(['id','label', 'alias'])->where('is_active', 1)->orderBy('id')->get()->toArray();
+        foreach($parent as $key => $value) {
+            foreach($value['menu'] as $k => $val) {
+                if(in_array($value['alias'], config('global.privilege.hidden'))) {
+                    unset($parent[$key]['menu'][$k]);
+                    continue;
+                }
+
+                $privilege = Privilege::select(['id','code', 'modules'])->where('menu_id', $value['id'])->orderBy('modules')->get()->toArray();
+                if(count($privilege) < count($modules)) {
+                    $diff = count($privilege);
+                    while($diff < count($modules)) {
+                        $privilege[] = array();
+                        $diff++;
+                    }
+                }
+                $parent[$key]['menu'][$k]['privileges'] = $privilege;
             }
 
-            $privilege = Privilege::select(['id','code', 'modules'])->where('menu_id', $value['id'])->orderBy('modules')->get()->toArray();
-            if(count($privilege) < count($modules)) {
-                $diff = count($privilege);
-                while($diff < count($modules)) {
-                    $privilege[] = array();
-                    $diff++;
-                }
-            }
-            $menu[$key]['privileges'] = $privilege;
         }
 
 
@@ -199,7 +188,7 @@ class UserController extends Controller
         $user['privilege_desc'] = $privigroup['description'];
         $user['username_enc'] = SecureHelper::secure($user['username']);
 
-        $view = ['modulesArr' => $modules, 'privilegeArr' => $menu, 'privileges' => $privileges, 'is_update' => $this->hasPrivilege($this->_update), 'is_delete' => $this->hasPrivilege($this->_delete)];
+        $view = ['modulesArr' => $modules, 'privilegeArr' => $parent, 'privileges' => $privileges, 'is_update' => $this->hasPrivilege($this->_update), 'is_delete' => $this->hasPrivilege($this->_delete)];
 
         $this->writeAppLog($this->_readid, 'User Account : '.$user['username']);
 
@@ -352,6 +341,39 @@ class UserController extends Controller
             } else {
                 $response = new Response(false, __('Account delete failed. Please try again'));
             }
+        }
+
+        return response()->json($response->responseJson());
+    }
+
+    public function reset(Request $request, $id)
+    {
+        if(!$this->hasPrivilege($this->_update)) {
+            $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
+            return response()->json($response->responseJson());
+        }
+
+        $plainId = SecureHelper::unsecure($id);
+        if(!$plainId) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $user = User::find($plainId);
+        $hash = md5(sha1(date('ymdHis')));
+        $password = $user->username.$user->username.$hash;
+        $user->hash = $hash;
+        $user->password = $password;
+        $user->is_new = 1;
+        $user->updated_by = Auth::user()->username;
+
+        if($user->save()) {
+            $response = new Response(true, __('Account password reset successfuly'), 1);
+            $response->setRedirect(route('settings.user.view', ['id' => $id]));
+
+            $this->writeAppLog($this->_update, 'Reset Password Account : '.$user->username);
+        } else {
+            $response = new Response(false, __('Account password reset failed. Please try again'));
         }
 
         return response()->json($response->responseJson());

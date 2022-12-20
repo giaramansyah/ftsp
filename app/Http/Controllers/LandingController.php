@@ -42,10 +42,10 @@ class LandingController extends Controller
                     $response = new Response(false, __('Your account is linked to another browser/device'));
                 } else {
                     if (Auth::attempt(['username' => $param['username'], 'password' => $password], $remember)) {
-                        if ($remember) {
-                            $user->is_remember = 1;
-                            $user->save();
-                        }
+                        // if ($remember) {
+                        //     $user->is_remember = 1;
+                        //     $user->save();
+                        // }
                         $response = new Response(true, __('Welcome'), 1);
                         $response->setRedirect(route('home'));
 

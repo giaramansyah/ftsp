@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }} | Login</title>
-    <link rel="shortcut icon" href="{{ asset('img/AdminLTELogo.png') }}" />
+    <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="{{asset('css/app.css')}}">
   </head>
   <body class="hold-transition login-page text-sm">
@@ -51,9 +51,6 @@
                 </div>
               </div>
             </div>
-            <p class="mb-1 text-center">
-              <a href="#">{{ __('Forgot my password') }}</a>
-            </p>
           </form>
         </div>
       </div>

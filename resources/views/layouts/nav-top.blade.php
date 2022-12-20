@@ -11,7 +11,7 @@
         <i class="fas fa-cog"></i>
       </a>
       <div class="dropdown-menu dropdown-menu-right">
-        <a href="#" class="dropdown-item">
+        <a href="{{ route('myaccount') }}" class="dropdown-item">
           Akun Saya
         </a>
         <a href="{{ route('logout') }}" class="dropdown-item">
