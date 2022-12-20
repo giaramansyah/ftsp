@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Compro'),
+    'name' => env('APP_NAME', 'Monitoring Keuangan FTSP'),
 
     /*
     |--------------------------------------------------------------------------

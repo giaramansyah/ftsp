@@ -16,6 +16,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Unit<code>*</code></label>
           <div class="col-sm-2">
+            <input type="hidden" name="division_id" value="{{ isset($division_id) && $division_id ? $division_id : '' }}">
             <input type="text" class="form-control form-control-sm"
               value="{{ isset($division) && $division ? $division : '' }}" readonly>
           </div>

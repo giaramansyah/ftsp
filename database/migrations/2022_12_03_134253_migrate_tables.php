@@ -150,6 +150,7 @@ class MigrateTables extends Migration
                 $table->id();
                 $table->bigInteger('balance_id')->nullable(false);
                 $table->string('description')->nullable(false);
+                $table->bigInteger('data_id')->nullable(true)->default(0);
                 $table->tinyInteger('transaction_id')->nullable(false);
                 $table->bigInteger('amount')->nullable(false);
                 $table->timestamps();
@@ -212,6 +213,29 @@ class MigrateTables extends Migration
                 $table->timestamps();
             });
         }
+
+        if (!Schema::hasTable('ts_report')) {
+            Schema::create('ts_report', function (Blueprint $table) {
+                $table->id();
+                $table->integer('year')->nullable(false);
+                $table->tinyInteger('division_id')->nullable(false);
+                $table->date('report_date')->nullable(false);
+                $table->tinyInteger('type')->nullable(false);
+                $table->text('knowing')->nullable(false);
+                $table->string('created_by', 100)->nullable(false);
+                $table->string('updated_by', 100)->nullable(false);
+                $table->timestamps();
+            });
+        }
+
+        if (!Schema::hasTable('map_report')) {
+            Schema::create('map_report', function (Blueprint $table) {
+                $table->bigInteger('report_id')->nullable(false);
+                $table->bigInteger('data_id')->nullable(false);
+                $table->boolean('is_reception')->nullable(false);
+                $table->boolean('is_expense')->nullable(false);
+            });
+        }
     }
 
     /**
@@ -221,20 +245,22 @@ class MigrateTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ms_user');
-        Schema::dropIfExists('log_user');
-        Schema::dropIfExists('ms_parent_menus');
-        Schema::dropIfExists('ms_menus');
-        Schema::dropIfExists('ms_privilege');
-        Schema::dropIfExists('ms_privilege_group');
-        Schema::dropIfExists('map_privilege');
-        Schema::dropIfExists('ms_data');
-        Schema::dropIfExists('map_data');
-        Schema::dropIfExists('log_data');
-        Schema::dropIfExists('ms_balance');
-        Schema::dropIfExists('ts_history_balance');
-        Schema::dropIfExists('ts_expense');
-        Schema::dropIfExists('ts_reception');
-        Schema::dropIfExists('ms_year');
+        // Schema::dropIfExists('ms_user');
+        // Schema::dropIfExists('log_user');
+        // Schema::dropIfExists('ms_parent_menus');
+        // Schema::dropIfExists('ms_menus');
+        // Schema::dropIfExists('ms_privilege');
+        // Schema::dropIfExists('ms_privilege_group');
+        // Schema::dropIfExists('map_privilege');
+        // Schema::dropIfExists('ms_data');
+        // Schema::dropIfExists('map_data');
+        // Schema::dropIfExists('log_data');
+        // Schema::dropIfExists('ms_balance');
+        // Schema::dropIfExists('ts_history_balance');
+        // Schema::dropIfExists('ts_expense');
+        // Schema::dropIfExists('ts_reception');
+        // Schema::dropIfExists('ms_year');
+        Schema::dropIfExists('ts_report');
+        Schema::dropIfExists('map_report');
     }
 }

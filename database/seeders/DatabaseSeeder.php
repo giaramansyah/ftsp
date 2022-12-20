@@ -199,10 +199,31 @@ class DatabaseSeeder extends Seeder
                 )
             ),
             array(
+                'label' => 'Laporan',
+                'alias' => 'report',
+                'icon' => 'fa-file-invoice',
+                'order' => 3,
+                'child' => array(
+                    array(
+                        'label' => 'Pertanggung Jawaban',
+                        'alias' => 'accountability',
+                        'url' => 'report.accountability.index',
+                        'order' => 1,
+                        'privilege' => array(
+                            array(
+                                'code' => 'ACCR',
+                                'modules' => Config::get('global.modules.code.create'),
+                                'desc' => 'Add new report accountability'
+                            ),
+                        )
+                    ),
+                )
+            ),
+            array(
                 'label' => 'Pengaturan',
                 'alias' => 'settings',
                 'icon' => 'fa-cog',
-                'order' => 3,
+                'order' => 5,
                 'child' => array(
                     array(
                         'label' => 'Grup Akses',
@@ -299,7 +320,7 @@ class DatabaseSeeder extends Seeder
                 'label' => 'Logs',
                 'alias' => 'logs',
                 'icon' => 'fa-keyboard',
-                'order' => 4,
+                'order' => 6,
                 'child' => array(
                     array(
                         'label' => 'Aktivitas Akun',
@@ -311,6 +332,19 @@ class DatabaseSeeder extends Seeder
                                 'code' => 'LURA',
                                 'modules' => Config::get('global.modules.code.readall'),
                                 'desc' => 'Read list of user activity data'
+                            ),
+                        )
+                    ),
+                    array(
+                        'label' => 'Aktivitas Upload File',
+                        'alias' => 'file',
+                        'url' => 'logs.file.index',
+                        'order' => 1,
+                        'privilege' => array(
+                            array(
+                                'code' => 'LFRA',
+                                'modules' => Config::get('global.modules.code.readall'),
+                                'desc' => 'Read list of upload file activity data'
                             ),
                         )
                     )

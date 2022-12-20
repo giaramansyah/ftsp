@@ -526,6 +526,12 @@ b.modal=function(a){return function(b,d,f){if(c.fn.modal){if(!d){if(a&&a.header)
                         willClose: () => {
                             if (response.status) {
                                 if (response.redirect.length) {
+                                    $_default["default"](_this._element)
+                                        .find(FORM_LOADING)
+                                        .hide();
+                                    $_default["default"](_this._element)
+                                        .find(FORM_BUTTON)
+                                        .show();
                                     window.location.href = response.redirect;
                                 } else {
                                     $_default["default"](_this._element)

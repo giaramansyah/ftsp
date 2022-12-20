@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Library\Response;
 use App\Library\SecureHelper;
+use App\Models\Balance;
 use App\Models\Data;
 use App\Models\Expense;
+use App\Models\HistoryBalance;
 use App\Models\MapData;
 use App\Models\Reception;
 use Illuminate\Http\Request;
@@ -79,7 +81,7 @@ class ReceptionController extends Controller
 
         $from_ma = false;
         $staffArr = array();
-        if($data['data_id']) {
+        if ($data['data_id']) {
             $from_ma = true;
             $data['data'] = Data::find($data['data_id'])->toArray();
             $map = MapData::where('data_id', $data['data_id'])->get()->toArray();
@@ -239,7 +241,7 @@ class ReceptionController extends Controller
         $data['id'] = $id;
 
         $from_ma = false;
-        if($data['data_id']) {
+        if ($data['data_id']) {
             $from_ma = true;
             $data['data'] = Data::find($data['data_id'])->toArray();
         }
@@ -288,25 +290,41 @@ class ReceptionController extends Controller
                     'created_by' => Auth::user()->username,
                     'updated_by' => Auth::user()->username,
                 ]);
-    
+
                 if ($reception->id) {
+                    $division_id = SecureHelper::unsecure($param['division_id']);
+                    $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
+                    if ($balance) {
+                        $balance->amount = ($this->convertAmount($balance->amount, true) + $this->convertAmount($param['amount'], true));
+                        $balance->updated_by = Auth::user()->username;
+                        if ($balance->save()) {
+                            HistoryBalance::create([
+                                'balance_id' => $balance->id,
+                                'amount' => $param['amount'],
+                                'description' => $param['description'],
+                                'data_id' => $reception->id,
+                                'transaction_id' => config('global.transaction.code.credit')
+                            ]);
+                        }
+                    }
+
                     $response = new Response(true, __('Reception created successfuly'), 1);
                     $response->setRedirect(route('transaction.reception.view', ['id' => SecureHelper::secure($reception->id)]));
-    
+
                     $this->writeAppLog($this->_create, 'Reception : ' . $param['reception_id']);
                 } else {
                     $response = new Response(false, __('Reception create failed. Please try again'));
                 }
             }
 
-            if($action === config('global.action.form.edit')) {
-                if(!$this->hasPrivilege($this->_update)) {
+            if ($action === config('global.action.form.edit')) {
+                if (!$this->hasPrivilege($this->_update)) {
                     $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
                     return response()->json($response->responseJson());
                 }
 
                 $plainId = SecureHelper::unsecure($id);
-                if(!$plainId) {
+                if (!$plainId) {
                     $response = new Response();
                     return response()->json($response->responseJson());
                 }
@@ -323,6 +341,18 @@ class ReceptionController extends Controller
                 $reception->created_by = Auth::user()->username;
 
                 if ($reception->save()) {
+                    $division_id = $param['division_id'];
+                    $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
+                    if ($balance) {
+                        $history = HistoryBalance::where('balance_id', $balance->id)->where('data_id', $reception->id)->where('transaction_id', config('global.transaction.code.credit'))->first();
+                        $balance->amount = ($this->convertAmount($balance->amount, true) - $this->convertAmount($history->amount, true) + $this->convertAmount($param['amount'], true));
+                        $balance->updated_by = Auth::user()->username;
+                        if ($balance->save()) {
+                            $history->amount = $param['amount'];
+                            $history->save();
+                        }
+                    }
+
                     $response = new Response(true, __('Reception updated successfuly'), 1);
                     $response->setRedirect(route('transaction.reception.view', ['id' => SecureHelper::secure($reception->id)]));
 

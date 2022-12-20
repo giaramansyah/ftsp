@@ -2,7 +2,7 @@
   <a href="index3.html" class="brand-link">
     <img src="{{ asset('img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle"
       style="opacity: .8">
-    <span class="brand-text font-weight-light">{{ config("app.name") }}</span>
+    <span class="brand-text font-weight-light">MOKU FTSP</span>
   </a>
   <div class="sidebar">
     <nav class="mt-2">

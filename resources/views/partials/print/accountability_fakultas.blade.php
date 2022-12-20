@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Lap. Pertanggung Jawaban</title>
+    <style>
+      body {
+        font-size: 0.875rem
+      }
+
+      table.table, .table th, .table td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding : 5px;
+        margin-bottom: 50px;
+        font-size: 0.75rem;
+      }
+
+      .table th {
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h4 style="margin:0px">LAPORAN PERTANGGUNG JAWABAN KAS-UMD</h4>
+    <h4 style="margin:0px">{{ $header }}</h4>
+    <h4 style="margin-top:0px">TANGGAL : {{ $report_date }}</h4>
+    <table class="table" width="100%">
+      <thead>
+        <tr>
+          <th>NO</th>
+          <th>NO SURAT</th>
+          <th>TGL SURAT</th>
+          <th>M.A.</th>
+          <th>URAIAN</th>
+          <th>&nbsp;</th>
+          <th>KREDIT (RP)</th>
+          <th>DEBET (RP)</th>
+          <th>DIAJUKAN</th>
+          <th>DISETUJUI</th>
+          <th>PERTANGGUNG</th>
+          <th>SELISIH</th>
+          <th>SALDO</th>
+          <th>KET.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>Saldo Akhir Tanggal {{ $opening_balance_date }}</td>
+          <td>&nbsp;</td>
+          <td style="text-align: right; font-weight:600">{{ $opening_balance }}</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td style="text-align: right; font-weight:600">{{ $opening_balance }}</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td style="font-weight: 600">PENERIMAAN :</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        @if(!empty($reception))
+          @foreach ($reception as $value)
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>{{ $value['ma_id'] }}</td>
+            <td>{{ $value['description'] }}</td>
+            <td>{{ $value['id'] }}</td>
+            <td style="text-align: right">{{ $value['amount'] }}</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align: right">{{ $value['amount'] }}</td>
+            <td>&nbsp;</td>
+          </tr>
+          @endforeach
+        @else
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>Tanggal {{ $report_date }} tidak ada penerimaan</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+        @endif
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td style="font-weight: 600">PENGELUARAN :</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        @if(!empty($expense))
+          @foreach ($expense as $key => $value)
+          <tr>
+            <td>{{ ($key+1) }}</td>
+            <td>{{ $value['reff_no'] }}</td>
+            <td>{{ $value['reff_date'] }}</td>
+            <td>{{ $value['ma_id'] }}</td>
+            <td>{{ $value['description'] }}</td>
+            <td>{{ $value['id'] }}</td>
+            <td>&nbsp;</td>
+            <td style="text-align: right">{{ $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['amount'] }}</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          @endforeach
+        @else
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>Tanggal {{ $report_date }} tidak ada realisasi</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+        @endif
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td style="text-align: right; font-weight:600">{{ $total_expense }}</td>
+          <td style="text-align: right; font-weight:600">{{ $total_expense }}</td>
+          <td style="text-align: right; font-weight:600">{{ $total_expense }}</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td style="text-align: right; font-weight:600">{{ $total_reception }}</td>
+          <td style="text-align: right; font-weight:600">{{ $total_expense }}</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>Saldo Akhir Tanggal {{ $closing_balance_date }}</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td style="text-align: right; font-weight:600">{{ $closing_balance }}</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td style="text-align: right; font-weight:600">{{ $closing_balance }}</td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+    <table width="100%">
+      <tr>
+        <td width="50%" style="text-align: center">Mengetahui,</td>
+        <td width="50%" style="text-align: center">Jakarta, {{ $report_date }}</td>
+      </tr>
+      <tr>
+        <td width="50%" style="text-align: center">Wakil Dekan II</td>
+        <td width="50%" style="text-align: center">Kasir FTSP</td>
+      </tr>
+      <tr>
+        <td width="50%" style="text-align: center">&nbsp;</td>
+        <td width="50%" style="text-align: center">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="50%" style="text-align: center">&nbsp;</td>
+        <td width="50%" style="text-align: center">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="50%" style="text-align: center">&nbsp;</td>
+        <td width="50%" style="text-align: center">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="50%" style="text-align: center; font-weight: 600">{{ $knowing }}</td>
+        <td width="50%" style="text-align: center; font-weight: 600">{{ $user }}</td>
+      </tr>
+    </table>
+  </body>
+</html>

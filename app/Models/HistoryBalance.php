@@ -18,6 +18,7 @@ class HistoryBalance extends Model
         'balance_id',
         'amount',
         'description',
+        'data_id',
         'transaction_id',
     ];
 

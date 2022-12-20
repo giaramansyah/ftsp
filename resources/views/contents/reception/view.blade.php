@@ -64,7 +64,7 @@
               => $id])))
             </div>
             <div class="col-auto">
-              @include('partials.button.print', array('class' => 'btn-sm', 'action' =>
+              @include('partials.button.print', array('class' => 'btn-sm', 'label' => 'Cetak Bon', 'action' =>
               route('transaction.reception.index')))
             </div>
             @endif

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountabilityController;
 use App\Http\Controllers\BalanceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -108,10 +109,18 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/expense/add/{type}', [ExpenseController::class, 'add'])->name('transaction.expense.add');
     Route::get('/expense/edit/{id}', [ExpenseController::class, 'edit'])->name('transaction.expense.edit');
     Route::get('/expense/download/{id}', [ExpenseController::class, 'download'])->name('transaction.expense.download');
+    Route::get('/expense/print/{id}', [ExpenseController::class, 'print'])->name('transaction.expense.print');
     Route::post('/expense/post/{action}/{id}', [ExpenseController::class, 'post'])->name('transaction.expense.post');
 
     //years
     Route::get('/years', [YearController::class, 'index'])->name('master.years.index');
     Route::get('/years/list', [YearController::class, 'getList'])->name('master.years.list');
     Route::post('/years/post/{action}/{id}', [YearController::class, 'post'])->name('master.years.post');
+
+    //accountability
+    Route::get('/accountability', [AccountabilityController::class, 'index'])->name('report.accountability.index');
+    Route::get('/accountability/reception', [AccountabilityController::class, 'getReception'])->name('report.accountability.reception');
+    Route::get('/accountability/expense', [AccountabilityController::class, 'getExpense'])->name('report.accountability.expense');
+    Route::post('/accountability/post', [AccountabilityController::class, 'post'])->name('report.accountability.post');
+    Route::get('/accountability/download/{id}', [AccountabilityController::class, 'download'])->name('report.accountability.download');
 });

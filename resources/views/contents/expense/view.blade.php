@@ -83,8 +83,8 @@
               => $id])))
             </div>
             <div class="col-auto">
-              @include('partials.button.print', array('class' => 'btn-sm', 'action' =>
-              route('transaction.expense.index')))
+              @include('partials.button.print', array('class' => 'btn-sm', 'label' => 'Cetak Bon', 'action' =>
+              route('transaction.expense.print', ['id' => $id])))
             </div>
             @endif
           </div>

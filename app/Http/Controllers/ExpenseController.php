@@ -9,6 +9,7 @@ use App\Models\Data;
 use App\Models\Expense;
 use App\Models\HistoryBalance;
 use App\Models\MapData;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -104,20 +105,20 @@ class ExpenseController extends Controller
 
         $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $data['data_id'])->whereNotIn('id', [$plainId])->groupBy('data_id')->first();
         $data['data']['available'] = $this->convertAmount($data['data']['amount'], true);
-        if($expense) {
+        if ($expense) {
             $data['data']['available'] = $this->convertAmount($data['data']['amount'], true) - $this->convertAmount($expense->amount, true);
         }
         $data['data']['remain'] = $this->convertAmount($data['data']['available']);
 
-        
+
         $types = array_combine(config('global.type.code'), config('global.type.desc'));
         $typeDesc = $types[$data['type']];
-        
+
         $is_red = false;
         if ($data['type'] == config('global.type.code.red')) {
             $is_red = true;
             $file = $this->getFile($data['image']);
-            $data['image'] = $file->name; 
+            $data['image'] = $file->name;
             $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::secure($data['image'])]);
         }
 
@@ -304,14 +305,14 @@ class ExpenseController extends Controller
         if ($data['type'] == config('global.type.code.red')) {
             $is_red = true;
             $file = $this->getFile($data['image']);
-            $data['image'] = $file->name; 
+            $data['image'] = $file->name;
             $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::secure($data['image'])]);
         }
 
         $view = ['is_red' => $is_red, 'is_update' => $this->hasPrivilege($this->_update)];
 
         $this->writeAppLog($this->_readid, 'Expense : ' . $data['ma_id']);
-
+        
         return view('contents.expense.view', array_merge($data, $view));
     }
 
@@ -435,20 +436,21 @@ class ExpenseController extends Controller
                     ]);
 
                     if ($expense->id) {
-                        // $division_id = SecureHelper::unsecure($param['data_id']);
-                        // $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
-                        // if ($balance) {
-                        //     $balance->amount = ($this->convertAmount($balance->amount, true) - $this->convertAmount($param['amount'], true));
-                        //     $balance->updated_by = Auth::user()->username;
-                        //     if ($balance->save()) {
-                        //         HistoryBalance::create([
-                        //             'balance_id' => $balance->id,
-                        //             'amount' => $param['amount'],
-                        //             'description' => $param['description'],
-                        //             'transaction_id' => config('global.transaction.code.debet')
-                        //         ]);
-                        //     }
-                        // }
+                        $division_id = SecureHelper::unsecure($param['division_id']);
+                        $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
+                        if ($balance) {
+                            $balance->amount = ($this->convertAmount($balance->amount, true) - $this->convertAmount($param['amount'], true));
+                            $balance->updated_by = Auth::user()->username;
+                            if ($balance->save()) {
+                                HistoryBalance::create([
+                                    'balance_id' => $balance->id,
+                                    'amount' => $param['amount'],
+                                    'description' => $param['description'],
+                                    'data_id' => $expense->id,
+                                    'transaction_id' => config('global.transaction.code.debet')
+                                ]);
+                            }
+                        }
 
                         $response = new Response(true, __('Expense created successfuly'), 1);
                         $response->setRedirect(route('transaction.expense.view', ['id' => SecureHelper::secure($expense->id)]));
@@ -564,14 +566,26 @@ class ExpenseController extends Controller
                         $expense->amount = $param['amount'];
                         $expense->text_amount = $param['text_amount'];
                         $expense->account = $param['account'];
-                        $expense->apply_date = $apply_date;
-                        $expense->image = $image;
+                        if($apply_date) $expense->apply_date = $apply_date;
+                        if($image) $expense->image = $image;
                         $expense->updated_by = Auth::user()->username;
 
                         if ($expense->save()) {
+                            $division_id = $param['division_id'];
+                            $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
+                            if ($balance) {
+                                $history = HistoryBalance::where('balance_id', $balance->id)->where('data_id', $expense->id)->where('transaction_id', config('global.transaction.code.debet'))->first();
+                                $balance->amount = ($this->convertAmount($balance->amount, true) + $this->convertAmount($history->amount, true) - $this->convertAmount($param['amount'], true));
+                                $balance->updated_by = Auth::user()->username;
+                                if ($balance->save()) {
+                                    $history->amount = $param['amount'];
+                                    $history->save();
+                                }
+                            }
+                            
                             $response = new Response(true, __('Expense updated successfuly'), 1);
                             $response->setRedirect(route('transaction.expense.view', ['id' => SecureHelper::secure($expense->id)]));
-    
+
                             $this->writeAppLog($this->_create, 'Expense : ' . $param['expense_id']);
                         } else {
                             $response = new Response(false, __('Expense updated failed. Please try again'));
@@ -584,6 +598,27 @@ class ExpenseController extends Controller
         return response()->json($response->responseJson());
     }
 
+    public function print($id)
+    {
+        if (!$this->hasPrivilege($this->_update)) {
+            return abort(404);
+        }
+
+        $plainId = SecureHelper::unsecure($id);
+
+        if (!$plainId) {
+            return abort(404);
+        }
+
+        $data = Expense::find($plainId)->toArray();
+
+        $types = array_combine(config('global.type.code'), config('global.type.desc'));
+        $filename = $types[$data['type']]. ' ' . $data['ma_id'] . '.pdf';
+        $pdf = Pdf::loadView('partials.print.red', $data)->setPaper([0, 0, 680.315, 396.85], 'portrait');
+        
+        return $pdf->download($filename);
+    }
+
     public function download($id)
     {
         if (!$this->hasPrivilege($this->_readid)) {
@@ -592,15 +627,15 @@ class ExpenseController extends Controller
 
         $plainId = SecureHelper::unsecure($id);
 
-        if(!$plainId) {
+        if (!$plainId) {
             return abort(404);
         }
 
         $file = $this->getFile($plainId);
-        
+
         $headers = array(
             'Content-Type: application/pdf',
-            'Content-Disposition: attachment;filename='.$file->name,
+            'Content-Disposition: attachment;filename=' . $file->name,
             'Cache-Control: max-age=0',
             'Pragma: no-cache',
             'Expires: 0'

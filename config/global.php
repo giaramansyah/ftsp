@@ -1,7 +1,7 @@
 <?php
 return [
     'home' => 'Beranda',
-    
+
     'sysadmin' => [
         'username' => 'sysadmin',
         'privilege' => 1
@@ -85,6 +85,13 @@ return [
             'mta' => 'Magister Teknik Arsitektur',
             'mts' => 'Magister Teknik Sipil',
         ],
+        'report' => [
+            'fakultas' => 'FAKULTAS TEKNIK SIPIL DAN PERENCANAAN UNIVERSITAS TRISAKTI',
+            'arsitektur' => 'PROGRAM STUDI TEKNIK ARSITEKTUR UNIVERSITAS TRISAKTI',
+            'sipil' => 'PROGRAM STUDI TEKNIK SIPIL UNIVERSITAS TRISAKTI',
+            'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
+            'mts' => 'PROGRAM STUDI MAGISTER TEKNIK SIPIL (S2 MTS) UNIVERSITAS TRISAKTI',
+        ]
     ],
 
     'staff' => [
@@ -181,10 +188,23 @@ return [
         'code' => [
             'debet' => 1,
             'credit' => 2
-        ], 
+        ],
         'desc' => [
             'debet' => 'Debit',
             'credit' => 'Kredit'
+        ]
+    ],
+
+    'report' => [
+        'code' => [
+            'accountability_fakultas' => 1,
+            'accountability' => 2,
+            'accountability_umd' => 3,
+        ],
+        'desc' => [
+            'accountability_fakultas' => 'Lap. Pertanggung Jawaban (Fakultas)',
+            'accountability' => 'Lap. Pertanggung Jawaban',
+            'accountability_umd' => 'Lap. Pertanggung Jawaban (UMD)',
         ]
     ],
 
