@@ -311,7 +311,9 @@ class ExpenseController extends Controller
             $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::pack(['file' => $image, 'path' => public_path('upload')])]);
         }
 
-        $view = ['is_red' => $is_red, 'is_update' => $this->hasPrivilege($this->_update)];
+        $employeeArr = $this->getEmployees();
+
+        $view = ['employeeArr' => $employeeArr, 'is_red' => $is_red, 'is_update' => $this->hasPrivilege($this->_update)];
 
         $this->writeAppLog($this->_readid, 'Expense : ' . $data['ma_id']);
 

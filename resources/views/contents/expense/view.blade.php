@@ -122,5 +122,10 @@
     </div>
   </div>
 </div>
-@include('partials.modal.modalprint', ['modal_action' => route('transaction.expense.print', ['id' => $id])])
+@include('partials.modal.modalprint', ['modal_action' => route('transaction.expense.print', ['id' => $id]), 'employeeArr' => $employeeArr])
+@endsection
+@section('push-js')
+<script type="text/javascript">
+  $('.select2').select2({theme: 'bootstrap4'});
+</script>
 @endsection

@@ -208,4 +208,37 @@ return [
         ]
     ],
 
+    'unit' => [
+        'code' => [
+            'arsitek' => 1,
+            'sipil' => 2,
+            'tendik' => 3,
+        ],
+        'desc' => [
+            'arsitek' => 'arsitektur',
+            'sipil' => 'sipil',
+            'tendik' => 'tendik',
+        ],
+    ],
+
+    'employee' => [
+        'columns' => [
+            'nik' => 'NIK',
+            'unit_id' => 'UNIT',
+            'name' => 'NAMA',
+            'account' => 'NOMOR REKENING',
+        ],
+        'regex' => [
+            'nik' => "/[^A-Z0-9]/",
+            'unit_id' => "/[^A-Z]/",
+            'name' => "/[^\s+a-zA-Z0-9.,]/",
+            'account' => "/[^0-9]/",
+        ],
+        'limitter' => [
+            'nik' => 20,
+            'unit_id' => 100,
+            'name' => 100,
+            'account' => 20,
+        ]
+    ],
 ];

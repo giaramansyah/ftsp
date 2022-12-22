@@ -11,6 +11,7 @@ use App\Http\Controllers\PrivilegeController;
 use App\Http\Controllers\PrivilegeGroupController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ReceptionController;
@@ -131,4 +132,14 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/accountability/expense', [AccountabilityController::class, 'getExpense'])->name('report.accountability.expense');
     Route::post('/accountability/post', [AccountabilityController::class, 'post'])->name('report.accountability.post');
     Route::get('/accountability/download/{id}', [AccountabilityController::class, 'download'])->name('report.accountability.download');
+
+    //employee
+    Route::get('/employee', [EmployeeController::class, 'index'])->name('master.employee.index');
+    Route::get('/employee/list', [EmployeeController::class, 'getList'])->name('master.employee.list');
+    // Route::get('/employee/view/{id}', [BalanceController::class, 'view'])->name('master.employee.view');
+    Route::get('/employee/upload', [EmployeeController::class, 'upload'])->name('master.employee.upload');
+    Route::get('/employee/add', [EmployeeController::class, 'add'])->name('master.employee.add');
+    Route::get('/employee/edit/{id}', [EmployeeController::class, 'edit'])->name('master.employee.edit');
+    Route::post('/employee/post/{action}/{id}', [EmployeeController::class, 'post'])->name('master.employee.post');
+    Route::post('/employee/upload', [EmployeeController::class, 'postUpload'])->name('master.employee.postupload');
 });

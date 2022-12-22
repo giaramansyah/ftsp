@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataLog;
+use App\Models\Employee;
 use App\Models\Privilege;
 use App\Models\UserLog;
 use App\Models\Year;
@@ -149,6 +150,34 @@ class Controller extends BaseController
             $result[] = array(
                 'id' => $key,
                 'name' => $value,
+            );
+        }
+
+        return $result;
+    }
+
+    public function getUnits()
+    {
+        $staff = array_combine(config('global.unit.code'), config('global.unit.desc'));
+        $result = array();
+        foreach($staff as $key => $value) {
+            $result[] = array(
+                'id' => $key,
+                'name' => Str::ucfirst($value),
+            );
+        }
+
+        return $result;
+    }
+
+    public function getEmployees()
+    {
+        $employee = Employee::select('id', 'name')->where('is_trash', 0)->get()->toArray();
+        $result = array();
+        foreach($employee as $key => $value) {
+            $result[] = array(
+                'id' => $value['id'],
+                'name' => $value['name'],
             );
         }
 

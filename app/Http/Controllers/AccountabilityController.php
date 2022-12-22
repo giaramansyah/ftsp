@@ -6,6 +6,7 @@ use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Balance;
 use App\Models\Data;
+use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\MapReport;
 use App\Models\Reception;
@@ -29,8 +30,9 @@ class AccountabilityController extends Controller
 
         $yearArr = $this->getYears();
         $divisionArr = $this->getDivisions();
+        $employeeArr = $this->getEmployees();
 
-        $view = ['yearArr' => $yearArr, 'divisionArr' => $divisionArr, 'mandatory' => $this->hasPrivilege($this->_create), 'action' => route('report.accountability.post')];
+        $view = ['yearArr' => $yearArr, 'divisionArr' => $divisionArr, 'employeeArr' => $employeeArr, 'mandatory' => $this->hasPrivilege($this->_create), 'action' => route('report.accountability.post')];
 
         return view('contents.accountability.index', $view);
     }
@@ -216,7 +218,9 @@ class AccountabilityController extends Controller
 
             $reports = array_combine(config('global.report.code'), config('global.report.desc'));
             $divisions = array_combine(config('global.division.code'), config('global.division.report'));
+            $employee = Employee::find($param['knowing']);
             $date = Carbon::createFromFormat('Y-m-d', $param['accountability_date']);
+
 
             if($param['report_type'] == config('global.report.code.accountability_fakultas')) {
                 $data = [
@@ -230,7 +234,7 @@ class AccountabilityController extends Controller
                     'expense' => array(),
                     'total_reception' => 0,
                     'total_expense' => 0,
-                    'knowing' => $param['knowing'],
+                    'knowing' => isset($employee->name) ? $employee->name : Auth::user()->full_name,
                     'user' => Auth::user()->full_name
                 ];
 

@@ -44,6 +44,39 @@ class DatabaseSeeder extends Seeder
                 'order' => 1,
                 'child' => array(
                     array(
+                        'label' => 'Dosen & Tendik',
+                        'alias' => 'employee',
+                        'url' => 'master.employee.index',
+                        'order' => 1,
+                        'privilege' => array(
+                            array(
+                                'code' => 'EMCR',
+                                'modules' => Config::get('global.modules.code.create'),
+                                'desc' => 'Add new master employee'
+                            ),
+                            array(
+                                'code' => 'EMUP',
+                                'modules' => Config::get('global.modules.code.update'),
+                                'desc' => 'Update existing master employee'
+                            ),
+                            array(
+                                'code' => 'EMRM',
+                                'modules' => Config::get('global.modules.code.delete'),
+                                'desc' => 'Remove existing master employee'
+                            ),
+                            array(
+                                'code' => 'EMRA',
+                                'modules' => Config::get('global.modules.code.readall'),
+                                'desc' => 'Read list of master employee'
+                            ),
+                            array(
+                                'code' => 'EMRD',
+                                'modules' => Config::get('global.modules.code.readid'),
+                                'desc' => 'Read detail of master employee'
+                            ),
+                        )
+                    ),
+                    array(
                         'label' => 'Mata Anggaran',
                         'alias' => 'data',
                         'url' => 'master.data.index',
@@ -335,19 +368,19 @@ class DatabaseSeeder extends Seeder
                             ),
                         )
                     ),
-                    array(
-                        'label' => 'Aktivitas Upload File',
-                        'alias' => 'file',
-                        'url' => 'logs.file.index',
-                        'order' => 1,
-                        'privilege' => array(
-                            array(
-                                'code' => 'LFRA',
-                                'modules' => Config::get('global.modules.code.readall'),
-                                'desc' => 'Read list of upload file activity data'
-                            ),
-                        )
-                    )
+                    // array(
+                    //     'label' => 'Aktivitas Upload File',
+                    //     'alias' => 'file',
+                    //     'url' => 'logs.file.index',
+                    //     'order' => 1,
+                    //     'privilege' => array(
+                    //         array(
+                    //             'code' => 'LFRA',
+                    //             'modules' => Config::get('global.modules.code.readall'),
+                    //             'desc' => 'Read list of upload file activity data'
+                    //         ),
+                    //     )
+                    // )
                 )
             ),
         );

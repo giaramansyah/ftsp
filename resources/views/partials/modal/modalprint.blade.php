@@ -9,25 +9,49 @@
           <div class="form-group row">
             <label class="col-form-label col-sm-4">Mengetahui</label>
             <div class="col-sm-8">
-              <input type="text" name="knowing" class="form-control form-control-sm" required> 
+              <select class="form-control form-control-sm select2" name="knowing" required>
+                <option value="">-- Silakan Pilih --</option>
+                @foreach ($employeeArr as $key => $value)
+                <option value="{{ $value['id'] }}">{{
+                  $value['name'] }}</option>
+                @endforeach
+              </select>
             </div>
           </div>
           <div class="form-group row">
             <label class="col-form-label col-sm-4">Setujui</label>
             <div class="col-sm-8">
-              <input type="text" name="approver" class="form-control form-control-sm" required> 
+              <select class="form-control form-control-sm select2" name="approver" required>
+                <option value="">-- Silakan Pilih --</option>
+                @foreach ($employeeArr as $key => $value)
+                <option value="{{ $value['id'] }}">{{
+                  $value['name'] }}</option>
+                @endforeach
+              </select>
             </div>
           </div>
           <div class="form-group row">
             <label class="col-form-label col-sm-4">Yang Membayar</label>
             <div class="col-sm-8">
-              <input type="text" name="sender" class="form-control form-control-sm" required> 
+              <select class="form-control form-control-sm select2" name="sender" required>
+                <option value="">-- Silakan Pilih --</option>
+                @foreach ($employeeArr as $key => $value)
+                <option value="{{ $value['id'] }}">{{
+                  $value['name'] }}</option>
+                @endforeach
+              </select>
             </div>
           </div>
           <div class="form-group row">
             <label class="col-form-label col-sm-4">Yang Menerima</label>
             <div class="col-sm-8">
-              <input type="text" name="reciever" class="form-control form-control-sm" required> 
+              <select class="form-control form-control-sm select2" name="reciever" required>
+                <option value="">-- Silakan Pilih --</option>
+                @foreach ($employeeArr as $key => $value)
+                <option value="{{ $value['id'] }}">{{
+                  $value['name'] }}</option>
+                @endforeach
+              </select>
             </div>
           </div>
         </div>

@@ -8,8 +8,8 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Tahun Ajaran<code>*</code></label>
           <div class="col-sm-2">
-            <select class="form-control form-control-sm select2" name="year" onchange="getData()" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+            <select class="form-control form-control-sm select2" name="year" onchange="getData()" {{ isset($mandatory)
+              && $mandatory? 'required' : '' }}>
               <option value="">-- Silakan Pilih --</option>
               @foreach ($yearArr as $key => $value)
               <option value="{{ Secure::secure($value['id']) }}">{{
@@ -21,8 +21,8 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Unit<code>*</code></label>
           <div class="col-sm-2">
-            <select class="form-control form-control-sm select2" name="division_id" onchange="getData()" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+            <select class="form-control form-control-sm select2" name="division_id" onchange="getData()" {{
+              isset($mandatory) && $mandatory? 'required' : '' }}>
               <option value="">-- Silakan Pilih --</option>
               @foreach ($divisionArr as $key => $value)
               <option value="{{ Secure::secure($value['id']) }}">{{
@@ -34,8 +34,8 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Tgl. Laporan<code>*</code></label>
           <div class="col-sm-2">
-            <input type="date" class="form-control form-control-sm" name="accountability_date" value="{{ date('Y-m-d') }}" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+            <input type="date" class="form-control form-control-sm" name="accountability_date"
+              value="{{ date('Y-m-d') }}" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
           </div>
         </div>
         <div class="form-group row">
@@ -80,9 +80,15 @@
         </div>
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Mengetahui<code>*</code></label>
-          <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" name="knowing" {{ isset($mandatory) &&
+          <div class="col-sm-4">
+            <select class="form-control form-control-sm select2" name="knowing" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
+              <option value="">-- Silakan Pilih --</option>
+              @foreach ($employeeArr as $key => $value)
+              <option value="{{ $value['id'] }}">{{
+                $value['name'] }}</option>
+              @endforeach
+            </select>
           </div>
         </div>
       </div>
@@ -90,17 +96,20 @@
         <div class="form-button">
           <div class="row justify-content-center">
             <div class="col-auto">
-              <button type="submit" class="btn btn-outline-dark btn-sm btn-block" name="report_type" value="{{ config('global.report.code.accountability_fakultas') }}">
+              <button type="submit" class="btn btn-outline-dark btn-sm btn-block" name="report_type"
+                value="{{ config('global.report.code.accountability_fakultas') }}">
                 <i class="fas fa-print"></i> Cetak Laporan (Fakultas)
               </button>
             </div>
             <div class="col-auto">
-              <button type="submit" class="btn btn-outline-primary btn-sm btn-block" name="report_type" value="{{ config('global.report.code.accountability') }}">
+              <button type="submit" class="btn btn-outline-primary btn-sm btn-block" name="report_type"
+                value="{{ config('global.report.code.accountability') }}">
                 <i class="fas fa-print"></i> Cetak Laporan (Universitas)
               </button>
             </div>
             <div class="col-auto">
-              <button type="submit" class="btn btn-outline-secondary btn-sm btn-block" name="report_type" value="{{ config('global.report.code.accountability_umd') }}">
+              <button type="submit" class="btn btn-outline-secondary btn-sm btn-block" name="report_type"
+                value="{{ config('global.report.code.accountability_umd') }}">
                 <i class="fas fa-print"></i> Cetak Laporan (UMD)
               </button>
             </div>

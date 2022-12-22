@@ -236,6 +236,20 @@ class MigrateTables extends Migration
                 $table->boolean('is_expense')->nullable(false);
             });
         }
+
+        if (!Schema::hasTable('ms_employee')) {
+            Schema::create('ms_employee', function (Blueprint $table) {
+                $table->id();
+                $table->tinyInteger('unit_id')->nullable(false);
+                $table->string('nik')->nullable(false);
+                $table->string('name')->nullable(false);
+                $table->string('account')->nullable(false);
+                $table->tinyInteger('is_trash')->nullable(false)->default(0);
+                $table->string('created_by', 100)->nullable(false);
+                $table->string('updated_by', 100)->nullable(false);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -260,7 +274,8 @@ class MigrateTables extends Migration
         // Schema::dropIfExists('ts_expense');
         // Schema::dropIfExists('ts_reception');
         // Schema::dropIfExists('ms_year');
-        Schema::dropIfExists('ts_report');
-        Schema::dropIfExists('map_report');
+        // Schema::dropIfExists('ts_report');
+        // Schema::dropIfExists('map_report');
+        Schema::dropIfExists('ms_employee');
     }
 }
