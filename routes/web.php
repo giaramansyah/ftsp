@@ -117,7 +117,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/expense/add/{type}', [ExpenseController::class, 'add'])->name('transaction.expense.add');
     Route::get('/expense/edit/{id}', [ExpenseController::class, 'edit'])->name('transaction.expense.edit');
     Route::get('/expense/download/{id}', [ExpenseController::class, 'download'])->name('transaction.expense.download');
-    Route::get('/expense/print/{id}', [ExpenseController::class, 'print'])->name('transaction.expense.print');
+    Route::post('/expense/print/{id}', [ExpenseController::class, 'print'])->name('transaction.expense.print');
     Route::post('/expense/post/{action}/{id}', [ExpenseController::class, 'post'])->name('transaction.expense.post');
 
     //years

@@ -1,13 +1,15 @@
-.form-button, .form-loading {
-	text-align: center;
+.form-button,
+.form-loading {
+    text-align: center;
 }
 
 .form-button {
-	display: block;
+    display: block;
 }
 
-.form-loading, .hidden {
-	display: none;
+.form-loading,
+.hidden {
+    display: none;
 }
 
 .alert-danger {
@@ -49,14 +51,36 @@
 }
 
 .bg-login {
-    background-image: url("../img/background.jpg");
+    background-image: url("../img/background.png");
     background-position: center;
-	background-repeat: no-repeat;
-	background-size: auto;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
-/* .login-box {
-	width: 100%;
-	padding-left: 7%;
-	padding-right: 7%;
-} */
+.login-box {
+    width: 100%;
+    height: 100%;
+    padding: 7%;
+}
+
+.card-login {
+    border-radius: 1.25rem;
+}
+
+.card-login .card-body {
+    border-radius: 1.25rem;
+    background-image: linear-gradient(150deg, #1346d3, #57d6e5);
+    padding: 5rem;
+}
+
+.title-login {
+    font-size: 3rem !important;
+    text-shadow: 0px 4px 3px rgba(0, 0, 0, 0.4), 0px 8px 13px rgba(0, 0, 0, 0.1),
+        0px 18px 23px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle-login {
+    font-size: 2rem !important;
+    text-shadow: 0px 4px 3px rgba(0, 0, 0, 0.4), 0px 8px 13px rgba(0, 0, 0, 0.1),
+        0px 18px 23px rgba(0, 0, 0, 0.1);
+}

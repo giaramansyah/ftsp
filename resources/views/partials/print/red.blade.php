@@ -126,16 +126,16 @@
       {{ $amount }}
     </div>
     <div class="ttd-1">
-      Ir. Khotijah Lahji, MT.
+      {{ $knowing }}
     </div>
     <div class="ttd-2">
-      Rita Sari Pujiastuti, SPd.
+      {{ $approver }}
     </div>
     <div class="ttd-3">
-      Romdoni
+      {{ $sender }}
     </div>
     <div class="ttd-4">
-      Ir. Khotijah Lahji, MT.
+      {{ $reciever }}
     </div>
   </div>
 </body>

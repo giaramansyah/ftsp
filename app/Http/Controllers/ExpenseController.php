@@ -117,9 +117,10 @@ class ExpenseController extends Controller
         $is_red = false;
         if ($data['type'] == config('global.type.code.red')) {
             $is_red = true;
-            $file = $this->getFile($data['image']);
+            $file = $this->getFile($data['image'], public_path('upload'));
+            $image = $data['image'];
             $data['image'] = $file->name;
-            $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::secure($data['image'])]);
+            $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::pack(['file' => $image, 'path' => public_path('upload')])]);
         }
 
         if (!$this->hasPrivilege($this->_readid)) {
@@ -304,15 +305,16 @@ class ExpenseController extends Controller
         $is_red = false;
         if ($data['type'] == config('global.type.code.red')) {
             $is_red = true;
-            $file = $this->getFile($data['image']);
+            $file = $this->getFile($data['image'], public_path('upload'));
+            $image = $data['image'];
             $data['image'] = $file->name;
-            $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::secure($data['image'])]);
+            $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::pack(['file' => $image, 'path' => public_path('upload')])]);
         }
 
         $view = ['is_red' => $is_red, 'is_update' => $this->hasPrivilege($this->_update)];
 
         $this->writeAppLog($this->_readid, 'Expense : ' . $data['ma_id']);
-        
+
         return view('contents.expense.view', array_merge($data, $view));
     }
 
@@ -566,8 +568,8 @@ class ExpenseController extends Controller
                         $expense->amount = $param['amount'];
                         $expense->text_amount = $param['text_amount'];
                         $expense->account = $param['account'];
-                        if($apply_date) $expense->apply_date = $apply_date;
-                        if($image) $expense->image = $image;
+                        if ($apply_date) $expense->apply_date = $apply_date;
+                        if ($image) $expense->image = $image;
                         $expense->updated_by = Auth::user()->username;
 
                         if ($expense->save()) {
@@ -582,7 +584,7 @@ class ExpenseController extends Controller
                                     $history->save();
                                 }
                             }
-                            
+
                             $response = new Response(true, __('Expense updated successfuly'), 1);
                             $response->setRedirect(route('transaction.expense.view', ['id' => SecureHelper::secure($expense->id)]));
 
@@ -598,10 +600,17 @@ class ExpenseController extends Controller
         return response()->json($response->responseJson());
     }
 
-    public function print($id)
+    public function print(Request $request, $id)
     {
         if (!$this->hasPrivilege($this->_update)) {
             return abort(404);
+        }
+
+        $param = SecureHelper::unpack($request->input('json'));
+
+        if (!is_array($param)) {
+            $response = new Response();
+            return response()->json($response->responseJson());
         }
 
         $plainId = SecureHelper::unsecure($id);
@@ -611,12 +620,42 @@ class ExpenseController extends Controller
         }
 
         $data = Expense::find($plainId)->toArray();
+        $data['knowing'] = $param['knowing'];
+        $data['approver'] = $param['approver'];
+        $data['sender'] = $param['sender'];
+        $data['reciever'] = $param['reciever'];
 
         $types = array_combine(config('global.type.code'), config('global.type.desc'));
-        $filename = $types[$data['type']]. ' ' . $data['ma_id'] . '.pdf';
-        $pdf = Pdf::loadView('partials.print.red', $data)->setPaper([0, 0, 680.315, 396.85], 'portrait');
-        
-        return $pdf->download($filename);
+        $filename = date('d_M_Y_H_i_s') . '_' . $types[$data['type']] . ' ' . $data['ma_id'] . '.pdf';
+        $pdf = Pdf::loadView('partials.print.red', $data);
+
+        $descMonth = config('global.months');
+
+        $today = Carbon::now();
+        $year = $today->year;
+        $month = $today->month;
+        $month = $month < 10 ? '0' . $month : $month;
+
+        $pathYear = public_path('download') . '/' . $year;
+        $pathMonth = public_path('download') . '/' . $year . '/' . $descMonth[$month];
+
+        if (!File::exists($pathYear)) {
+            File::makeDirectory($pathYear, 0777, true, true);
+        }
+
+        if (!File::exists($pathMonth)) {
+            File::makeDirectory($pathMonth, 0777, true, true);
+        }
+
+        $pdf->setPaper([0, 0, 680.315, 396.85], 'portrait');
+        $pdf->save($pathMonth . '/' . $filename);
+
+        $id = SecureHelper::pack(['file' => $filename, 'path' => public_path('download')]);
+
+        $response = new Response(true, 'Report successfuly printed', 1);
+        $response->setRedirect(route('transaction.expense.download', ['id' => $id]));
+
+        return response()->json($response->responseJson());
     }
 
     public function download($id)
@@ -625,13 +664,13 @@ class ExpenseController extends Controller
             return abort(404);
         }
 
-        $plainId = SecureHelper::unsecure($id);
+        $param = SecureHelper::unpack($id);
 
-        if (!$plainId) {
+        if (!is_array($param)) {
             return abort(404);
         }
 
-        $file = $this->getFile($plainId);
+        $file = $this->getFile($param['file'], $param['path']);
 
         $headers = array(
             'Content-Type: application/pdf',
@@ -641,7 +680,7 @@ class ExpenseController extends Controller
             'Expires: 0'
         );
 
-        return response()->download($file->path, $file->name, $headers);
+        return response()->download($file->path, $headers);
     }
 
     private function generate()

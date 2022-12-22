@@ -164,7 +164,7 @@ class Controller extends BaseController
         }
     }
 
-    public function getFile($filename) {
+    public function getFile($filename, $path) {
         $arr = explode('_', $filename);
         $arrDate = Arr::only($arr, [0, 1, 2]);
         $arrName = Arr::except($arr, [0, 1, 2, 3, 4, 5]);
@@ -174,7 +174,7 @@ class Controller extends BaseController
         $name = implode('_', $arrName);
         $descMonth = config('global.months');
 
-        return (object) array('name' => $name, 'path' => public_path('upload').'/'.$year.'/'.$descMonth[$month].'/'.$filename);
+        return (object) array('name' => $name, 'path' => $path.'/'.$year.'/'.$descMonth[$month].'/'.$filename);
     }
     
 }

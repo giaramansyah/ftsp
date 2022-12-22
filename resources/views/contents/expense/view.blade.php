@@ -83,8 +83,9 @@
               => $id])))
             </div>
             <div class="col-auto">
-              @include('partials.button.print', array('class' => 'btn-sm', 'label' => 'Cetak Bon', 'action' =>
-              route('transaction.expense.print', ['id' => $id])))
+              <button type="button" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#modalPrint">
+                <i class="fas fa-print"></i> Cetak Bon
+              </button>
             </div>
             @endif
           </div>
@@ -121,4 +122,5 @@
     </div>
   </div>
 </div>
+@include('partials.modal.modalprint', ['modal_action' => route('transaction.expense.print', ['id' => $id])])
 @endsection
