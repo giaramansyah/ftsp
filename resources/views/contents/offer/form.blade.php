@@ -7,7 +7,7 @@
       <div class="card-body">
         <div class="alert hidden" role="alert"></div>
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Tahun Ajaran<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="division_id">
               <option value="">-- Silakan Pilih --</option>

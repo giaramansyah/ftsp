@@ -31,74 +31,81 @@ class Authenticate extends Middleware
     {
         $this->authenticate($request, $guards);
 
-        $currentRoute = Route::currentRouteName();
+        //$cache = Cache::remember('users', now()->addHours(24), function () {
+            $currentRoute = Route::currentRouteName();
 
-        $appender = '';
-        $header = Str::ucfirst(config('global.home'));
-        $breadcrumb = array(
-            array('label' => Str::ucfirst(config('global.home')), 'active' => true), 
-        );
+            $appender = '';
+            $header = Str::ucfirst(config('global.home'));
+            $breadcrumb = array(
+                array('label' => Str::ucfirst(config('global.home')), 'active' => true), 
+            );
 
-        $aliases = explode('.', $currentRoute);
+            $aliases = explode('.', $currentRoute);
 
-        $group = PrivilegeGroup::find(Auth::user()->privilege_group_id)->privileges()->get()->toArray();
-        $group = array_column($group, 'menu_id');
-        $menus = ParentMenu::where('is_active', 1)->orderBy('order', 'asc')->get()->toArray();
-        $side_nav = array();
-        foreach($menus as $value) {
-            foreach($value['menu'] as $val) {
-                if(in_array($val['id'], $group)) {
-                    if(!array_key_exists($value['alias'], $side_nav)) {
-                        $active = count($aliases) > 0 && Str::is($aliases[0], $value['alias']);
+            $group = PrivilegeGroup::find(Auth::user()->privilege_group_id)->privileges()->get()->toArray();
+            $group = array_column($group, 'menu_id');
+            $menus = ParentMenu::where('is_active', 1)->orderBy('order', 'asc')->get()->toArray();
+            $side_nav = array();
+            foreach($menus as $value) {
+                foreach($value['menu'] as $val) {
+                    if(in_array($val['id'], $group)) {
+                        if(!array_key_exists($value['alias'], $side_nav)) {
+                            $active = count($aliases) > 0 && Str::is($aliases[0], $value['alias']);
 
-                        $side_nav[$value['alias']] = array(
-                            'label' => $value['label'],
-                            'alias' => $value['alias'],
-                            'icon' => $value['icon'],
+                            $side_nav[$value['alias']] = array(
+                                'label' => $value['label'],
+                                'alias' => $value['alias'],
+                                'icon' => $value['icon'],
+                                'active' => $active,
+                                'menus' => array()
+                            );
+                        }
+
+                        $active = count($aliases) > 1 && Str::is($aliases[1], $val['alias']);
+
+                        if($active) {
+                            $header = $val['label'];
+                            $breadcrumb = array(
+                                array('label' => $value['label'], 'active' => false), 
+                                array('label' => $val['label'], 'active' => true), 
+                            );
+                        }
+
+                        $side_nav[$value['alias']]['menus'][$val['alias']] = array(
+                            'label' => $val['label'],
+                            'alias' => $val['label'],
+                            'url' => $val['url'],
                             'active' => $active,
-                            'menus' => array()
                         );
                     }
-
-                    $active = count($aliases) > 1 && Str::is($aliases[1], $val['alias']);
-
-                    if($active) {
-                        $header = $val['label'];
-                        $breadcrumb = array(
-                            array('label' => $value['label'], 'active' => false), 
-                            array('label' => $val['label'], 'active' => true), 
-                        );
-                    }
-
-                    $side_nav[$value['alias']]['menus'][$val['alias']] = array(
-                        'label' => $val['label'],
-                        'alias' => $val['label'],
-                        'url' => $val['url'],
-                        'active' => $active,
-                    );
                 }
             }
-        }
 
-        if(in_array('add', $aliases)) {
-            $appender = 'Tambah Baru';
-            $breadcrumb[1]['active'] = false;
-            $breadcrumb[] = array('label' => $appender, 'active' => true);
-        }
+            if(in_array('add', $aliases)) {
+                $appender = 'Tambah Baru';
+                $breadcrumb[1]['active'] = false;
+                $breadcrumb[] = array('label' => $appender, 'active' => true);
+            }
 
-        if(in_array('edit', $aliases)) {
-            $appender = 'Ubah';
-            $breadcrumb[1]['active'] = false;
-            $breadcrumb[] = array('label' => $appender, 'active' => true);
-        }
-        
-        if(in_array('view', $aliases)) {
-            $appender = 'Detil';
-            $breadcrumb[1]['active'] = false;
-            $breadcrumb[] = array('label' => $appender, 'active' => true);
-        }
+            if(in_array('edit', $aliases)) {
+                $appender = 'Ubah';
+                $breadcrumb[1]['active'] = false;
+                $breadcrumb[] = array('label' => $appender, 'active' => true);
+            }
+            
+            if(in_array('view', $aliases)) {
+                $appender = 'Detil';
+                $breadcrumb[1]['active'] = false;
+                $breadcrumb[] = array('label' => $appender, 'active' => true);
+            }
 
-        
+        //     return ['header' => $header, 'appender' => $appender, 'breadcrumb' => $breadcrumb, 'sidenav' => $side_nav];
+        // });
+
+        // View::share('header', $cache['header']);
+        // View::share('appender', $cache['appender']);
+        // View::share('breadcrumb', $cache['breadcrumb']);
+        // View::share('side_nav', $cache['sidenav']);
 
         View::share('header', $header);
         View::share('appender', $appender);

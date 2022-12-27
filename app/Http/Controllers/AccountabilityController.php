@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Library\ExcelWriter;
 use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Balance;
@@ -164,12 +165,18 @@ class AccountabilityController extends Controller
             $response = new Response();
             return response()->json($response->responseJson());
         }
+
+        $reportType =  SecureHelper::unpack($param['report_type']);
+        if (!is_array($reportType)) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
         
         $report = Report::create([
             'year' => $year,
             'division_id' => $division_id,
             'report_date' => $param['accountability_date'],
-            'type' => $param['report_type'],
+            'type' => $reportType['type'],
             'knowing' => $param['knowing'],
             'created_by' => Auth::user()->username,
             'updated_by' => Auth::user()->username,
@@ -222,7 +229,7 @@ class AccountabilityController extends Controller
             $date = Carbon::createFromFormat('Y-m-d', $param['accountability_date']);
 
 
-            if($param['report_type'] == config('global.report.code.accountability_fakultas')) {
+            if($reportType['type'] == config('global.report.code.accountability_fakultas')) {
                 $data = [
                     'header' => $divisions[$division_id],
                     'opening_balance' => 0,
@@ -260,8 +267,8 @@ class AccountabilityController extends Controller
                         $data['reception'][] = [
                             'ma_id' => $value->ma_id,
                             'description' => $value->description . ' a/n ' . $value->name . ' pada tanggal ' . $value->reception_date_format,
-                            'amount' => $value->amount,
                             'id' => $value->reception_id,
+                            'amount' => $value->amount,
                         ]; 
                         $data['total_reception'] += $this->convertAmount($value->amount, true);
                     }
@@ -280,8 +287,8 @@ class AccountabilityController extends Controller
                             'reff_date' => $value->reff_date_format,
                             'ma_id' => $value->ma_id,
                             'description' => $value->description . ' a/n ' . $value->name,
-                            'amount' => $value->amount,
                             'id' => $value->expense_id,
+                            'amount' => $value->amount,
                         ];
                         $data['total_expense'] += $this->convertAmount($value->amount, true);
                     }
@@ -290,9 +297,39 @@ class AccountabilityController extends Controller
                 $data['opening_balance'] = $this->convertAmount($this->convertAmount($data['closing_balance'], true) - $data['total_reception'] + $data['total_expense']);
                 $data['total_reception'] = $this->convertAmount($this->convertAmount($data['opening_balance'], true) + $data['total_reception']);
                 $data['total_expense'] = $this->convertAmount($data['total_expense']);
-                $orientation = 'landscape';
-                $pdf = Pdf::loadView('partials.print.accountability_fakultas', $data);
-            } else if($param['report_type'] == config('global.report.code.accountability'))  {
+
+                $filename = $reports[$reportType['type']] . ' ' . date('d F y') . '.' . $reportType['ext'];
+
+                if($reportType['ext'] == 'xlsx'){
+                    $excel = new ExcelWriter($filename, $reportType['type'], config('global.report.header.accountability_fakultas'), $data);
+                    $filepath = $excel->write();
+                } else {
+                    $orientation = 'landscape';
+                    $pdf = Pdf::loadView('partials.print.accountability_fakultas', $data);
+
+                    $descMonth = config('global.months');
+
+                    $today = Carbon::now();
+                    $year = $today->year;
+                    $month = $today->month;
+                    $month = $month < 10 ? '0' . $month : $month;
+
+                    $pathYear = public_path('download') . '/' . $year;
+                    $pathMonth = public_path('download') . '/' . $year . '/' . $descMonth[$month];
+
+                    if (!File::exists($pathYear)) {
+                        File::makeDirectory($pathYear, 0777, true, true);
+                    }
+
+                    if (!File::exists($pathMonth)) {
+                        File::makeDirectory($pathMonth, 0777, true, true);
+                    }
+
+                    $filepath = $pathMonth . '/' . $filename;
+                    $pdf->setPaper('a4', $orientation);
+                    $pdf->save($filepath);
+                }
+            } else if($reportType['type'] == config('global.report.code.accountability'))  {
                 $data = [
                     'header' => $divisions[$division_id],
                     'report_date' => $date->format('d F y'),
@@ -322,8 +359,38 @@ class AccountabilityController extends Controller
                 }
 
                 $data['total_expense'] = $this->convertAmount($data['total_expense']);
-                $orientation = 'landscape';
-                $pdf = Pdf::loadView('partials.print.accountability', $data);
+
+                $filename = $reports[$reportType['type']] . ' ' . date('d F y') . '.' . $reportType['ext'];
+
+                if($reportType['ext'] == 'xlsx'){
+                    $excel = new ExcelWriter($filename, $reportType['type'], config('global.report.header.accountability'), $data);
+                    $filepath = $excel->write();
+                } else {
+                    $orientation = 'landscape';
+                    $pdf = Pdf::loadView('partials.print.accountability', $data);
+
+                    $descMonth = config('global.months');
+
+                    $today = Carbon::now();
+                    $year = $today->year;
+                    $month = $today->month;
+                    $month = $month < 10 ? '0' . $month : $month;
+
+                    $pathYear = public_path('download') . '/' . $year;
+                    $pathMonth = public_path('download') . '/' . $year . '/' . $descMonth[$month];
+
+                    if (!File::exists($pathYear)) {
+                        File::makeDirectory($pathYear, 0777, true, true);
+                    }
+
+                    if (!File::exists($pathMonth)) {
+                        File::makeDirectory($pathMonth, 0777, true, true);
+                    }
+
+                    $filepath = $pathMonth . '/' . $filename;
+                    $pdf->setPaper('a4', $orientation);
+                    $pdf->save($filepath);
+                }
             } else {
                 $data = [
                     'header' => $divisions[$division_id],
@@ -354,33 +421,42 @@ class AccountabilityController extends Controller
                 }
 
                 $data['total_expense'] = $this->convertAmount($data['total_expense']);
-                $orientation = 'potrait';
-                $pdf = Pdf::loadView('partials.print.accountability_umd', $data);
+
+
+                $filename = $reports[$reportType['type']] . ' ' . date('d F y') . '.' . $reportType['ext'];
+
+                if($reportType['ext'] == 'xlsx'){
+                    $excel = new ExcelWriter($filename, $reportType['type'], config('global.report.header.accountability_umd'), $data);
+                    $filepath = $excel->write();
+                } else {
+                    $orientation = 'potrait';
+                    $pdf = Pdf::loadView('partials.print.accountability_umd', $data);
+
+                    $descMonth = config('global.months');
+
+                    $today = Carbon::now();
+                    $year = $today->year;
+                    $month = $today->month;
+                    $month = $month < 10 ? '0' . $month : $month;
+
+                    $pathYear = public_path('download') . '/' . $year;
+                    $pathMonth = public_path('download') . '/' . $year . '/' . $descMonth[$month];
+
+                    if (!File::exists($pathYear)) {
+                        File::makeDirectory($pathYear, 0777, true, true);
+                    }
+
+                    if (!File::exists($pathMonth)) {
+                        File::makeDirectory($pathMonth, 0777, true, true);
+                    }
+
+                    $filepath = $pathMonth . '/' . $filename;
+                    $pdf->setPaper('a4', $orientation);
+                    $pdf->save($filepath);
+                }
             }
 
-            $filename = $reports[$param['report_type']] . ' ' . date('d F y') . '.pdf';
-            $descMonth = config('global.months');
-
-            $today = Carbon::now();
-            $year = $today->year;
-            $month = $today->month;
-            $month = $month < 10 ? '0' . $month : $month;
-
-            $pathYear = public_path('download') . '/' . $year;
-            $pathMonth = public_path('download') . '/' . $year . '/' . $descMonth[$month];
-
-            if (!File::exists($pathYear)) {
-                File::makeDirectory($pathYear, 0777, true, true);
-            }
-
-            if (!File::exists($pathMonth)) {
-                File::makeDirectory($pathMonth, 0777, true, true);
-            }
-
-            $pdf->setPaper('a4', $orientation);
-            $pdf->save($pathMonth . '/' . $filename);
-
-            $param = SecureHelper::pack(['path' => $pathMonth . '/' . $filename, 'name' => $filename]);
+            $param = SecureHelper::pack(['path' => $filepath, 'name' => $filename]);
 
             $response = new Response(true, 'Report successfuly printed', 1);
             $response->setRedirect(route('report.accountability.download', ['id' => $param]));
@@ -398,7 +474,7 @@ class AccountabilityController extends Controller
         }
 
         $headers = array(
-            'Content-Type: application/pdf',
+            //'Content-Type: application/pdf',
             'Content-Disposition: attachment;filename=' . $param['name'],
             'Cache-Control: max-age=0',
             'Pragma: no-cache',

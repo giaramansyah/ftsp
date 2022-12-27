@@ -143,7 +143,7 @@ class DatabaseSeeder extends Seeder
                         )
                     ),
                     array(
-                        'label' => 'Tahun Ajaran',
+                        'label' => 'Tahun Akademik',
                         'alias' => 'years',
                         'url' => 'master.years.index',
                         'order' => 0,

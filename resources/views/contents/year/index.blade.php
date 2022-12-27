@@ -25,7 +25,7 @@
         <thead>
           <tr>
             <th>No</th>
-            <th>Tahun Ajaran</th>
+            <th>Tahun Akademik</th>
             <th>Tgl. Diubah</th>
             <th>Opsi</th>
           </tr>

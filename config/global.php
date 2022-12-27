@@ -205,6 +205,102 @@ return [
             'accountability_fakultas' => 'Lap. Pertanggung Jawaban (Fakultas)',
             'accountability' => 'Lap. Pertanggung Jawaban',
             'accountability_umd' => 'Lap. Pertanggung Jawaban (UMD)',
+        ],
+        'header' => [
+            'accountability_fakultas' => [
+                'NO',
+                'NO SURAT',
+                'TGL SURAT',
+                'M.A.',
+                'URAIAN',
+                '',
+                'KREDIT (RP)',
+                'DEBET (RP)',
+                'DIAJUKAN',
+                'DISETUJUI',
+                'PERTANGGUNG',
+                'SELISIH',
+                'SALDO',
+                'KET.',
+            ],
+            'accountability' => [
+                'NO',
+                'NO SURAT',
+                'TGL SURAT',
+                'M.A.',
+                'URAIAN',
+                'DIAJUKAN',
+                'DISETUJUI',
+                'PERTANGGUNG JAWABAN',
+                'SELISIH',
+                'KET.',
+            ],
+            'accountability_umd' => [
+                'NO',
+                'TGL',
+                'M.A.',
+                'URAIAN',
+                'PIC',
+                'Rp.',
+            ],
+        ],
+        'excel' => [
+            'title' => [
+                'font' => [
+                    'bold' => true,
+                    'size' => 14,
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                ],
+            ],
+            'subtitle' => [
+                'font' => [
+                    'bold' => true,
+                    'size' => 11,
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                ],
+            ],
+            'header' => [
+                'font' => [
+                    'bold' => true,
+                    'size' => 10,
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                    ],
+                ]
+            ],
+            'body' => [
+                'font' => [
+                    'bold' => false,
+                    'size' => 10,
+                ],
+                'alignment' => [
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    ],
+                ]
+            ],
+            'footer' => [
+                'font' => [
+                    'bold' => false,
+                    'size' => 11,
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                ],
+            ]
         ]
     ],
 
@@ -241,4 +337,6 @@ return [
             'account' => 20,
         ]
     ],
+
+    
 ];

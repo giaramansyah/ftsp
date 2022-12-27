@@ -7,7 +7,7 @@
       <div class="card-body">
         <input type="hidden" name="type" value="{{ isset($type) ? $type : '' }}">
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Tahun Ajaran<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
           <div class="col-sm-2">
             <input type="text" class="form-control form-control-sm"
               value="{{ isset($years) && $years ? $years : '' }}" readonly>

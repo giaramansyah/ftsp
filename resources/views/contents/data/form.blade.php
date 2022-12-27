@@ -6,7 +6,7 @@
     <form class="form-lazy-control" data-action="{{ $action }}">
       <div class="card-body">
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">{{ __('Tahun Ajaran') }}<code>*</code></label>
+          <label class="col-sm-2 col-form-label">{{ __('Tahun Akademik') }}<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="year" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
               <option value="">-- Silakan Pilih --</option>

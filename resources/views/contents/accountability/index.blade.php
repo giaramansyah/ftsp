@@ -6,7 +6,7 @@
     <form class="form-lazy-control" data-action="{{ $action }}">
       <div class="card-body">
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Tahun Ajaran<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="year" onchange="getData()" {{ isset($mandatory)
               && $mandatory? 'required' : '' }}>
@@ -83,7 +83,7 @@
           <div class="col-sm-4">
             <select class="form-control form-control-sm select2" name="knowing" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
-              <option value="">-- Silakan Pilih --</option>
+              <option value="test">-- Silakan Pilih --</option>
               @foreach ($employeeArr as $key => $value)
               <option value="{{ $value['id'] }}">{{
                 $value['name'] }}</option>
@@ -96,22 +96,52 @@
         <div class="form-button">
           <div class="row justify-content-center">
             <div class="col-auto">
-              <button type="submit" class="btn btn-outline-dark btn-sm btn-block" name="report_type"
-                value="{{ config('global.report.code.accountability_fakultas') }}">
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block dropdown-toggle"
+                data-toggle="dropdown">
                 <i class="fas fa-print"></i> Cetak Laporan (Fakultas)
               </button>
+              <div class="dropdown-menu" role="menu">
+                <button type="submit" class="dropdown-item" name="report_type"
+                  value="{{ Secure::pack(['type' => config('global.report.code.accountability_fakultas'), 'ext' => 'xlsx']) }}">
+                  <i class="fas fa-excel"></i> Excel
+                </button>
+                <button type="submit" class="dropdown-item" name="report_type"
+                value="{{ Secure::pack(['type' => config('global.report.code.accountability_fakultas'), 'ext' => 'pdf']) }}">
+                  <i class="fas fa-pdf"></i> PDF
+                </button>
+              </div>
             </div>
             <div class="col-auto">
-              <button type="submit" class="btn btn-outline-primary btn-sm btn-block" name="report_type"
-                value="{{ config('global.report.code.accountability') }}">
+              <button type="button" class="btn btn-outline-primary btn-sm btn-block dropdown-toggle"
+                data-toggle="dropdown">
                 <i class="fas fa-print"></i> Cetak Laporan (Universitas)
               </button>
+              <div class="dropdown-menu" role="menu">
+                <button type="submit" class="dropdown-item" name="report_type"
+                  value="{{ Secure::pack(['type' => config('global.report.code.accountability'), 'ext' => 'xlsx']) }}">
+                  <i class="fas fa-excel"></i> Excel
+                </button>
+                <button type="submit" class="dropdown-item" name="report_type"
+                value="{{ Secure::pack(['type' => config('global.report.code.accountability'), 'ext' => 'pdf']) }}">
+                  <i class="fas fa-pdf"></i> PDF
+                </button>
+              </div>
             </div>
             <div class="col-auto">
-              <button type="submit" class="btn btn-outline-secondary btn-sm btn-block" name="report_type"
-                value="{{ config('global.report.code.accountability_umd') }}">
+              <button type="button" class="btn btn-outline-secondary btn-sm btn-block dropdown-toggle"
+                data-toggle="dropdown">
                 <i class="fas fa-print"></i> Cetak Laporan (UMD)
               </button>
+              <div class="dropdown-menu" role="menu">
+                <button type="submit" class="dropdown-item" name="report_type"
+                  value="{{ Secure::pack(['type' => config('global.report.code.accountability_umd'), 'ext' => 'xlsx']) }}">
+                  <i class="fas fa-excel"></i> Excel
+                </button>
+                <button type="submit" class="dropdown-item" name="report_type"
+                value="{{ Secure::pack(['type' => config('global.report.code.accountability_umd'), 'ext' => 'pdf']) }}">
+                  <i class="fas fa-pdf"></i> PDF
+                </button>
+              </div>
             </div>
           </div>
         </div>
