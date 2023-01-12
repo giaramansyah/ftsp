@@ -71,7 +71,7 @@
   $('.select2').select2({theme: 'bootstrap4'});
 
   $('.select2').on('change', function(){
-    window.location.href = "{{ route('master.data.index') }}/"+$(this).val()
+    window.location.href = "{{ route('transaction.expense.index') }}/"+$(this).val()
   })
 
   $('.table-data').each(function(){

@@ -26,7 +26,11 @@ class MapData extends Model
 
     public function getStaffAttribute()
     {
-        $arrStaff = array_combine(config('global.staff.code'), config('global.staff.desc'));
-        return $arrStaff[$this->attributes['staff_id']];
+        if($this->attributes['staff_id'] > 0) {
+            $arrStaff = array_combine(config('global.staff.code'), config('global.staff.desc'));
+            return $arrStaff[$this->attributes['staff_id']];
+        }
+
+        return '';
     }
 }

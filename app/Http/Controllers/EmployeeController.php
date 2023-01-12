@@ -350,11 +350,13 @@ class EmployeeController extends Controller
         $validator = array_values(config('global.employee.columns'));
         $valid = true;
         foreach ($validator as $key => $value) {
-            if (Str::upper($header[$key]) != Str::upper($value)) {
+            if (Str::upper(trim($header[$key])) != Str::upper($value)) {
                 $valid = false;
                 break;
             }
         }
+
+
 
         return $valid;
     }

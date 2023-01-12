@@ -279,6 +279,14 @@ class DataController extends Controller
                 } else {
                     $arrDivision = config('global.division.code');
                     $arrStaff = array_combine(config('global.staff.raw'), config('global.staff.code'));
+
+                    $data = Data::where('year', $param['year'])->get();
+                    foreach($data as $value) {
+                        $delete = Data::find($value->id);
+                        $delete->is_trash = 1;
+                        $delete->save();
+                    }
+
                     foreach ($collections as $collection) {
                         $staff = Str::lower(str_replace(" ", "", $collection['staff']));
                         $division = Str::lower(str_replace(" ", "", $collection['division']));
