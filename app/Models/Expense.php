@@ -13,7 +13,7 @@ class Expense extends Model
 
     protected $table = 'ts_expense';
     
-    protected $appends = ['staff', 'status', 'expense_date_format', 'apply_date_format', 'reff_date_format'];
+    protected $appends = ['staff', 'status_desc', 'expense_date_format', 'apply_date_format', 'reff_date_format'];
 
     protected $fillable = [
         'expense_id',
@@ -32,6 +32,7 @@ class Expense extends Model
         'apply_date',
         'image',
         'type',
+        'status',
         'created_by',
         'updated_by',
     ];
@@ -65,13 +66,21 @@ class Expense extends Model
         return '';
     }
 
-    public function getStatusAttribute()
-    {
+    public function getStatusDescAttribute()
+    {   
+        $status = array();
+
         if(isset($this->attributes['type']) && $this->attributes['type'] != 0) {
             $arrType = array_combine(config('global.type.code'), config('global.type.status'));
-            return $arrType[$this->attributes['type']];
+            $status[] = $arrType[$this->attributes['type']];
         }
-        return '';
+
+        if(isset($this->attributes['status']) && $this->attributes['status'] != 0 && $this->attributes['type'] == config('global.type.code.white')) {
+            $arrStatus = array_combine(config('global.status.code'), config('global.status.desc'));
+            $status[] = $arrStatus[$this->attributes['status']];
+        }
+
+        return implode(' - ', $status);
     }
 
     public function getExpenseDateFormatAttribute()

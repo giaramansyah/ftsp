@@ -174,8 +174,9 @@ class MigrateTables extends Migration
                 $table->string('text_amount', 100)->nullable(false);
                 $table->string('account', 20)->nullable(false);
                 $table->date('apply_date')->nullable(true);
-                $table->string('image', 200)->nullable(true);
+                $table->text('image')->nullable(true);
                 $table->tinyInteger('type')->nullable(false);
+                $table->tinyInteger('status')->nullable(false);
                 $table->string('created_by', 100)->nullable(false);
                 $table->string('updated_by', 100)->nullable(false);
                 $table->timestamps();
@@ -259,23 +260,23 @@ class MigrateTables extends Migration
      */
     public function down()
     {
-        // Schema::dropIfExists('ms_user');
-        // Schema::dropIfExists('log_user');
-        // Schema::dropIfExists('ms_parent_menus');
-        // Schema::dropIfExists('ms_menus');
-        // Schema::dropIfExists('ms_privilege');
-        // Schema::dropIfExists('ms_privilege_group');
-        // Schema::dropIfExists('map_privilege');
-        // Schema::dropIfExists('ms_data');
-        // Schema::dropIfExists('map_data');
-        // Schema::dropIfExists('log_data');
-        // Schema::dropIfExists('ms_balance');
-        // Schema::dropIfExists('ts_history_balance');
-        // Schema::dropIfExists('ts_expense');
-        // Schema::dropIfExists('ts_reception');
-        // Schema::dropIfExists('ms_year');
-        // Schema::dropIfExists('ts_report');
-        // Schema::dropIfExists('map_report');
+        Schema::dropIfExists('ms_user');
+        Schema::dropIfExists('log_user');
+        Schema::dropIfExists('ms_parent_menus');
+        Schema::dropIfExists('ms_menus');
+        Schema::dropIfExists('ms_privilege');
+        Schema::dropIfExists('ms_privilege_group');
+        Schema::dropIfExists('map_privilege');
+        Schema::dropIfExists('ms_data');
+        Schema::dropIfExists('map_data');
+        Schema::dropIfExists('log_data');
+        Schema::dropIfExists('ms_balance');
+        Schema::dropIfExists('ts_history_balance');
+        Schema::dropIfExists('ts_expense');
+        Schema::dropIfExists('ts_reception');
+        Schema::dropIfExists('ms_year');
+        Schema::dropIfExists('ts_report');
+        Schema::dropIfExists('map_report');
         Schema::dropIfExists('ms_employee');
     }
 }

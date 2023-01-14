@@ -54,7 +54,7 @@ return [
 
     'url' => env('APP_URL', 'http://ftsp.localhost'),
 
-    'asset_url' => env('ASSET_URL', 'http://ftsp.localhost/assets'),
+    'asset_url' => env('ASSET_URL', 'http://ftsp.localhost/public/assets'),
 
     /*
     |--------------------------------------------------------------------------

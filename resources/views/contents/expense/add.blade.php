@@ -6,6 +6,7 @@
     <form class="form-lazy-control" data-action="{{ $action }}" data-method="upload" data-validate="max_amount,image">
       <div class="card-body">
         <input type="hidden" name="type" value="{{ isset($type) ? $type : '' }}">
+        <input type="hidden" name="status" value="{{ isset($type) && $type == config('global.type.code.white') ? config('global.status.code.unfinished') : config('global.status.code.finished') }}">
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
           <div class="col-sm-2">
@@ -72,12 +73,13 @@
         </div>
         <div class="form-group row">
           <div class="offset-sm-2 col-sm-10">
-            <table class="table table-sm table-bordered" width="100%">
+            <table class="table table-sm table-bordered table-striped" width="100%">
               <thead>
                 <tr>
                   <th class="text-center">#</th>
                   <th class="text-center">No. M.A.</th>
                   <th class="text-center">Deskripsi</th>
+                  <th class="text-center">PIC</th>
                   <th class="text-center">Total Dana</th>
                   <th class="text-center">Sisa Dana</th>
                 </tr>
@@ -122,7 +124,7 @@
                 <span class="input-group-text">Rp</span>
               </div>
               <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="amount"
-                onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)" onblur="numberFormat(this, true)" {{
+                onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)" onblur="numberFormat(this, true);amountText(this.value, '#text_amount')" {{
                 isset($mandatory) && $mandatory? 'required' : '' }}>
             </div>
           </div>
@@ -136,8 +138,8 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Terbilang<code>*</code></label>
           <div class="col-sm-7">
-            <input type="text" class="form-control form-control-sm" name="text_amount" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+            <input type="text" class="form-control form-control-sm" name="text_amount" id="text_amount" {{ isset($mandatory) &&
+              $mandatory? 'required' : '' }} readonly>
           </div>
         </div>
         @if($is_red)
@@ -221,7 +223,8 @@
           columns : [
             {data: 'input', name: 'input', orderable: false, searchable: false, class: "text-center"},
             {data: 'ma_id', name: 'ma_id', orderable: true, searchable: true},
-            {data: 'description', name: 'description', orderable: true, searchable: true},
+            {data: 'description', name: 'description', orderable: true, searchable: true, class: "text-wrap"},
+            {data: 'staff', name: 'staff', orderable: true, searchable: true},
             {data: 'amount', name: 'amount', orderable: true, searchable: true, class: "text-right"},
             {data: 'remain', name: 'remain', orderable: true, searchable: true, class: "text-right"},
           ],

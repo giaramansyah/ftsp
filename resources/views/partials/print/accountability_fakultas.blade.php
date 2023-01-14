@@ -156,9 +156,9 @@
             <td>{{ $value['id'] }}</td>
             <td>&nbsp;</td>
             <td style="text-align: right">{{ $value['amount'] }}</td>
-            <td style="text-align: right">{{ $value['amount'] }}</td>
-            <td style="text-align: right">{{ $value['amount'] }}</td>
-            <td style="text-align: right">{{ $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['type'] == config('global.type.code.white') ? '' : $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['type'] == config('global.type.code.white') ? '' : $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['type'] == config('global.type.code.white') ? '' : $value['amount'] }}</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>

@@ -94,6 +94,24 @@ return [
         ]
     ],
 
+    'compact_division' => [
+        'code' => [
+            'fakultas' => 99,
+            'mta' => 4,
+            'mts' => 5,
+        ],
+        'desc' => [
+            'fakultas' => 'Fakultas S1',
+            'mta' => 'Magister Teknik Arsitektur',
+            'mts' => 'Magister Teknik Sipil',
+        ],
+        'report' => [
+            'fakultas' => 'FAKULTAS TEKNIK SIPIL DAN PERENCANAAN UNIVERSITAS TRISAKTI',
+            'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
+            'mts' => 'PROGRAM STUDI MAGISTER TEKNIK SIPIL (S2 MTS) UNIVERSITAS TRISAKTI',
+        ]
+    ],
+
     'staff' => [
         'code' => [
             'admin' => 1,
@@ -182,6 +200,17 @@ return [
             'green' => 'Masuk',
             'red' => 'Selesai',
         ]
+    ],
+
+    'status' => [
+        'code' => [
+            'unfinished' => 0,
+            'finished' => 1,
+        ],
+        'desc' => [
+            'unfinished' => 'Belum Selesai',
+            'finished' => 'Selesai',
+        ],
     ],
 
     'transaction' => [

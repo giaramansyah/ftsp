@@ -34,7 +34,7 @@ class BalanceController extends Controller
             return abort(404);
         }
 
-        $division = $this->getDivisions();
+        $division = $this->getCompactDivisions();
 
         $view = ['divisionArr' => $division, 'action' => route('master.balance.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
 
@@ -195,7 +195,7 @@ class BalanceController extends Controller
                         ]);
                         $response = new Response(true, __('Balance created successfuly'), 1);
                         $response->setRedirect(route('master.balance.index'));
-                        $divisions = array_combine(config('global.division.code'), config('global.division.desc'));
+                        $divisions = array_combine(config('global.compact_division.code'), config('global.compact_division.desc'));
                         $this->writeAppLog($this->_create, 'Balance Division : ' . $divisions[$param['division_id']] . ' Rp ' . $param['amount']);
                     } else {
                         $response = new Response(false, __('Balance create failed. Please try again'));
@@ -295,7 +295,7 @@ class BalanceController extends Controller
             if ($balance->save()) {
                 $response = new Response(true, __('Balance deleted successfuly'), 1);
                 $response->setRedirect(route('master.balance.index'));
-                $divisions = array_combine(config('global.division.code'), config('global.division.desc'));
+                $divisions = array_combine(config('global.compact_division.code'), config('global.compact_division.desc'));
                 $this->writeAppLog($this->_delete, 'Balance Division : ' . $divisions[$balance->division_id]);
             } else {
                 $response = new Response(false, __('Balance delete failed. Please try again'));

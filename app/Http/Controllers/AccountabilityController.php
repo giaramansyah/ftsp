@@ -15,6 +15,7 @@ use App\Models\Report;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -30,7 +31,7 @@ class AccountabilityController extends Controller
         }
 
         $yearArr = $this->getYears();
-        $divisionArr = $this->getDivisions();
+        $divisionArr = $this->getCompactDivisions();
         $employeeArr = $this->getEmployees();
 
         $view = ['yearArr' => $yearArr, 'divisionArr' => $divisionArr, 'employeeArr' => $employeeArr, 'mandatory' => $this->hasPrivilege($this->_create), 'action' => route('report.accountability.post')];
@@ -61,7 +62,12 @@ class AccountabilityController extends Controller
                 return $table->toJson();
             }
 
-            $data = Reception::where('year', $year)->where('division_id', $division_id);
+            $data = Reception::where('year', $year);
+            if($division_id != 99) {
+                $data->where('division_id', $division_id);
+            } else {
+                $data->whereIn('division_id', [config('global.division.code.fakultas'), config('global.division.code.arsitektur'), config('global.division.code.sipil')]);
+            }
             $table = DataTables::eloquent($data);
             $rawColumns = array('input');
 
@@ -105,7 +111,13 @@ class AccountabilityController extends Controller
                 return $table->toJson();
             }
 
-            $data = Data::select(['id'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division_id)->orderBy('id')->get()->toArray();
+            $data = Data::select(['id'])->where('is_trash', 0)->where('year', $year);
+            if($division_id != 99) {
+                $data->where('division_id', $division_id);
+            } else {
+                $data->whereIn('division_id', [config('global.division.code.fakultas'), config('global.division.code.arsitektur'), config('global.division.code.sipil')]);
+            }
+            $data = $data->orderBy('id')->get()->toArray();
             $data = array_column($data, 'id');
             $data = Expense::whereIn('data_id', $data);
             $table = DataTables::eloquent($data);
@@ -122,12 +134,12 @@ class AccountabilityController extends Controller
 
             $table->addColumn('status_desc', function ($row) {
                 $column = '';
-                if ($row->status == config('global.type.status.white')) {
-                    $column .= '<small class="badge badge-secondary">' . $row->status . '</small>';
+                if ($row->status == config('global.status.code.unfinished')) {
+                    $column .= '<small class="badge badge-secondary">' . $row->status_desc . '</small>';
                 }
 
-                if ($row->status == config('global.type.status.red')) {
-                    $column .= '<small class="badge badge-danger">' . $row->status . '</small>';
+                if ($row->status == config('global.status.code.finished')) {
+                    $column .= '<small class="badge badge-danger">' . $row->status_desc . '</small>';
                 }
                 return $column;
             });
@@ -224,7 +236,7 @@ class AccountabilityController extends Controller
             }
 
             $reports = array_combine(config('global.report.code'), config('global.report.desc'));
-            $divisions = array_combine(config('global.division.code'), config('global.division.report'));
+            $divisions = array_combine(config('global.compact_division.code'), config('global.compact_division.report'));
             $employee = Employee::find($param['knowing']);
             $date = Carbon::createFromFormat('Y-m-d', $param['accountability_date']);
 
@@ -289,6 +301,7 @@ class AccountabilityController extends Controller
                             'description' => $value->description . ' a/n ' . $value->name,
                             'id' => $value->expense_id,
                             'amount' => $value->amount,
+                            'type' => $value->type,
                         ];
                         $data['total_expense'] += $this->convertAmount($value->amount, true);
                     }
@@ -335,7 +348,7 @@ class AccountabilityController extends Controller
                     'report_date' => $date->format('d F y'),
                     'expense' => array(),
                     'total_expense' => 0,
-                    'knowing' => $param['knowing'],
+                    'knowing' => isset($employee->name) ? $employee->name : Auth::user()->full_name,
                     'user' => Auth::user()->full_name
                 ];
 
@@ -398,7 +411,7 @@ class AccountabilityController extends Controller
                     'year' => $report->years,
                     'expense' => array(),
                     'total_expense' => 0,
-                    'knowing' => $param['knowing'],
+                    'knowing' => isset($employee->name) ? $employee->name : Auth::user()->full_name,
                 ];
 
                 if(isset($param['expense'])) {

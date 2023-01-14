@@ -54,7 +54,7 @@ class Report extends Model
     public function getDivisionAttribute()
     {
         if(isset($this->attributes['division_id']) && $this->attributes['division_id'] != 0) {
-            $arrDivision = array_combine(config('global.division.code'), config('global.division.desc'));
+            $arrDivision = array_combine(config('global.compact_division.code'), config('global.compact_division.desc'));
             return $arrDivision[$this->attributes['division_id']];
         }
         return '';

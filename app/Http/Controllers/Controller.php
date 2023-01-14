@@ -101,6 +101,25 @@ class Controller extends BaseController
         return $result;
     }
 
+    public function getCompactDivisions()
+    {
+        $division = array_combine(config('global.compact_division.code'), config('global.compact_division.desc'));
+
+        if(Auth::user()->division_id != 0) {
+            $division = Arr::only($division, [Auth::user()->division_id]);
+        }
+
+        $result = array();
+        foreach($division as $key => $value) {
+            $result[] = array(
+                'id' => $key,
+                'name' => $value,
+            );
+        }
+
+        return $result;
+    }
+
     public function getStaffs()
     {
         $staff = array_combine(config('global.staff.code'), config('global.staff.desc'));
@@ -200,6 +219,9 @@ class Controller extends BaseController
 
         $year = Carbon::createFromFormat('d M Y', implode(' ', $arrDate))->year;
         $month = Carbon::createFromFormat('d M Y', implode(' ', $arrDate))->month;
+        if($month < 10) {
+            $month = '0'.$month;
+        }
         $name = implode('_', $arrName);
         $descMonth = config('global.months');
 

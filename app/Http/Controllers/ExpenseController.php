@@ -154,7 +154,7 @@ class ExpenseController extends Controller
 
             $data = Data::select(['id'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('id')->get()->toArray();
             $data = array_column($data, 'id');
-            $expense = Expense::select(['id', 'expense_id', 'ma_id', 'expense_date', 'reff_no', 'reff_date', 'staff_id', 'amount', 'type', 'updated_at'])->whereIn('data_id', $data)->orderBY('updated_at', 'desc');
+            $expense = Expense::select(['id', 'expense_id', 'ma_id', 'expense_date', 'reff_no', 'reff_date', 'staff_id', 'amount', 'type', 'updated_at', 'status'])->whereIn('data_id', $data)->orderBY('updated_at', 'desc');
             $table = DataTables::eloquent($expense);
             $rawColumns = array('expense', 'status_desc');
             $table->addIndexColumn();
@@ -171,13 +171,14 @@ class ExpenseController extends Controller
 
             $table->addColumn('status_desc', function ($row) {
                 $column = '';
-                if ($row->status == config('global.type.status.white')) {
-                    $column .= '<small class="badge badge-secondary">' . $row->status . '</small>';
+                if ($row->status == config('global.status.code.unfinished')) {
+                    $column .= '<small class="badge badge-secondary">' . $row->status_desc . '</small>';
                 }
 
-                if ($row->status == config('global.type.status.red')) {
-                    $column .= '<small class="badge badge-danger">' . $row->status . '</small>';
+                if ($row->status == config('global.status.code.finished')) {
+                    $column .= '<small class="badge badge-danger">' . $row->status_desc . '</small>';
                 }
+
                 return $column;
             });
 
@@ -351,7 +352,7 @@ class ExpenseController extends Controller
                         'text_amount' => 'required',
                         'apply_date' => 'required',
                         'account' => 'required',
-                        'image' => 'required|mimes:pdf,png,jpg',
+                        'image' => 'required',
                     ];
                 } else {
                     $validateParams = [
@@ -420,6 +421,7 @@ class ExpenseController extends Controller
 
                     $expense = Expense::create([
                         'type' => $param['type'],
+                        'status' => $param['status'],
                         'expense_id' => $param['expense_id'],
                         'expense_date' => $param['expense_date'],
                         'reff_no' => $param['reff_no'],

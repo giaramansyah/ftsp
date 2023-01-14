@@ -11,7 +11,7 @@
           <p class="text-muted text-center mb-0">No. Kas</p>
           <p class="text-muted text-center">{{ $expense_id }}</p>
           <p class="text-md badge {{ $is_red ? 'badge-danger' : 'badge-secondary' }}">{{
-            $status }}</p>
+            $status_desc }}</p>
           <ul class="list-group list-group-unbordered mb-3">
             <li class="list-group-item">
               <b>Tgl. Transaksi</b>
@@ -84,7 +84,7 @@
             </div>
             <div class="col-auto">
               <button type="button" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#modalPrint">
-                <i class="fas fa-print"></i> Cetak Bon
+                <i class="fas fa-print"></i> {{ $is_red ? 'Cetak Bon' : 'Buat UMD' }}
               </button>
             </div>
             @endif
