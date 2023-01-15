@@ -39,7 +39,7 @@
             </li>
             <li class="list-group-item">
               <b>Atas Nama</b>
-              <p class="float-right mb-0">{{ $name }}</p>
+              <p class="float-right mb-0">{{ $name_desc }}</p>
             </li>
             <li class="list-group-item">
               <b>Jml. Penerimaan</b>

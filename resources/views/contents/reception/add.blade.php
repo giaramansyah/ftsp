@@ -96,8 +96,14 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">A/N<code>*</code></label>
           <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" name="name" {{ isset($mandatory) &&
+            <select class="form-control form-control-sm select2" name="name" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
+              <option value="">-- Silakan Pilih --</option>
+              @foreach ($employeeArr as $key => $value)
+              <option value="{{ $value['id'] }}">{{
+                $value['name'] }}</option>
+              @endforeach
+            </select>
           </div>
           <label class="col-sm-2 offset-sm-1 col-form-label form-pic-label">PIC<code>*</code></label>
           <div class="col-sm-2 form-pic-select">
@@ -115,7 +121,7 @@
                 <span class="input-group-text">Rp</span>
               </div>
               <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="amount"
-                onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)" onblur="numberFormat(this, true)" {{
+                onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)" onblur="numberFormat(this, true);amountText(this.value, '#text_amount')" {{
                 isset($mandatory) && $mandatory? 'required' : '' }}>
             </div>
           </div>
@@ -124,7 +130,7 @@
           <label class="col-sm-2 col-form-label">Terbilang<code>*</code></label>
           <div class="col-sm-7">
             <input type="text" class="form-control form-control-sm" name="text_amount" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+              $mandatory? 'required' : '' }} readonly>
           </div>
         </div>
       </div>

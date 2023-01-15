@@ -27,12 +27,9 @@
     <table class="table" width="100%">
       <thead>
         <tr>
-          <th>NO</th>
-          <th>TGL</th>
-          <th>M.A.</th>
-          <th>URAIAN</th>
-          <th>PIC</th>
-          <th>Rp.</th>
+          @foreach (config('global.report.header.accountability_umd') as $value)
+          <th>{{ $value }}</th>
+          @endforeach
         </tr>
       </thead>
       <tbody>

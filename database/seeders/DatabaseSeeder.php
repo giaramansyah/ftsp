@@ -250,6 +250,32 @@ class DatabaseSeeder extends Seeder
                             ),
                         )
                     ),
+                    array(
+                        'label' => 'Harian',
+                        'alias' => 'daily',
+                        'url' => 'report.daily.index',
+                        'order' => 1,
+                        'privilege' => array(
+                            array(
+                                'code' => 'DLCR',
+                                'modules' => Config::get('global.modules.code.create'),
+                                'desc' => 'Add new report daily'
+                            ),
+                        )
+                    ),
+                    array(
+                        'label' => 'Rekapitulasi',
+                        'alias' => 'recapitulation',
+                        'url' => 'report.recapitulation.index',
+                        'order' => 1,
+                        'privilege' => array(
+                            array(
+                                'code' => 'RCRA',
+                                'modules' => Config::get('global.modules.code.readall'),
+                                'desc' => 'view report recapitulation'
+                            ),
+                        )
+                    ),
                 )
             ),
             array(

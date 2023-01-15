@@ -17,6 +17,8 @@ use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\YearController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\DailyController;
+use App\Http\Controllers\RecapitulationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -142,4 +144,18 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/employee/edit/{id}', [EmployeeController::class, 'edit'])->name('master.employee.edit');
     Route::post('/employee/post/{action}/{id}', [EmployeeController::class, 'post'])->name('master.employee.post');
     Route::post('/employee/upload', [EmployeeController::class, 'postUpload'])->name('master.employee.postupload');
+
+    //daily
+    Route::get('/daily', [DailyController::class, 'index'])->name('report.daily.index');
+    Route::post('/daily/post', [DailyController::class, 'post'])->name('report.daily.post');
+    Route::get('/daily/download/{id}', [DailyController::class, 'download'])->name('report.daily.download');
+
+    //recapitulation
+    Route::get('/recapitulation/reff/{year?}', [RecapitulationController::class, 'index'])->name('report.recapitulation.index');
+    Route::get('/recapitulation/list/division', [RecapitulationController::class, 'getListDivision'])->name('report.recapitulation.list.division');
+    Route::get('/recapitulation/list/pic', [RecapitulationController::class, 'getListPic'])->name('report.recapitulation.list.pic');
+    Route::get('/recapitulation/division/{id}', [RecapitulationController::class, 'division'])->name('report.recapitulation.division');
+    Route::get('/recapitulation/data/{id}', [RecapitulationController::class, 'data'])->name('report.recapitulation.data');
+    Route::get('/recapitulation/detail/division/', [RecapitulationController::class, 'getDetailDivision'])->name('report.recapitulation.division.detail');
+    Route::get('/recapitulation/detail/data/', [RecapitulationController::class, 'getDetailData'])->name('report.recapitulation.data.detail');
 });

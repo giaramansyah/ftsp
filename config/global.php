@@ -229,11 +229,13 @@ return [
             'accountability_fakultas' => 1,
             'accountability' => 2,
             'accountability_umd' => 3,
+            'daily' => 4,
         ],
         'desc' => [
             'accountability_fakultas' => 'Lap. Pertanggung Jawaban (Fakultas)',
             'accountability' => 'Lap. Pertanggung Jawaban',
             'accountability_umd' => 'Lap. Pertanggung Jawaban (UMD)',
+            'daily' => 'Lap. Harian',
         ],
         'header' => [
             'accountability_fakultas' => [
@@ -247,7 +249,7 @@ return [
                 'DEBET (RP)',
                 'DIAJUKAN',
                 'DISETUJUI',
-                'PERTANGGUNG',
+                'LAPORAN',
                 'SELISIH',
                 'SALDO',
                 'KET.',
@@ -260,8 +262,9 @@ return [
                 'URAIAN',
                 'DIAJUKAN',
                 'DISETUJUI',
-                'PERTANGGUNG JAWABAN',
+                'LAPORAN',
                 'SELISIH',
+                'SALDO',
                 'KET.',
             ],
             'accountability_umd' => [
@@ -271,6 +274,14 @@ return [
                 'URAIAN',
                 'PIC',
                 'Rp.',
+            ],
+            'daily' => [
+                'NO',
+                'TGL. TRANSAKSI',
+                'DESKRIPSI',
+                'NOMINAL (RP)',
+                'NO. REKENING',
+                'A/N',
             ],
         ],
         'excel' => [

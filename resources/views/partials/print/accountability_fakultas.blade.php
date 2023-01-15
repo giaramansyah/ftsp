@@ -27,20 +27,9 @@
     <table class="table" width="100%">
       <thead>
         <tr>
-          <th>NO</th>
-          <th>NO SURAT</th>
-          <th>TGL SURAT</th>
-          <th>M.A.</th>
-          <th>URAIAN</th>
-          <th>&nbsp;</th>
-          <th>KREDIT (RP)</th>
-          <th>DEBET (RP)</th>
-          <th>DIAJUKAN</th>
-          <th>DISETUJUI</th>
-          <th>PERTANGGUNG</th>
-          <th>SELISIH</th>
-          <th>SALDO</th>
-          <th>KET.</th>
+          @foreach (config('global.report.header.accountability_fakultas') as $value)
+          <th>{{ $value }}</th>
+          @endforeach
         </tr>
       </thead>
       <tbody>
@@ -156,9 +145,9 @@
             <td>{{ $value['id'] }}</td>
             <td>&nbsp;</td>
             <td style="text-align: right">{{ $value['amount'] }}</td>
-            <td style="text-align: right">{{ $value['type'] == config('global.type.code.white') ? '' : $value['amount'] }}</td>
-            <td style="text-align: right">{{ $value['type'] == config('global.type.code.white') ? '' : $value['amount'] }}</td>
-            <td style="text-align: right">{{ $value['type'] == config('global.type.code.white') ? '' : $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['status'] == config('global.status.code.unfinished') ? '' : $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['status'] == config('global.status.code.unfinished') ? '' : $value['amount'] }}</td>
+            <td style="text-align: right">{{ $value['status'] == config('global.status.code.unfinished') ? '' : $value['amount'] }}</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>

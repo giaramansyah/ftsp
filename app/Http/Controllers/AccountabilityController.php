@@ -278,7 +278,7 @@ class AccountabilityController extends Controller
                     foreach($reception as $value){
                         $data['reception'][] = [
                             'ma_id' => $value->ma_id,
-                            'description' => $value->description . ' a/n ' . $value->name . ' pada tanggal ' . $value->reception_date_format,
+                            'description' => $value->description . ' a/n ' . $value->name_desc . ' pada tanggal ' . $value->reception_date_format,
                             'id' => $value->reception_id,
                             'amount' => $value->amount,
                         ]; 
@@ -298,10 +298,10 @@ class AccountabilityController extends Controller
                             'reff_no' => $value->reff_no,
                             'reff_date' => $value->reff_date_format,
                             'ma_id' => $value->ma_id,
-                            'description' => $value->description . ' a/n ' . $value->name,
+                            'description' => $value->description . ' a/n ' . $value->name_desc,
                             'id' => $value->expense_id,
                             'amount' => $value->amount,
-                            'type' => $value->type,
+                            'status' => $value->status,
                         ];
                         $data['total_expense'] += $this->convertAmount($value->amount, true);
                     }
@@ -345,6 +345,7 @@ class AccountabilityController extends Controller
             } else if($reportType['type'] == config('global.report.code.accountability'))  {
                 $data = [
                     'header' => $divisions[$division_id],
+                    'balance' => 0,
                     'report_date' => $date->format('d F y'),
                     'expense' => array(),
                     'total_expense' => 0,
@@ -352,11 +353,16 @@ class AccountabilityController extends Controller
                     'user' => Auth::user()->full_name
                 ];
 
+                $balance = Balance::where('division_id', $division_id)->first();
+                if($balance) {
+                    $data['balance'] = $balance->amount;
+                }
+
                 if(isset($param['expense'])) {
                     if(is_array($param['expense'])) {
-                        $expense = Expense::whereIn('id', $param['expense'])->where('type', config('global.type.code.red'))->get();
+                        $expense = Expense::whereIn('id', $param['expense'])->where('status', config('global.status.code.finished'))->get();
                     } else {
-                        $expense = Expense::where('id', $param['expense'])->where('type', config('global.type.code.red'))->get();
+                        $expense = Expense::where('id', $param['expense'])->where('status', config('global.status.code.finished'))->get();
                     }
 
                     foreach($expense as $value){
@@ -364,7 +370,7 @@ class AccountabilityController extends Controller
                             'reff_no' => $value->reff_no,
                             'reff_date' => $value->reff_date_format,
                             'ma_id' => $value->ma_id,
-                            'description' => $value->description . ' a/n ' . $value->name,
+                            'description' => $value->description . ' a/n ' . $value->name_desc,
                             'amount' => $value->amount,
                         ];
                         $data['total_expense'] += $this->convertAmount($value->amount, true);
@@ -426,7 +432,7 @@ class AccountabilityController extends Controller
                             'reff_date' => $value->reff_date_format,
                             'ma_id' => $value->ma_id,
                             'description' => $value->description,
-                            'name' => ' a/n ' . $value->name,
+                            'name' => ' a/n ' . $value->name_desc,
                             'amount' => $value->amount,
                         ];
                         $data['total_expense'] += $this->convertAmount($value->amount, true);

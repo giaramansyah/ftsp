@@ -5,7 +5,8 @@
   <div class="card">
     <form class="form-lazy-control" data-action="{{ $action }}" data-method="upload" data-validate="max_amount,image">
       <div class="card-body">
-        <input type="hidden" name="type" value="{{ isset($type) ? $type : '' }}">
+        <input type="hidden" name="type" value="{{ isset($type) ? $type : '' }}"> 
+        <input type="hidden" name="status" value="{{ isset($status) ? $status : '' }}"> 
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
           <div class="col-sm-2">
@@ -103,8 +104,14 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">A/N<code>*</code></label>
           <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" name="name"
-              value="{{ isset($name) && $name ? $name : '' }}" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
+            <select class="form-control form-control-sm select2" name="name" {{ isset($mandatory) &&
+              $mandatory? 'required' : '' }}>
+              <option value="">-- Silakan Pilih --</option>
+              @foreach ($employeeArr as $key => $value)
+              <option value="{{ $value['id'] }}" {{ isset($name) && $name == $value['id'] ? 'selected' : '' }}>{{
+                $value['name'] }}</option>
+              @endforeach
+            </select>
           </div>
           <label class="col-sm-2 offset-sm-1 col-form-label">PIC<code>*</code></label>
           <div class="col-sm-2">
@@ -168,6 +175,30 @@
                 <input type="file" name="image" id="image" class="custom-file-input"
                   accept="application/pdf, image/jpg, image/png" {{ isset($mandatory) && $mandatory &&
                   !isset($image)? 'required' : '' }}>
+                <label class="custom-file-label" for="file">Pilih File</label>
+              </div>
+            </div>
+            <span class="font-italic small">*ekstensi file hanya .pdf, .jpg dan .png</span>
+          </div>
+        </div>
+        @else
+        <div class="form-group row">
+          <label class="offset-sm-2 col-sm-10 col-form-label text-danger font-italic font-weight-normal">catatan : upload file LPJ jika ingin merubah status menjadi bon merah (selesai), jika tidak kosongkan</label>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Tgl. Penyerahan<code>*</code></label>
+          <div class="col-sm-2">
+            <input type="date" class="form-control form-control-sm" name="apply_date"
+              value="{{ isset($apply_date) && $apply_date ? $apply_date : '' }}">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Upload LPJ</label>
+          <div class="col-sm-7">
+            <div class="input-group input-group-sm">
+              <div class="custom-file">
+                <input type="file" name="image" id="image" class="custom-file-input"
+                  accept="application/pdf, image/jpg, image/png">
                 <label class="custom-file-label" for="file">Pilih File</label>
               </div>
             </div>

@@ -13,7 +13,7 @@ class Expense extends Model
 
     protected $table = 'ts_expense';
     
-    protected $appends = ['staff', 'status_desc', 'expense_date_format', 'apply_date_format', 'reff_date_format'];
+    protected $appends = ['staff', 'status_desc', 'name_desc', 'expense_date_format', 'apply_date_format', 'reff_date_format'];
 
     protected $fillable = [
         'expense_id',
@@ -42,6 +42,11 @@ class Expense extends Model
         return $this->hasOne(Data::class, 'id', 'data_id');
     }
 
+    public function names()
+    {
+        return $this->hasOne(Employee::class, 'id', 'name');
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format(config('global.dateformat.view'));
@@ -55,6 +60,19 @@ class Expense extends Model
     public function getAmountAttribute()
     {
         return number_format($this->attributes['amount'], 0, null, ',');
+    }
+
+    public function getNameDescAttribute()
+    {
+        if(isset($this->attributes['name']) && $this->attributes['name'] != '') {
+            $employee = self::find($this->id)->names()->where('id', $this->attributes['name'])->first();
+            if($employee) {
+                return $employee->name;
+            } else {
+                return $this->attributes['name'];
+            }
+        }
+        return '';
     }
 
     public function getStaffAttribute()

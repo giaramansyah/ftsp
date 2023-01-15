@@ -13,7 +13,7 @@ class Reception extends Model
 
     protected $table = 'ts_reception';
     
-    protected $appends = ['staff', 'division', 'years', 'reception_date_format'];
+    protected $appends = ['staff', 'division', 'years', 'reception_date_format', 'name_desc'];
 
     protected $fillable = [
         'reception_id',
@@ -35,6 +35,11 @@ class Reception extends Model
     public function datas()
     {
         return $this->hasOne(Data::class, 'id', 'data_id');
+    }
+
+    public function names()
+    {
+        return $this->hasOne(Employee::class, 'id', 'name');
     }
 
     protected function serializeDate(DateTimeInterface $date)
@@ -82,6 +87,19 @@ class Reception extends Model
         if(isset($this->attributes['division_id']) && $this->attributes['division_id'] != 0) {
             $arrDivision = array_combine(config('global.division.code'), config('global.division.desc'));
             return $arrDivision[$this->attributes['division_id']];
+        }
+        return '';
+    }
+
+    public function getNameDescAttribute()
+    {
+        if(isset($this->attributes['name']) && $this->attributes['name'] != 0) {
+            if(is_numeric($this->attributes['name'])) {
+                $employee = self::find($this->id)->names()->where('id', $this->attributes['name'])->first();
+                return $employee->name;
+            } else {
+                return $this->attributes['name'];
+            }
         }
         return '';
     }

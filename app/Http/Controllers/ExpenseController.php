@@ -63,6 +63,7 @@ class ExpenseController extends Controller
         $typeDesc = $types[$type];
         $years = $this->getYears();
         $divisions = $this->getDivisions();
+        $employees = $this->getEmployees();
         $expense_id = $this->generate();
 
         $is_red = false;
@@ -70,7 +71,7 @@ class ExpenseController extends Controller
             $is_red = true;
         }
 
-        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'type' => $type, 'expense_id' => $expense_id, 'action' => route('transaction.expense.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'is_red' => $is_red, 'typeDesc' => $typeDesc, 'mandatory' => $this->hasPrivilege($this->_create)];
+        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'employeeArr' => $employees, 'type' => $type, 'expense_id' => $expense_id, 'action' => route('transaction.expense.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'is_red' => $is_red, 'typeDesc' => $typeDesc, 'mandatory' => $this->hasPrivilege($this->_create)];
 
         return view('contents.expense.add', $view);
     }
@@ -127,7 +128,9 @@ class ExpenseController extends Controller
             $data = array('expense_id' => $data['expense_id']);
         }
 
-        $view = ['staffArr' => $staffArr, 'action' => route('transaction.expense.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'is_red' => $is_red, 'typeDesc' => $typeDesc, 'mandatory' => $this->hasPrivilege($this->_update)];
+        $employees = $this->getEmployees();
+
+        $view = ['staffArr' => $staffArr, 'employeeArr' => $employees, 'action' => route('transaction.expense.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'is_red' => $is_red, 'typeDesc' => $typeDesc, 'mandatory' => $this->hasPrivilege($this->_update)];
 
         return view('contents.expense.edit', array_merge($view, $data));
     }
@@ -304,7 +307,7 @@ class ExpenseController extends Controller
         $data['data'] = Data::find($data['data_id'])->toArray();
 
         $is_red = false;
-        if ($data['type'] == config('global.type.code.red')) {
+        if ($data['status'] == config('global.status.code.finished')) {
             $is_red = true;
             $file = $this->getFile($data['image'], public_path('upload'));
             $image = $data['image'];
@@ -529,6 +532,7 @@ class ExpenseController extends Controller
 
                         $image = null;
                         $apply_date = null;
+                        $status = null;
 
                         if (isset($param['image']) && $param['image'] != '') {
                             $file = $request->file('image');
@@ -554,6 +558,9 @@ class ExpenseController extends Controller
                             if ($file->move($pathMonth, $filename)) {
                                 $image = $filename;
                                 $apply_date = $param['apply_date'];
+                                if($param['type'] == config('global.type.code.white') && $param['status'] == config('global.status.code.unfinished')) {
+                                    $status = config('global.status.code.finished');
+                                }
                             } else {
                                 $response = new Response(false, 'Gagal Mengunggah File Ke Server');
                                 return response()->json($response->responseJson());
@@ -574,6 +581,7 @@ class ExpenseController extends Controller
                         $expense->account = $param['account'];
                         if ($apply_date) $expense->apply_date = $apply_date;
                         if ($image) $expense->image = $image;
+                        if ($status) $expense->status = $status;
                         $expense->updated_by = Auth::user()->username;
 
                         if ($expense->save()) {

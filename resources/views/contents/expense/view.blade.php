@@ -41,7 +41,7 @@
             </li>
             <li class="list-group-item">
               <b>Atas Nama</b>
-              <p class="float-right mb-0">{{ $name }}</p>
+              <p class="float-right mb-0">{{ $name_desc }}</p>
             </li>
             <li class="list-group-item">
               <b>No. Rekening</b>
@@ -122,7 +122,8 @@
     </div>
   </div>
 </div>
-@include('partials.modal.modalprint', ['modal_action' => route('transaction.expense.print', ['id' => $id]), 'employeeArr' => $employeeArr])
+@include('partials.modal.modalprint', ['modal_action' => route('transaction.expense.print', ['id' => $id]),
+'employeeArr' => $employeeArr])
 @endsection
 @section('push-js')
 <script type="text/javascript">

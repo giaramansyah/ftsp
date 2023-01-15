@@ -193,7 +193,7 @@
             {data: 'reception_date_format', name: 'reception_date_format', orderable: true, searchable: true},
             {data: 'ma_id', name: 'ma_id', orderable: true, searchable: true},
             {data: 'description', name: 'description', orderable: true, searchable: true},
-            {data: 'name', name: 'name', orderable: true, searchable: true},
+            {data: 'name_desc', name: 'name_desc', orderable: true, searchable: true},
             {data: 'amount', name: 'amount', orderable: true, searchable: true, class: "text-right"},
           ],
         }
@@ -219,7 +219,7 @@
             {data: 'expense_id', name: 'expense_id', orderable: true, searchable: true},
             {data: 'expense_date_format', name: 'expense_date_format', orderable: true, searchable: true},
             {data: 'description', name: 'description', orderable: true, searchable: true},
-            {data: 'name', name: 'name', orderable: true, searchable: true},
+            {data: 'name_desc', name: 'name_desc', orderable: true, searchable: true},
             {data: 'amount', name: 'amount', orderable: true, searchable: true, class: "text-right"},
             {data: 'status_desc', name: 'status_desc', orderable: true, searchable: true},
           ],

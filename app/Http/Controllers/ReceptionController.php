@@ -54,9 +54,10 @@ class ReceptionController extends Controller
 
         $years = $this->getYears();
         $divisions = $this->getDivisions();
+        $employees = $this->getEmployees();
         $reception_id = $this->generate();
 
-        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'reception_id' => $reception_id, 'action' => route('transaction.reception.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
+        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'employeeArr' => $employees, 'reception_id' => $reception_id, 'action' => route('transaction.reception.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
 
         return view('contents.reception.add', $view);
     }
@@ -97,7 +98,9 @@ class ReceptionController extends Controller
             $data = array('reception_id' => $data['reception_id']);
         }
 
-        $view = ['staffArr' => $staffArr, 'action' => route('transaction.reception.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'from_ma' => $from_ma, 'mandatory' => $this->hasPrivilege($this->_update)];
+        $employees = $this->getEmployees();
+
+        $view = ['staffArr' => $staffArr, 'employeeArr' => $employees, 'action' => route('transaction.reception.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'from_ma' => $from_ma, 'mandatory' => $this->hasPrivilege($this->_update)];
 
         return view('contents.reception.edit', array_merge($view, $data));
     }

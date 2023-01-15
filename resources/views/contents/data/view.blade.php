@@ -102,8 +102,8 @@
                       <td class="text-center text-nowrap">{{ $value['staff'] }}</td>
                       <td class="text-center text-nowrap">
                         <small
-                          class="badge {{ $value['type'] == config('global.type.code.white') ? 'badge-secondary' : 'badge-danger' }}">{{
-                          $value['status'] }}</small>
+                          class="badge {{ $value['status'] == config('global.status.code.unfinished') ? 'badge-secondary' : 'badge-danger' }}">{{
+                          $value['status_desc'] }}</small>
                       </td>
                       <td>
                         <button type="button" class="btn btn-lazy-control btn-outline-info btn-sm"

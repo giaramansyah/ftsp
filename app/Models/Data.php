@@ -54,22 +54,28 @@ class Data extends Model
 
     public function getStaffIdAttribute()
     {
-        $staffs = self::find($this->id)->staffs()->get()->toArray();
-        return array_column($staffs, 'staff_id');
+        if(isset($this->attributes['id'])) {
+            $staffs = self::find($this->id)->staffs()->get()->toArray();
+            return array_column($staffs, 'staff_id');
+        }
+        return array();
     }
 
     public function getStaffAttribute()
     {
-        $staffs = self::find($this->id)->staffs()->get()->toArray();
-        $arrStaff = array_combine(config('global.staff.code'), config('global.staff.desc'));
-        $descStaff = array();
-        foreach($staffs as $staff) {
-            if(isset($staff['staff_id']) && $staff['staff_id'] != 0) {
-                $descStaff[] = $arrStaff[$staff['staff_id']];
+        if(isset($this->attributes['id'])) {
+            $staffs = self::find($this->id)->staffs()->get()->toArray();
+            $arrStaff = array_combine(config('global.staff.code'), config('global.staff.desc'));
+            $descStaff = array();
+            foreach($staffs as $staff) {
+                if(isset($staff['staff_id']) && $staff['staff_id'] != 0) {
+                    $descStaff[] = $arrStaff[$staff['staff_id']];
+                }
             }
-        }
 
-        return implode(', ', $descStaff);
+            return implode(', ', $descStaff);
+        }
+        return '';
     }
 
     public function getDivisionAttribute()

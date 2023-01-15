@@ -105,8 +105,14 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">A/N<code>*</code></label>
           <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" name="name" {{ isset($mandatory) &&
+            <select class="form-control form-control-sm select2" name="name" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
+              <option value="">-- Silakan Pilih --</option>
+              @foreach ($employeeArr as $key => $value)
+              <option value="{{ $value['id'] }}">{{
+                $value['name'] }}</option>
+              @endforeach
+            </select>
           </div>
           <label class="col-sm-2 offset-sm-1 col-form-label">PIC<code>*</code></label>
           <div class="col-sm-2">

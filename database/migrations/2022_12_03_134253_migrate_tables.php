@@ -267,8 +267,8 @@ class MigrateTables extends Migration
         // Schema::dropIfExists('ms_privilege');
         // Schema::dropIfExists('ms_privilege_group');
         // Schema::dropIfExists('map_privilege');
-        // Schema::dropIfExists('ms_data');
-        // Schema::dropIfExists('map_data');
+        Schema::dropIfExists('ms_data');
+        Schema::dropIfExists('map_data');
         Schema::dropIfExists('log_data');
         Schema::dropIfExists('ms_balance');
         Schema::dropIfExists('ts_history_balance');

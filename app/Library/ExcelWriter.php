@@ -34,7 +34,7 @@ class ExcelWriter
         $spreadsheet->addSheet($sheet, 0);
         $spreadsheet->setActiveSheetIndex(0);
         $sheet = $spreadsheet->getActiveSheet();
-        
+
         if ($this->_type == config('global.report.code.accountability')) {
             $this->accountability($sheet);
         } else if ($this->_type == config('global.report.code.accountability_fakultas')) {
@@ -42,26 +42,26 @@ class ExcelWriter
         } else {
             $this->accountability_umd($sheet);
         }
-        
+
         $spreadsheet->setActiveSheetIndex(0);
-        
+
         $descMonth = config('global.months');
         $today = Carbon::now();
         $year = $today->year;
         $month = $today->month;
         $month = $month < 10 ? '0' . $month : $month;
-        
+
         $pathYear = public_path('download') . '/' . $year;
         $pathMonth = public_path('download') . '/' . $year . '/' . $descMonth[$month];
-        
+
         if (!File::exists($pathYear)) {
             File::makeDirectory($pathYear, 0777, true, true);
         }
-        
+
         if (!File::exists($pathMonth)) {
             File::makeDirectory($pathMonth, 0777, true, true);
         }
-        
+
         $filepath = $pathMonth . '/' . $this->_filename;
         $writer = new Xlsx($spreadsheet);
         $writer->save($filepath);
@@ -85,7 +85,7 @@ class ExcelWriter
 
         $row++;
         $row++;
-        $width = [34, 165, 71, 79, 454, 100, 100, 100, 71, 50];
+        $width = [34, 165, 71, 79, 454, 100, 100, 100, 100, 100, 50];
         foreach ($this->_header as $key => $value) {
             $sheet->setCellValue($this->_columns[$key] . $row, $value);
             $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['header']);
@@ -94,7 +94,7 @@ class ExcelWriter
         }
 
         $row++;
-        $values = ['', '', '', '', 'PENGELUARAN :', '', '', '', '', ''];
+        $values = ['', '', '', '', 'Saldo Awal', '', '', '', '', $this->_data['balance'], ''];
         foreach ($values as $key => $value) {
             $sheet->setCellValue($this->_columns[$key] . $row, $value);
             $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
@@ -102,7 +102,7 @@ class ExcelWriter
         }
 
         $row++;
-        $values = ['', '', '', '', '', '', '', '', '', ''];
+        $values = ['', '', '', '', '', '', '', '', '', '', ''];
         foreach ($values as $key => $value) {
             $sheet->setCellValue($this->_columns[$key] . $row, $value);
             $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
@@ -112,7 +112,7 @@ class ExcelWriter
         if (!empty($this->_data['expense'])) {
             foreach ($this->_data['expense'] as $key => $value) {
                 $i = 0;
-                $sheet->setCellValue($this->_columns[$i] . $row, ($key+1));
+                $sheet->setCellValue($this->_columns[$i] . $row, ($key + 1));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
@@ -132,16 +132,20 @@ class ExcelWriter
 
                     $i++;
                 }
-                
+
                 $sheet->setCellValue($this->_columns[$i] . $row, $value['amount']);
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-                
+
                 $i++;
                 $sheet->setCellValue($this->_columns[$i] . $row, $value['amount']);
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
+                $i++;
+                $sheet->setCellValue($this->_columns[$i] . $row, '');
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                
                 $i++;
                 $sheet->setCellValue($this->_columns[$i] . $row, '');
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
@@ -153,7 +157,7 @@ class ExcelWriter
                 $row++;
             }
         } else {
-            $values = ['', '', '', '', 'Tanggal ' . $this->_data['report_date'] . ' tidak ada realisasi', '', '', '', '', ''];
+            $values = ['', '', '', '', 'Tanggal ' . $this->_data['report_date'] . ' tidak ada realisasi', '', '', '', '', '', ''];
             foreach ($values as $key => $value) {
                 $sheet->setCellValue($this->_columns[$key] . $row, $value);
                 $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
@@ -162,11 +166,26 @@ class ExcelWriter
             $row++;
         }
 
-        $values = ['', '', '', '', '', $this->_data['total_expense'], $this->_data['total_expense'], $this->_data['total_expense'], '', ''];
+        $values = ['', '', '', '', '', $this->_data['total_expense'], $this->_data['total_expense'], $this->_data['total_expense'], '', '', ''];
         foreach ($values as $key => $value) {
             $sheet->setCellValue($this->_columns[$key] . $row, $value);
             $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
             $sheet->getStyle($this->_columns[$key] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle($this->_columns[$key] . $row)->getFont()->setBold(true);
+        }
+
+        $row++;
+        $values = ['', '', '', '', '', '', '', '', '', '', ''];
+        foreach ($values as $key => $value) {
+            $sheet->setCellValue($this->_columns[$key] . $row, $value);
+            $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
+        }
+
+        $row++;
+        $values = ['', '', '', '', 'Saldo Akhir', '', '', '', '', $this->_data['balance'], ''];
+        foreach ($values as $key => $value) {
+            $sheet->setCellValue($this->_columns[$key] . $row, $value);
+            $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
             $sheet->getStyle($this->_columns[$key] . $row)->getFont()->setBold(true);
         }
 
@@ -180,16 +199,16 @@ class ExcelWriter
         $sheet->setCellValue($this->_columns[5] . $row, 'Jakarta, ' . $this->_data['report_date']);
         $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
         $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
-        
+
         $row++;
         $sheet->setCellValue($this->_columns[0] . $row, 'Wakil Dekan II');
         $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[3] . $row);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
-        
+
         $sheet->setCellValue($this->_columns[5] . $row, 'Kasir FTSP');
         $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
         $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
-        
+
         $row++;
         $row++;
         $row++;
@@ -198,7 +217,7 @@ class ExcelWriter
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->getFont()->setBold(true);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->getFont()->setBaseLine(true);
-        
+
         $sheet->setCellValue($this->_columns[5] . $row, $this->_data['user']);
         $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
         $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
@@ -235,7 +254,7 @@ class ExcelWriter
         foreach ($values as $key => $value) {
             $sheet->setCellValue($this->_columns[$key] . $row, $value);
             $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
-            if(in_array($key, [6, 12])) {
+            if (in_array($key, [6, 12])) {
                 $sheet->getStyle($this->_columns[$key] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             }
         }
@@ -343,7 +362,7 @@ class ExcelWriter
         if (!empty($this->_data['expense'])) {
             foreach ($this->_data['expense'] as $key => $value) {
                 $i = 0;
-                $sheet->setCellValue($this->_columns[$i] . $row, ($key+1));
+                $sheet->setCellValue($this->_columns[$i] . $row, ($key + 1));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
@@ -383,17 +402,17 @@ class ExcelWriter
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
                 $i++;
-                $sheet->setCellValue($this->_columns[$i] . $row, $value['amount']);
+                $sheet->setCellValue($this->_columns[$i] . $row, ($value['type'] == config('global.type.code.white') ? '' : $value['amount']));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
                 $i++;
-                $sheet->setCellValue($this->_columns[$i] . $row, $value['amount']);
+                $sheet->setCellValue($this->_columns[$i] . $row, ($value['type'] == config('global.type.code.white') ? '' : $value['amount']));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
                 $i++;
-                $sheet->setCellValue($this->_columns[$i] . $row, $value['amount']);
+                $sheet->setCellValue($this->_columns[$i] . $row, ($value['type'] == config('global.type.code.white') ? '' : $value['amount']));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
@@ -443,7 +462,7 @@ class ExcelWriter
         foreach ($values as $key => $value) {
             $sheet->setCellValue($this->_columns[$key] . $row, $value);
             $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
-            if(in_array($key, [6, 11])) {
+            if (in_array($key, [6, 11])) {
                 $sheet->getStyle($this->_columns[$key] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             }
         }
@@ -458,16 +477,16 @@ class ExcelWriter
         $sheet->setCellValue($this->_columns[5] . $row, 'Jakarta, ' . $this->_data['report_date']);
         $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
         $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
-        
+
         $row++;
         $sheet->setCellValue($this->_columns[0] . $row, 'Wakil Dekan II');
         $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[3] . $row);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
-        
+
         $sheet->setCellValue($this->_columns[5] . $row, 'Kasir FTSP');
         $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
         $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
-        
+
         $row++;
         $row++;
         $row++;
@@ -476,7 +495,7 @@ class ExcelWriter
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->getFont()->setBold(true);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->getFont()->setBaseLine(true);
-        
+
         $sheet->setCellValue($this->_columns[5] . $row, $this->_data['user']);
         $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
         $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
@@ -526,7 +545,7 @@ class ExcelWriter
         if (!empty($this->_data['expense'])) {
             foreach ($this->_data['expense'] as $key => $value) {
                 $i = 0;
-                $sheet->setCellValue($this->_columns[$i] . $row, ($key+1));
+                $sheet->setCellValue($this->_columns[$i] . $row, ($key + 1));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
@@ -581,11 +600,11 @@ class ExcelWriter
             $sheet->setCellValue($this->_columns[$key] . $row, $value);
             $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
             $sheet->getStyle($this->_columns[$key] . $row)->getFont()->setBold(true);
-            if($key == 3) {
+            if ($key == 3) {
                 $sheet->getStyle($this->_columns[$key] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             }
 
-            if($key == 5) {
+            if ($key == 5) {
                 $sheet->getStyle($this->_columns[$key] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             }
         }
@@ -599,7 +618,7 @@ class ExcelWriter
         $row++;
         $row++;
         $lastkey = (count($this->_header) - 1);
-        $sheet->setCellValue($this->_columns[0] . $row, 'Jakarta, '. $this->_data['report_date']);
+        $sheet->setCellValue($this->_columns[0] . $row, 'Jakarta, ' . $this->_data['report_date']);
         $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->applyFromArray($this->_style['footer']);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->getFont()->setBold(true);
@@ -623,6 +642,5 @@ class ExcelWriter
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->getFont()->setBold(true);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->getFont()->setBaseLine(true);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
     }
 }
