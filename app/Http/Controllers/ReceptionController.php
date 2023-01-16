@@ -177,7 +177,7 @@ class ReceptionController extends Controller
             $reception = Reception::select(['expense_id'])->where('year', $year)->where('division_id', $division_id)->get()->toArray();
             $reception = array_column($reception, 'expense_id');
 
-            $map = MapExpense::whereIn('data_id', $data)->whereNotIn('expense_id', $reception)->get()->toArray();
+            $map = MapExpense::whereIn('data_id', $data)->get()->toArray();
             $map = array_column($map, 'expense_id');
 
             $expense = Expense::select(['*'])->where('type', config('global.type.code.white'))->whereIn('id', $map)->with('map');
