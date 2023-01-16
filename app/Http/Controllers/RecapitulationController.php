@@ -232,7 +232,11 @@ class RecapitulationController extends Controller
         $mid['amount'] = $this->convertAmount($amount);
         $mid['used'] = $this->convertAmount($used);
         $mid['remain'] = $this->convertAmount($amount - $used);
-        $mid['percent'] = round(($used / $amount) * 100, 2) . '%';
+        if($amount > 0) {
+            $mid['percent'] = round(($used / $amount) * 100, 2) . '%';
+        } else {
+            $mid['percent'] = '0%';
+        }
 
         array_splice( $json['data'], 3, 0, array($mid) );
         array_splice( $json['data'], 4, 0, array($space) );
