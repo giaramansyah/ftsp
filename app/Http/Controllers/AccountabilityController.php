@@ -124,7 +124,7 @@ class AccountabilityController extends Controller
             $map = MapExpense::whereIn('data_id', $data)->get()->toArray();
             $map = array_column($map, 'expense_id');
 
-            $data = Expense::whereIn('expense_id', $map);
+            $data = Expense::whereIn('id', $map);
             $table = DataTables::eloquent($data);
             $rawColumns = array('input', 'status_desc');
 
