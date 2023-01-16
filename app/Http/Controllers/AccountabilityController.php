@@ -9,6 +9,7 @@ use App\Models\Balance;
 use App\Models\Data;
 use App\Models\Employee;
 use App\Models\Expense;
+use App\Models\MapExpense;
 use App\Models\MapReport;
 use App\Models\Reception;
 use App\Models\Report;
@@ -119,7 +120,11 @@ class AccountabilityController extends Controller
             }
             $data = $data->orderBy('id')->get()->toArray();
             $data = array_column($data, 'id');
-            $data = Expense::whereIn('data_id', $data);
+
+            $map = MapExpense::whereIn('data_id', $data)->get()->toArray();
+            $map = array_column($map, 'expense_id');
+
+            $data = Expense::whereIn('expense_id', $map);
             $table = DataTables::eloquent($data);
             $rawColumns = array('input', 'status_desc');
 

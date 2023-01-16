@@ -14,8 +14,7 @@
             <select class="form-control form-control-sm select2" name="year" onchange="getData()">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($yearArr as $key => $value)
-              <option value="{{ Secure::secure($value['id']) }}">{{
-                $value['name'] }}</option>
+              <option value="{{ Secure::secure($value['id']) }}">{{ $value['name'] }}</option>
               @endforeach
             </select>
           </div>
@@ -36,8 +35,7 @@
           <label class="col-sm-2 col-form-label">No. Kas<code>*</code></label>
           <div class="col-sm-2">
             <input type="text" class="form-control form-control-sm" name="expense_id"
-              value="{{ isset($expense_id) ? $expense_id : '' }}" readonly {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+              value="{{ isset($expense_id) ? $expense_id : '' }}" readonly {{ isset($mandatory) && $mandatory? 'required' : '' }}>
           </div>
           <label class="col-sm-2 offset-sm-1 col-form-label">Tgl. Transaksi<code>*</code></label>
           <div class="col-sm-2">
