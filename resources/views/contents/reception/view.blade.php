@@ -83,7 +83,7 @@
           <ul class="list-group list-group-unbordered mb-3">
             <li class="list-group-item">
               <b>{{ __('Deskripsi') }}</b>
-              <p class="float-right mb-0">{{ $data['description'] }}</p>
+              <p class="float-right mb-0">{!! $data['description'] !!}</p>
             </li>
             <li class="list-group-item">
               <b>{{ __('PIC') }}</b>

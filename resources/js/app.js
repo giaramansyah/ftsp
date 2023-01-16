@@ -161,3 +161,50 @@ function amountText(value, target = null) {
         return result;
     }
 }
+
+function multidata(element) {
+    var checkboxes = $(element).attr('name')
+    var id = $(element).attr('id')
+    var count = 0;
+    var available = 0;
+    var checked = [];
+    var data_id = [];
+    $('input[name="'+checkboxes+'"]').each(function(){
+        if($(this).is(':checked')) {
+            count += 1;
+            checked.push($(this))
+        }
+    })
+
+    if(count > 1) {
+        $.each(checked, function(index,value){
+            if(value.attr('id') != id) {
+                $('input[name="'+checkboxes+'"]:not(#' + id + ')').each(function(){
+                    $(this).prop('checked', false)
+                })
+                count = 1;
+                available = $(element).data('available')
+                data_id.push($(element).val());
+            } else {
+                available += $(this).data('available')
+                data_id.push($(this).val());
+            }
+        })
+    } else {
+        available = $(element).data('available')
+        data_id.push($(element).val());
+    }
+
+    if(count > 1) {
+        $('input[name=is_multiple]').val(1)
+    } else {
+        $('input[name=is_multiple]').val(0)
+    }
+
+    return {
+        data_id :data_id.join('|'),
+        amount : $(element).data('amount'),
+        available : available,
+        ma : $(element).data('ma')
+    }
+}

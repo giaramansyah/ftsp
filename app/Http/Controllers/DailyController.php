@@ -97,6 +97,8 @@ class DailyController extends Controller
         }
 
         if ($ext == 'xlsx') {
+            $response = new Response(false, 'Not Supported yet');
+            return response()->json($response->responseJson());
         } else {
             $orientation = 'potrait';
             $pdf = Pdf::loadView('partials.print.daily', $data);

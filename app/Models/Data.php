@@ -30,6 +30,11 @@ class Data extends Model
         return $date->format(config('global.dateformat.view'));
     }
 
+    public function expense()
+    {
+        return $this->hasMany(MapExpense::class, 'data_id', 'id');
+    }
+
     public function staffs()
     {
         return $this->hasMany(MapData::class, 'data_id', 'id');

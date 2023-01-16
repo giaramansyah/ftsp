@@ -99,10 +99,13 @@
           <h3 class="profile-username text-center">{{ $data['ma_id'] }}</h3>
           <p class="text-muted text-center mb-0">Tahun Akademik</p>
           <p class="text-muted text-center">{{ $data['years'] }}</p>
+          @if($is_multiple == 1)
+            <p class="text-md badge badge-info">Multi Anggaran</p>
+          @endif
           <ul class="list-group list-group-unbordered mb-3">
             <li class="list-group-item">
               <b>{{ __('Deskripsi') }}</b>
-              <p class="float-right mb-0">{{ $data['description'] }}</p>
+              <p class="float-right mb-0">{!! $data['description'] !!}</p>
             </li>
             <li class="list-group-item">
               <b>{{ __('PIC') }}</b>

@@ -22,7 +22,7 @@ class Reception extends Model
         'division_id',
         'description',
         'sub_description',
-        'data_id',
+        'expense_id',
         'ma_id',
         'name',
         'staff_id',
@@ -32,9 +32,9 @@ class Reception extends Model
         'updated_by',
     ];
 
-    public function datas()
+    public function expense()
     {
-        return $this->hasOne(Data::class, 'id', 'data_id');
+        return $this->hasOne(Expense::class, 'id', 'expense_id');
     }
 
     public function names()

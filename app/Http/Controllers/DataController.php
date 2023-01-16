@@ -7,6 +7,7 @@ use App\Library\SecureHelper;
 use App\Models\Data;
 use App\Models\MapData;
 use App\Models\Expense;
+use App\Models\MapExpense;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -113,7 +114,7 @@ class DataController extends Controller
 
         $data['id'] = $id;
 
-        $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $plainId)->first()->toArray();
+        $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $plainId)->first()->toArray();
         if ($expense) {
             $used = $this->convertAmount($expense['amount'], true);
         } else {
@@ -126,7 +127,10 @@ class DataController extends Controller
         $data['used'] = $this->convertAmount($used);
         $data['remain'] = $this->convertAmount($remain);
         $data['percent'] = $percent . '%';
-        $data['history'] =  Expense::where('data_id', $plainId)->get()->toArray();
+
+        $map = MapExpense::where('data_id', $plainId)->get()->toArray();
+        $map = array_column($map, 'expense_id');
+        $data['history'] = Expense::whereIn('id', $map)->get()->toArray();
 
         $view = ['is_update' => $this->hasPrivilege($this->_update), 'is_delete' => $this->hasPrivilege($this->_delete)];
 
@@ -171,9 +175,9 @@ class DataController extends Controller
             });
 
             $table->addColumn('used', function ($row) {
-                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
                 if ($expense) {
-                    $column = $expense->amount;
+                    $column = $this->convertAmount($expense->amount);
                 } else {
                     $column = '0';
                 }
@@ -182,9 +186,9 @@ class DataController extends Controller
             });
 
             $table->addColumn('remain', function ($row) {
-                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
                 if ($expense) {
-                    $used = $this->convertAmount($expense->amount, true);
+                    $used = $expense->amount;
                     $total = $this->convertAmount($row->amount, true);
                     $column = $this->convertAmount($total - $used);
                 } else {
@@ -195,9 +199,9 @@ class DataController extends Controller
             });
 
             $table->addColumn('percent', function ($row) {
-                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
-                if ($expense) {
-                    $used = $this->convertAmount($expense->amount, true);
+                $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
+                if ($expense->amount > 0) {
+                    $used = $expense->amount;
                     $total = $this->convertAmount($row->amount, true);
                     $column = round(($used / $total) * 100, 2);
                 } else {

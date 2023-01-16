@@ -78,7 +78,7 @@
               <tbody>
                 <tr>
                   <td>{{ $data['ma_id'] }}</td>
-                  <td>{{ $data['description'] }}</td>
+                  <td>{!! $data['description'] !!}</td>
                   <td>{{ $data['amount'] }}</td>
                   <td>{{ $data['remain'] }}</td>
                 </tr>

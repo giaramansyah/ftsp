@@ -6,6 +6,7 @@
     <form class="form-lazy-control" data-action="{{ $action }}" data-method="upload" data-validate="max_amount,image">
       <div class="card-body">
         <input type="hidden" name="type" value="{{ isset($type) ? $type : '' }}">
+        <input type="hidden" name="is_multiple" value="0">
         <input type="hidden" name="status" value="{{ isset($type) && $type == config('global.type.code.white') ? config('global.status.code.unfinished') : config('global.status.code.finished') }}">
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
@@ -59,7 +60,6 @@
         <div class="form-group row mb-0">
           <label class="col-sm-2 col-form-label">Mata Anggaran<code>*</code></label>
           <div class="col-sm-2">
-            <input type="hidden" name="data_id">
             <input type="hidden" name="validate_max" id="validate_max">
             <input type="text" class="form-control form-control-sm" name="ma_id" readonly {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
@@ -88,9 +88,18 @@
               </tbody>
             </table>
           </div>
+          <label class="offset-sm-8 col-sm-2 col-form-label text-right">Total Dana</label>
+          <div class="col-sm-2">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Rp</span>
+              </div>
+              <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="total_amount" readonly>
+            </div>
+          </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Deskripsi<code>*</code></label>
+          <label class="col-sm-2 col-form-label text-right">Deskripsi<code>*</code></label>
           <div class="col-sm-7">
             <input type="text" class="form-control form-control-sm" name="description" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
@@ -235,15 +244,12 @@
             {data: 'remain', name: 'remain', orderable: true, searchable: true, class: "text-right"},
           ],
           fnInitComplete : function() {
-            $('.table').off().on('click', 'input[name="ma"]', function() {
-              var data_id = $(this).val();
-              var amount = $(this).data('amount')
-              var available = $(this).data('available')
-              var ma = $(this).data('ma')
-              $('input[name="ma_id"]').val(ma)
-              $('input[name="data_id"]').val(data_id)
-              $('input[name="validate_max"]').val(available)
-              getPic(data_id)
+            $('.table').off().on('click', 'input[name="data_id[]"]', function() {
+              var result = multidata(this)
+              $('input[name="ma_id"]').val(result.ma)
+              $('input[name="validate_max"]').val(result.available)
+              $('input[name="total_amount"]').val(formatCurrency(result.available))
+              getPic(result.data_id)
             })
           }
         }
@@ -252,10 +258,11 @@
   }
 
   function getPic(data_id) {
+    data_id = data_id.split('|')
     $.ajax({
       method: 'get',
       url: "{{ route('transaction.expense.pic') }}",
-      data: {data_id : data_id},
+      data: {data_id : data_id[0]},
       dataType: 'json',
       beforeSend: function() {
         $('select[name="staff_id"]').empty().trigger("change");

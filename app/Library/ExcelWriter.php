@@ -402,17 +402,17 @@ class ExcelWriter
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
                 $i++;
-                $sheet->setCellValue($this->_columns[$i] . $row, ($value['type'] == config('global.type.code.white') ? '' : $value['amount']));
+                $sheet->setCellValue($this->_columns[$i] . $row, ($value['status'] == config('global.status.code.unfinished') ? '' : $value['amount']));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
                 $i++;
-                $sheet->setCellValue($this->_columns[$i] . $row, ($value['type'] == config('global.type.code.white') ? '' : $value['amount']));
+                $sheet->setCellValue($this->_columns[$i] . $row, ($value['status'] == config('global.status.code.unfinished') ? '' : $value['amount']));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
                 $i++;
-                $sheet->setCellValue($this->_columns[$i] . $row, ($value['type'] == config('global.type.code.white') ? '' : $value['amount']));
+                $sheet->setCellValue($this->_columns[$i] . $row, ($value['status'] == config('global.status.code.unfinished') ? '' : $value['amount']));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 

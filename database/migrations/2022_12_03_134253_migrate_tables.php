@@ -166,7 +166,6 @@ class MigrateTables extends Migration
                 $table->date('reff_date')->nullable(false);
                 $table->string('description', 100)->nullable(false);
                 $table->string('sub_description', 250)->nullable(true);
-                $table->string('data_id', 20)->nullable(false);
                 $table->string('ma_id', 20)->nullable(true);
                 $table->string('name', 50)->nullable(false);
                 $table->tinyInteger('staff_id')->nullable(false);
@@ -177,9 +176,18 @@ class MigrateTables extends Migration
                 $table->text('image')->nullable(true);
                 $table->tinyInteger('type')->nullable(false);
                 $table->tinyInteger('status')->nullable(false);
+                $table->tinyInteger('is_multiple')->nullable(false)->default(0);
                 $table->string('created_by', 100)->nullable(false);
                 $table->string('updated_by', 100)->nullable(false);
                 $table->timestamps();
+            });
+        }
+
+        if (!Schema::hasTable('map_expense')) {
+            Schema::create('map_expense', function (Blueprint $table) {
+                $table->bigInteger('expense_id')->nullable(false);
+                $table->bigInteger('data_id')->nullable(false);
+                $table->bigInteger('amount')->nullable(false);
             });
         }
 
@@ -192,7 +200,7 @@ class MigrateTables extends Migration
                 $table->tinyInteger('division_id')->nullable(false);
                 $table->string('description', 100)->nullable(false);
                 $table->string('sub_description', 250)->nullable(true);
-                $table->string('data_id', 20)->nullable(true);
+                $table->string('expense_id', 20)->nullable(true);
                 $table->string('ma_id', 20)->nullable(true);
                 $table->string('name', 50)->nullable(false);
                 $table->tinyInteger('staff_id')->nullable(true);
@@ -273,10 +281,11 @@ class MigrateTables extends Migration
         Schema::dropIfExists('ms_balance');
         Schema::dropIfExists('ts_history_balance');
         Schema::dropIfExists('ts_expense');
+        Schema::dropIfExists('map_expense');
         Schema::dropIfExists('ts_reception');
         // Schema::dropIfExists('ms_year');
         Schema::dropIfExists('ts_report');
         Schema::dropIfExists('map_report');
-        // Schema::dropIfExists('ms_employee');
+        Schema::dropIfExists('ms_employee');
     }
 }

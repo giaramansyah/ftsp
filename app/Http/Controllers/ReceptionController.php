@@ -9,6 +9,7 @@ use App\Models\Data;
 use App\Models\Expense;
 use App\Models\HistoryBalance;
 use App\Models\MapData;
+use App\Models\MapExpense;
 use App\Models\Reception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -170,16 +171,22 @@ class ReceptionController extends Controller
                 return $table->toJson();
             }
 
-            $reception = Expense::select(['data_id'])->where('type', config('global.type.code.white'))->get()->toArray();
-            $reception = array_column($reception, 'data_id');
-            $data = Data::select(['id', 'ma_id', 'description', 'amount'])->whereIn('id', $reception)->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
-            $table = DataTables::eloquent($data);
+            $data = Data::select(['id'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->get()->toArray();
+            $data = array_column($data, 'id');
+
+            $reception = Reception::select(['expense_id'])->where('year', $year)->where('division_id', $division_id)->get()->toArray();
+            $reception = array_column($reception, 'expense_id');
+
+            $map = MapExpense::whereIn('data_id', $data)->whereNotIn('expense_id', $reception)->groupBy('expense_id')->get()->toArray();
+            $map = array_column($map, 'expense_id');
+
+            $expense = Expense::select(['*'])->where('type', config('global.type.code.white'))->whereIn('id', $map)->with('map');
+            $table = DataTables::eloquent($expense);
             $rawColumns = array('input');
 
             $table->addColumn('input', function ($row) {
-                $expense = Expense::where('type', config('global.type.code.white'))->where('data_id', $row->id)->first();
                 $column = '<div class="form-check">
-                <input class="form-check-input" type="radio" name="ma" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->id) . '" data-ma="' . $row->ma_id . '" data-desc="' . $expense->description . '" data-subdesc="' . $expense->sub_description . '" data-name="' . $expense->name . '" data-pic="' . $expense->staff_id . '" data-amount="' . $expense->amount . '" data-textamount="' . $expense->text_amount . '">
+                <input class="form-check-input" type="radio" name="ma" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->map[0]->data_id) . '" data-id= "' . SecureHelper::secure($row->id) . '" data-ma="' . $row->ma_id . '" data-desc="' . $row->description . '" data-subdesc="' . $row->sub_description . '" data-name="' . $row->name . '" data-pic="' . $row->staff_id . '" data-amount="' . $row->amount . '" data-textamount="' . $row->text_amount . '">
                 <label class="form-check-label">&nbsp;</label>
                 </div>';
 
@@ -244,9 +251,31 @@ class ReceptionController extends Controller
         $data['id'] = $id;
 
         $from_ma = false;
-        if ($data['data_id']) {
+        if ($data['expense_id']) {
             $from_ma = true;
-            $data['data'] = Data::find($data['data_id'])->toArray();
+
+            $expense = Expense::find($data['expense_id']);
+            
+            if($expense['is_multiple'] == 1) {
+                $map = MapExpense::where('expense_id', $data['expense_id'])->get()->toArray();
+                $data_id = array_column($map, 'data_id');
+                
+                $description = array();
+                $amount = 0;
+                $data['data'] = Data::where('id', $data_id[0])->first()->toArray();
+    
+                $datas = Data::whereIn('id', $data_id)->get();
+                foreach($datas as $value) {
+                    $description[] = $value->description;
+                    $amount += $this->convertAmount($value->amount, true);
+                } 
+    
+                $data['data']['description'] = implode('<br>', $description);
+                $data['data']['amount'] = $this->convertAmount($amount);
+            } else {
+                $map = MapExpense::where('expense_id', $data['expense_id'])->first();
+                $data['data'] = Data::where('id', $map->data_id)->first()->toArray();
+            }
         }
 
         $view = ['from_ma' => $from_ma, 'is_update' => $this->hasPrivilege($this->_update)];
@@ -284,7 +313,7 @@ class ReceptionController extends Controller
                     'division_id' => SecureHelper::unsecure($param['division_id']),
                     'description' => $param['description'],
                     'sub_description' => $param['sub_description'],
-                    'data_id' => isset($param['from_ma_id']) && $param['from_ma_id'] == 1 ? SecureHelper::unsecure($param['data_id']) : null,
+                    'expense_id' => isset($param['from_ma_id']) && $param['from_ma_id'] == 1 ? SecureHelper::unsecure($param['expense_id']) : null,
                     'ma_id' => isset($param['from_ma_id']) && $param['from_ma_id'] == 1 ? $param['ma_id'] : null,
                     'name' => $param['name'],
                     'staff_id' => isset($param['from_ma_id']) && $param['from_ma_id'] == 1 ? $param['staff_id'] : null,
@@ -336,8 +365,8 @@ class ReceptionController extends Controller
                 $reception->reception_date = $param['reception_date'];
                 $reception->description = $param['description'];
                 $reception->sub_description = $param['sub_description'];
-                $reception->ma_id = isset($param['data_id']) ? $param['ma_id'] : null;
-                $reception->staff_id = isset($param['data_id']) ? $param['staff_id'] : null;
+                $reception->ma_id = isset($param['expense_id']) ? $param['ma_id'] : null;
+                $reception->staff_id = isset($param['expense_id']) ? $param['staff_id'] : null;
                 $reception->name = $param['name'];
                 $reception->amount = $param['amount'];
                 $reception->text_amount = $param['text_amount'];

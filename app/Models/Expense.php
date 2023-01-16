@@ -22,7 +22,6 @@ class Expense extends Model
         'reff_date',
         'description',
         'sub_description',
-        'data_id',
         'ma_id',
         'name',
         'staff_id',
@@ -33,13 +32,14 @@ class Expense extends Model
         'image',
         'type',
         'status',
+        'is_multiple',
         'created_by',
         'updated_by',
     ];
 
-    public function datas()
+    public function map()
     {
-        return $this->hasOne(Data::class, 'id', 'data_id');
+        return $this->hasMany(MapExpense::class, 'expense_id', 'id');
     }
 
     public function names()

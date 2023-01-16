@@ -9,6 +9,7 @@ use App\Models\Data;
 use App\Models\Expense;
 use App\Models\HistoryBalance;
 use App\Models\MapData;
+use App\Models\MapExpense;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -94,8 +95,24 @@ class ExpenseController extends Controller
             return abort(404);
         }
 
-        $data['data'] = Data::find($data['data_id'])->toArray();
-        $map = MapData::where('data_id', $data['data_id'])->get()->toArray();
+        $map = MapExpense::where('expense_id', $plainId)->get()->toArray();
+        $data_id = array_column($map, 'data_id');
+        $data['data'] = Data::where('id', $data_id[0])->first()->toArray();
+        if($data['is_multiple'] == 1) {
+            $description = array();
+            $amount = 0;
+
+            $datas = Data::whereIn('id', $data_id)->get();
+            foreach($datas as $value) {
+                $description[] = $value->description;
+                $amount += $this->convertAmount($value->amount, true);
+            } 
+
+            $data['data']['description'] = implode('<br>', $description);
+            $data['data']['amount'] = $this->convertAmount($amount);
+        }
+
+        $map = MapData::where('data_id', $data_id[0])->get()->toArray();
         $staffArr = array();
         foreach ($map as $value) {
             $staffArr[] = array(
@@ -104,7 +121,10 @@ class ExpenseController extends Controller
             );
         }
 
-        $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $data['data_id'])->whereNotIn('id', [$plainId])->groupBy('data_id')->first();
+        $map =  MapExpense::whereNotIn('expense_id', [$plainId])->whereIn('data_id', $data_id)->get()->toArray();
+        $expense_id = array_column($map, 'expense_id');
+        $expense = Expense::selectRaw('sum(amount) as amount')->whereIn('id', $expense_id)->first();
+
         $data['data']['available'] = $this->convertAmount($data['data']['amount'], true);
         if ($expense) {
             $data['data']['available'] = $this->convertAmount($data['data']['amount'], true) - $this->convertAmount($expense->amount, true);
@@ -157,7 +177,11 @@ class ExpenseController extends Controller
 
             $data = Data::select(['id'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('id')->get()->toArray();
             $data = array_column($data, 'id');
-            $expense = Expense::select(['id', 'expense_id', 'ma_id', 'expense_date', 'reff_no', 'reff_date', 'staff_id', 'amount', 'type', 'updated_at', 'status'])->whereIn('data_id', $data)->orderBY('updated_at', 'desc');
+
+            $map = MapExpense::whereIn('data_id', $data)->groupBy('expense_id')->get()->toArray();
+            $map = array_column($map, 'expense_id');
+
+            $expense = Expense::select(['id', 'expense_id', 'ma_id', 'expense_date', 'reff_no', 'reff_date', 'staff_id', 'amount', 'type', 'updated_at', 'status'])->whereIn('id', $map)->orderBY('updated_at', 'desc');
             $table = DataTables::eloquent($expense);
             $rawColumns = array('expense', 'status_desc');
             $table->addIndexColumn();
@@ -216,20 +240,18 @@ class ExpenseController extends Controller
                 return $table->toJson();
             }
 
-            $expense = Expense::select(['data_id'])->where('type', config('global.type.code.white'))->get()->toArray();
-            $expense = array_column($expense, 'data_id');
-            $data = Data::select(['id', 'ma_id', 'description', 'amount'])->whereNotIn('id', $expense)->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
+            $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
             $table = DataTables::eloquent($data);
             $rawColumns = array('input', 'remain');
 
             $table->addColumn('input', function ($row) {
-                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
                 $amount = $this->convertAmount($row->amount, true);
                 if ($expense) {
-                    $amount = $this->convertAmount($row->amount, true) - $this->convertAmount($expense->amount, true);
+                    $amount = $this->convertAmount($row->amount, true) - $expense->amount;
                 }
                 $column = '<div class="form-check">
-                <input class="form-check-input" type="radio" name="ma" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->id) . '" data-ma="' . $row->ma_id . '" data-available="' . $amount . '" data-amount="' . $this->convertAmount($row->amount, true) . '">
+                <input class="form-check-input" type="checkbox" name="data_id[]" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->id) . '" data-ma="' . $row->ma_id . '" data-available="' . $amount . '" data-amount="' . $this->convertAmount($row->amount, true) . '">
                 <label class="form-check-label">&nbsp;</label>
                 </div>';
 
@@ -237,12 +259,14 @@ class ExpenseController extends Controller
             });
 
             $table->addColumn('remain', function ($row) {
-                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                $expense =  MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
                 $amount = $row->amount;
                 if ($expense) {
-                    $amount = $this->convertAmount($row->amount, true) - $this->convertAmount($expense->amount, true);
+                    $amount = $this->convertAmount($row->amount, true) - $expense->amount;
                     $amount = $this->convertAmount($amount);
                 }
+
+                $amount = $amount < 0 ? '0' : $amount;
 
                 return $amount;
             });
@@ -304,7 +328,26 @@ class ExpenseController extends Controller
 
         $data['id'] = $id;
 
-        $data['data'] = Data::find($data['data_id'])->toArray();
+        if($data['is_multiple'] == 1) {
+            $map = MapExpense::where('expense_id', $plainId)->get()->toArray();
+            $data_id = array_column($map, 'data_id');
+            
+            $description = array();
+            $amount = 0;
+            $data['data'] = Data::where('id', $data_id[0])->first()->toArray();
+
+            $datas = Data::whereIn('id', $data_id)->get();
+            foreach($datas as $value) {
+                $description[] = $value->description;
+                $amount += $this->convertAmount($value->amount, true);
+            } 
+
+            $data['data']['description'] = implode('<br>', $description);
+            $data['data']['amount'] = $this->convertAmount($amount);
+        } else {
+            $map = MapExpense::where('expense_id', $plainId)->first();
+            $data['data'] = Data::where('id', $map->data_id)->first()->toArray();
+        }
 
         $is_red = false;
         if ($data['status'] == config('global.status.code.finished')) {
@@ -355,6 +398,7 @@ class ExpenseController extends Controller
                         'text_amount' => 'required',
                         'apply_date' => 'required',
                         'account' => 'required',
+                        'is_multiple' => 'required',
                         'image' => 'required',
                     ];
                 } else {
@@ -371,6 +415,7 @@ class ExpenseController extends Controller
                         'amount' => 'required',
                         'text_amount' => 'required',
                         'account' => 'required',
+                        'is_multiple' => 'required',
                     ];
                 }
 
@@ -388,7 +433,6 @@ class ExpenseController extends Controller
                         return response()->json($response->responseJson());
                     }
 
-                    $data_id = SecureHelper::unsecure($param['data_id']);
                     $image = null;
                     $apply_date = null;
 
@@ -431,13 +475,13 @@ class ExpenseController extends Controller
                         'reff_date' => $param['reff_date'],
                         'description' => $param['description'],
                         'sub_description' => $param['sub_description'],
-                        'data_id' => $data_id,
                         'ma_id' => $param['ma_id'],
                         'name' => $param['name'],
                         'staff_id' => $param['staff_id'],
                         'amount' => $param['amount'],
                         'text_amount' => $param['text_amount'],
                         'account' => $param['account'],
+                        'is_multiple' => $param['is_multiple'],
                         'apply_date' => $apply_date,
                         'image' => $image,
                         'created_by' => Auth::user()->username,
@@ -445,6 +489,39 @@ class ExpenseController extends Controller
                     ]);
 
                     if ($expense->id) {
+                        $totalAmount = $this->convertAmount($param['amount'], true);
+
+                        foreach($param['data_id'] as $value) {
+                            $value = SecureHelper::unsecure($value);
+
+                            if(!$value) {
+                                continue;
+                            }
+
+                            $map = [
+                                'expense_id' => $expense->id,
+                                'data_id' => $value,
+                                'amount' => 0
+                            ];
+
+                            if($param['is_multiple'] == 1) {
+                                $data = Data::find($value);
+                                if($data) {
+                                    $amount = $this->convertAmount($data->amount, true);
+                                    if($amount < $totalAmount) {
+                                        $map['amount'] = $amount;
+                                        $totalAmount -= $amount;
+                                    } else {
+                                        $map['amount'] = $totalAmount;
+                                    }
+                                }
+                            } else {
+                                $map['amount'] = $totalAmount;
+                            }
+
+                            MapExpense::create($map);
+                        }
+
                         $division_id = SecureHelper::unsecure($param['division_id']);
                         $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
                         if ($balance) {
@@ -585,6 +662,28 @@ class ExpenseController extends Controller
                         $expense->updated_by = Auth::user()->username;
 
                         if ($expense->save()) {
+                            $totalAmount = $this->convertAmount($param['amount'], true);
+
+                            $map = MapExpense::where('expense_id', $plainId)->get();
+                            foreach($map as $value){
+                                if($expense->is_multiple == 1) {
+                                    $data = Data::find($value->data_id);
+                                    if($data) {
+                                        $amount = $this->convertAmount($data->amount, true);
+                                        if($amount < $totalAmount) {
+                                            $value->amount = $amount;
+                                            $totalAmount -= $amount;
+                                        } else {
+                                            $value->amount = $totalAmount;
+                                        }
+                                    }
+                                } else {
+                                    $value->amount = $totalAmount;
+                                }
+
+                                MapExpense::where('expense_id', $value->expense_id)->where('data_id', $value->data_id)->update(['amount' => $value->amount]);
+                            }
+
                             $division_id = $param['division_id'];
                             $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
                             if ($balance) {

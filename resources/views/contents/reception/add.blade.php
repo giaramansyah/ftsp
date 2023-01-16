@@ -54,7 +54,7 @@
         </div>
         <div class="form-group row mb-0 form-ma-input">
           <div class="offset-sm-2 col-sm-2">
-            <input type="hidden" name="data_id">
+            <input type="hidden" name="expense_id">
             <input type="text" class="form-control form-control-sm" name="ma_id" readonly {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
@@ -73,6 +73,7 @@
                   <th class="text-center">#</th>
                   <th class="text-center">No. M.A.</th>
                   <th class="text-center">Deskripsi</th>
+                  <th class="text-center">Nominal</th>
                 </tr>
               </thead>
               <tbody>
@@ -199,10 +200,12 @@
             {data: 'input', name: 'input', orderable: false, searchable: false, class: "text-center"},
             {data: 'ma_id', name: 'ma_id', orderable: true, searchable: true},
             {data: 'description', name: 'description', orderable: true, searchable: true},
+            {data: 'amount', name: 'amount', orderable: true, searchable: true, class: "text-right"},
           ],
           fnInitComplete : function() {
             $('.table').off().on('click', 'input[name="ma"]', function() {
               var data_id = $(this).val();
+              var expense_id = $(this).data('id')
               var amount = $(this).data('amount')
               var ma = $(this).data('ma')
               var desc = $(this).data('desc')
@@ -211,10 +214,10 @@
               var pic = $(this).data('pic')
               var textamount = $(this).data('textamount')
               $('input[name="ma_id"]').val(ma)
-              $('input[name="data_id"]').val(data_id)
+              $('input[name="expense_id"]').val(expense_id)
               $('input[name="description"]').val(desc)
               $('input[name="sub_escription"]').val(subdesc)
-              $('input[name="name"]').val(name)
+              $('select[name="name"]').select2().val(name).trigger("change");
               $('input[name="amount"]').val(amount)
               $('input[name="text_amount"]').val(textamount)
               getPic(data_id, pic)
@@ -233,10 +236,11 @@
   }
 
   function getPic(data_id, pic = null) {
+    data_id = data_id.split('|')
     $.ajax({
       method: 'get',
       url: "{{ route('transaction.reception.pic') }}",
-      data: {data_id : data_id},
+      data: {data_id : data_id[0]},
       dataType: 'json',
       beforeSend: function() {
         $('select[name="staff_id"]').empty().trigger("change");

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Library\SecureHelper;
 use App\Models\Data;
 use App\Models\Expense;
+use App\Models\MapExpense;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -56,7 +57,7 @@ class RecapitulationController extends Controller
         }
 
         $used = 0;
-        $expense = Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
         if ($expense) {
             $used += $expense->used;
         } else {
@@ -99,7 +100,7 @@ class RecapitulationController extends Controller
 
         $data['id'] = $id;
 
-        $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $plainId)->first()->toArray();
+        $expense =  MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $plainId)->first()->toArray();
         if ($expense) {
             $used = $this->convertAmount($expense['amount'], true);
         } else {
@@ -147,7 +148,7 @@ class RecapitulationController extends Controller
         $table->addColumn('used', function ($row) {
             $ma = Data::select('id')->where('is_trash', 0)->where('division_id', $row->division_id)->get()->toArray();
             $data_id = array_column($ma, 'id');
-            $expense =  Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+            $expense =  MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
             if ($expense) {
                 $column = $this->convertAmount($expense->used);
             } else {
@@ -160,7 +161,7 @@ class RecapitulationController extends Controller
         $table->addColumn('remain', function ($row) {
             $ma = Data::select('id')->where('is_trash', 0)->where('division_id', $row->division_id)->get()->toArray();
             $data_id = array_column($ma, 'id');
-            $expense =  Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+            $expense =  MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
             if ($expense) {
                 $used = $this->convertAmount($expense->used, true);
                 $amount = $this->convertAmount($row->amount, true);
@@ -175,7 +176,7 @@ class RecapitulationController extends Controller
         $table->addColumn('percent', function ($row) {
             $ma = Data::select('id')->where('is_trash', 0)->where('division_id', $row->division_id)->get()->toArray();
             $data_id = array_column($ma, 'id');
-            $expense =  Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+            $expense =  MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
             if ($expense) {
                 $used = $this->convertAmount($expense->used, true);
                 $amount = $this->convertAmount($row->amount, true);
@@ -268,7 +269,7 @@ class RecapitulationController extends Controller
         }
 
         $used = 0;
-        $expense = Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
         if ($expense) {
             $used += $expense->used;
         } else {
@@ -294,7 +295,7 @@ class RecapitulationController extends Controller
         }
 
         $used = 0;
-        $expense = Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
         if ($expense) {
             $used += $expense->used;
         } else {
@@ -320,7 +321,7 @@ class RecapitulationController extends Controller
         }
 
         $used = 0;
-        $expense = Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
         if ($expense) {
             $used += $expense->used;
         } else {
@@ -346,7 +347,7 @@ class RecapitulationController extends Controller
         }
 
         $used = 0;
-        $expense = Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
         if ($expense) {
             $used += $expense->used;
         } else {
@@ -372,7 +373,7 @@ class RecapitulationController extends Controller
         }
 
         $used = 0;
-        $expense = Expense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
         if ($expense) {
             $used += $expense->used;
         } else {
@@ -426,9 +427,9 @@ class RecapitulationController extends Controller
             });
 
             $table->addColumn('used', function ($row) {
-                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
                 if ($expense) {
-                    $column = $expense->amount;
+                    $column = $this->convertAmount($expense->amount);
                 } else {
                     $column = '0';
                 }
@@ -437,9 +438,9 @@ class RecapitulationController extends Controller
             });
 
             $table->addColumn('remain', function ($row) {
-                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
+                $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
                 if ($expense) {
-                    $used = $this->convertAmount($expense->amount, true);
+                    $used = $expense->amount;
                     $total = $this->convertAmount($row->amount, true);
                     $column = $this->convertAmount($total - $used);
                 } else {
@@ -450,9 +451,9 @@ class RecapitulationController extends Controller
             });
 
             $table->addColumn('percent', function ($row) {
-                $expense =  Expense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->groupBy('data_id')->first();
-                if ($expense) {
-                    $used = $this->convertAmount($expense->amount, true);
+                $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
+                if ($expense->amount > 0) {
+                    $used = $expense->amount;
                     $total = $this->convertAmount($row->amount, true);
                     $column = round(($used / $total) * 100, 2);
                 } else {
@@ -487,8 +488,30 @@ class RecapitulationController extends Controller
                 }
             }
 
-            $data =  Expense::where('data_id', $data_id);
-            $table = DataTables::eloquent($data);
+            $map = MapExpense::where('data_id', $data_id)->get()->toArray();
+            $map = array_column($map, 'expense_id');
+
+            $data =  Expense::whereIn('id', $map)->with('map')->get();
+
+            $collect = collect();
+            foreach($data as $value) {
+                $collection = [
+                    'reff_no' => $value->reff_no,
+                    'description' => $value->description,
+                    'reff_date_format' => $value->reff_date_format,
+                    'amount' => 0
+                ];
+
+                foreach($value->map as $val) {
+                    if($val['data_id'] == $data_id) {
+                        $collection['amount'] = $this->convertAmount($val['amount']);
+                    }
+                }
+
+                $collect->push($collection);
+            }
+
+            $table = DataTables::of($collect);
             $table->addIndexColumn();
 
             $this->writeAppLog($this->_readall);
