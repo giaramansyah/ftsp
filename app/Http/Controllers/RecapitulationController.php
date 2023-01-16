@@ -280,11 +280,17 @@ class RecapitulationController extends Controller
             $used += '0';
         }
 
+        if($amount > 0) {
+            $percent = round(($used / $amount) * 100, 2) . '%';
+        } else {
+            $percent = '0%';
+        }
+
         $dekanData = [
             'pic' => config('global.staff.desc.dekan'),
             'amount' => $this->convertAmount($amount),
             'used' => $this->convertAmount($used),
-            'percent' => round(($used / $amount) * 100, 2) . '%',
+            'percent' => $percent,
             'remain' => $this->convertAmount($amount - $used),
         ];
 
@@ -306,11 +312,17 @@ class RecapitulationController extends Controller
             $used += '0';
         }
 
+        if($amount > 0) {
+            $percent = round(($used / $amount) * 100, 2) . '%';
+        } else {
+            $percent = '0%';
+        }
+
         $wd1Data = [
             'pic' => config('global.staff.desc.wd1'),
             'amount' => $this->convertAmount($amount),
             'used' => $this->convertAmount($used),
-            'percent' => round(($used / $amount) * 100, 2) . '%',
+            'percent' => $percent,
             'remain' => $this->convertAmount($amount - $used),
         ];
 
@@ -332,11 +344,17 @@ class RecapitulationController extends Controller
             $used += '0';
         }
 
+        if($amount > 0) {
+            $percent = round(($used / $amount) * 100, 2) . '%';
+        } else {
+            $percent = '0%';
+        }
+
         $wd2Data = [
             'pic' => config('global.staff.desc.wd2'),
             'amount' => $this->convertAmount($amount),
             'used' => $this->convertAmount($used),
-            'percent' => round(($used / $amount) * 100, 2) . '%',
+            'percent' => $percent,
             'remain' => $this->convertAmount($amount - $used),
         ];
 
@@ -358,11 +376,17 @@ class RecapitulationController extends Controller
             $used += '0';
         }
 
+        if($amount > 0) {
+            $percent = round(($used / $amount) * 100, 2) . '%';
+        } else {
+            $percent = '0%';
+        }
+
         $wd3Data = [
             'pic' => config('global.staff.desc.wd3'),
             'amount' => $this->convertAmount($amount),
             'used' => $this->convertAmount($used),
-            'percent' => round(($used / $amount) * 100, 2) . '%',
+            'percent' => $percent,
             'remain' => $this->convertAmount($amount - $used),
         ];
 
@@ -384,11 +408,17 @@ class RecapitulationController extends Controller
             $used += '0';
         }
 
+        if($amount > 0) {
+            $percent = round(($used / $amount) * 100, 2) . '%';
+        } else {
+            $percent = '0%';
+        }
+
         $wd4Data = [
             'pic' => config('global.staff.desc.wd4'),
             'amount' => $this->convertAmount($amount),
             'used' => $this->convertAmount($used),
-            'percent' => round(($used / $amount) * 100, 2) . '%',
+            'percent' => $percent,
             'remain' => $this->convertAmount($amount - $used),
         ];
 
