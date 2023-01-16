@@ -19,6 +19,7 @@ use App\Http\Controllers\YearController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\DailyController;
 use App\Http\Controllers\RecapitulationController;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,11 @@ Route::group(['middleware' => ['guest']], function() {
     Route::post('/auth', [LandingController::class, 'auth'])->name('auth');
     Route::get('/password/{action}/{id}', [PasswordController::class, 'index'])->name('password.guest');
     Route::post('/password/{action}/{id}', [PasswordController::class, 'post'])->name('password.guest.post');
+
+    Route::get('/migrate', function(){
+        Artisan::call('php artisan migrate:refresh --seed');
+        Artisan::call('php artisan optimize');
+    });
 });
 
 Route::group(['middleware' => ['auth']], function() {
@@ -159,3 +165,4 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/recapitulation/detail/division/', [RecapitulationController::class, 'getDetailDivision'])->name('report.recapitulation.division.detail');
     Route::get('/recapitulation/detail/data/', [RecapitulationController::class, 'getDetailData'])->name('report.recapitulation.data.detail');
 });
+
