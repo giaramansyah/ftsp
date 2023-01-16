@@ -130,7 +130,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Terbilang<code>*</code></label>
           <div class="col-sm-7">
-            <input type="text" class="form-control form-control-sm" name="text_amount" {{ isset($mandatory) &&
+            <input type="text" class="form-control form-control-sm" name="text_amount" id="text_amount" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }} readonly>
           </div>
         </div>
