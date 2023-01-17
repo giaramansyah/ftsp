@@ -52,8 +52,8 @@ class RecapitulationController extends Controller
         $data_id = array_column($ma, 'id');
 
         $amount = 0;
-        foreach($ma as $row) {
-            $amount += $this->convertAmount($row['amount'], true);    
+        foreach ($ma as $row) {
+            $amount += $this->convertAmount($row['amount'], true);
         }
 
         $used = 0;
@@ -120,11 +120,11 @@ class RecapitulationController extends Controller
         return view('contents.recapitulation.data', array_merge($view, $data));
     }
 
-    public function getListDivision(Request $request) 
+    public function getListDivision(Request $request)
     {
         if ($request->ajax()) {
             $param = $request->input('id');
-            
+
             if (!isset($param)) {
                 $year = 0;
             } else {
@@ -143,7 +143,7 @@ class RecapitulationController extends Controller
         $rawColumns = array('division_link', 'used', 'remain', 'percent');
 
         $table->addColumn('division_link', function ($row) {
-            return '<a href="'. route('report.recapitulation.division', ['id' => SecureHelper::pack(['year' => $row->year, 'division_id' => $row->division_id])]) .'">' . $row->division . '</a>';
+            return '<a href="' . route('report.recapitulation.division', ['id' => SecureHelper::pack(['year' => $row->year, 'division_id' => $row->division_id])]) . '">' . $row->division . '</a>';
         });
 
         $table->addColumn('used', function ($row) {
@@ -195,61 +195,63 @@ class RecapitulationController extends Controller
 
         $json = $table->toArray();
 
-        $mid = array(
-            'amount' => 0,
-            'division' => "ftsp",
-            'division_link' => "ftsp",
-            'division_id' => 99,
-            'percent' => 0,
-            'remain' => 0,
-            'staff' => "",
-            'staff_id' => [],
-            'used' => 0,
-            'years' => null,
-        );
+        if (!empty($json['data'])) {
+            $mid = array(
+                'amount' => 0,
+                'division' => "ftsp",
+                'division_link' => "ftsp",
+                'division_id' => 99,
+                'percent' => 0,
+                'remain' => 0,
+                'staff' => "",
+                'staff_id' => [],
+                'used' => 0,
+                'years' => null,
+            );
 
-        $space = array(
-            'amount' => '',
-            'division' => '',
-            'division_link' => '',
-            'division_id' => '',
-            'percent' => '',
-            'remain' => '',
-            'staff' => '',
-            'staff_id' => [],
-            'used' => '',
-            'years' => null,
-        );
+            $space = array(
+                'amount' => '',
+                'division' => '',
+                'division_link' => '',
+                'division_id' => '',
+                'percent' => '',
+                'remain' => '',
+                'staff' => '',
+                'staff_id' => [],
+                'used' => '',
+                'years' => null,
+            );
 
-        $amount = 0;
-        $used = 0;
-        foreach($json['data'] as $row) {
-            if(in_array($row['division_id'], [1, 2, 3])) {
-                $amount += $this->convertAmount($row['amount'], true);
-                $used += $this->convertAmount($row['used'], true);
+            $amount = 0;
+            $used = 0;
+            foreach ($json['data'] as $row) {
+                if (in_array($row['division_id'], [1, 2, 3])) {
+                    $amount += $this->convertAmount($row['amount'], true);
+                    $used += $this->convertAmount($row['used'], true);
+                }
             }
-        }
 
-        $mid['amount'] = $this->convertAmount($amount);
-        $mid['used'] = $this->convertAmount($used);
-        $mid['remain'] = $this->convertAmount($amount - $used);
-        if($amount > 0) {
-            $mid['percent'] = round(($used / $amount) * 100, 2) . '%';
-        } else {
-            $mid['percent'] = '0%';
-        }
+            $mid['amount'] = $this->convertAmount($amount);
+            $mid['used'] = $this->convertAmount($used);
+            $mid['remain'] = $this->convertAmount($amount - $used);
+            if ($amount > 0) {
+                $mid['percent'] = round(($used / $amount) * 100, 2) . '%';
+            } else {
+                $mid['percent'] = '0%';
+            }
 
-        array_splice( $json['data'], 3, 0, array($mid) );
-        array_splice( $json['data'], 4, 0, array($space) );
+            array_splice($json['data'], 3, 0, array($mid));
+            array_splice($json['data'], 4, 0, array($space));
+        }
 
         return json_encode($json);
     }
 
-    public function getListPic(Request $request) 
+    public function getListPic(Request $request)
     {
         if ($request->ajax()) {
             $param = $request->input('id');
-            
+
             if (!isset($param)) {
                 $year = 0;
             } else {
@@ -268,162 +270,172 @@ class RecapitulationController extends Controller
         $dekan = Data::select('division_id', 'id', 'amount')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.dekan'))->get()->toArray();
         $data_id = array_column($dekan, 'id');
 
-        $amount = 0;
-        foreach($dekan as $row) {
-            $amount += $this->convertAmount($row['amount'], true);    
+        if (!empty($data_id)) {
+            $amount = 0;
+            foreach ($dekan as $row) {
+                $amount += $this->convertAmount($row['amount'], true);
+            }
+
+            $used = 0;
+            $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+            if ($expense) {
+                $used += $expense->used;
+            } else {
+                $used += '0';
+            }
+
+            if ($amount > 0) {
+                $percent = round(($used / $amount) * 100, 2) . '%';
+            } else {
+                $percent = '0%';
+            }
+
+            $dekanData = [
+                'pic' => config('global.staff.desc.dekan'),
+                'amount' => $this->convertAmount($amount),
+                'used' => $this->convertAmount($used),
+                'percent' => $percent,
+                'remain' => $this->convertAmount($amount - $used),
+            ];
+
+            $data->push($dekanData);
         }
-
-        $used = 0;
-        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
-        if ($expense) {
-            $used += $expense->used;
-        } else {
-            $used += '0';
-        }
-
-        if($amount > 0) {
-            $percent = round(($used / $amount) * 100, 2) . '%';
-        } else {
-            $percent = '0%';
-        }
-
-        $dekanData = [
-            'pic' => config('global.staff.desc.dekan'),
-            'amount' => $this->convertAmount($amount),
-            'used' => $this->convertAmount($used),
-            'percent' => $percent,
-            'remain' => $this->convertAmount($amount - $used),
-        ];
-
-        $data->push($dekanData);
 
         $wd1 = Data::select('division_id', 'id', 'amount')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.wd1'))->get()->toArray();
         $data_id = array_column($wd1, 'id');
-        
-        $amount = 0;
-        foreach($wd1 as $row) {
-            $amount += $this->convertAmount($row['amount'], true);    
+
+        if (!empty($data_id)) {
+            $amount = 0;
+            foreach ($wd1 as $row) {
+                $amount += $this->convertAmount($row['amount'], true);
+            }
+
+            $used = 0;
+            $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+            if ($expense) {
+                $used += $expense->used;
+            } else {
+                $used += '0';
+            }
+
+            if ($amount > 0) {
+                $percent = round(($used / $amount) * 100, 2) . '%';
+            } else {
+                $percent = '0%';
+            }
+
+            $wd1Data = [
+                'pic' => config('global.staff.desc.wd1'),
+                'amount' => $this->convertAmount($amount),
+                'used' => $this->convertAmount($used),
+                'percent' => $percent,
+                'remain' => $this->convertAmount($amount - $used),
+            ];
+
+            $data->push($wd1Data);
         }
-
-        $used = 0;
-        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
-        if ($expense) {
-            $used += $expense->used;
-        } else {
-            $used += '0';
-        }
-
-        if($amount > 0) {
-            $percent = round(($used / $amount) * 100, 2) . '%';
-        } else {
-            $percent = '0%';
-        }
-
-        $wd1Data = [
-            'pic' => config('global.staff.desc.wd1'),
-            'amount' => $this->convertAmount($amount),
-            'used' => $this->convertAmount($used),
-            'percent' => $percent,
-            'remain' => $this->convertAmount($amount - $used),
-        ];
-
-        $data->push($wd1Data);
 
         $wd2 = Data::select('division_id', 'id', 'amount')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.wd2'))->has('staffs', '=', 1)->get()->toArray();
         $data_id = array_column($wd2, 'id');
-        
-        $amount = 0;
-        foreach($wd2 as $row) {
-            $amount += $this->convertAmount($row['amount'], true);    
+
+        if (!empty($data_id)) {
+            $amount = 0;
+            foreach ($wd2 as $row) {
+                $amount += $this->convertAmount($row['amount'], true);
+            }
+
+            $used = 0;
+            $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+            if ($expense) {
+                $used += $expense->used;
+            } else {
+                $used += '0';
+            }
+
+            if ($amount > 0) {
+                $percent = round(($used / $amount) * 100, 2) . '%';
+            } else {
+                $percent = '0%';
+            }
+
+            $wd2Data = [
+                'pic' => config('global.staff.desc.wd2'),
+                'amount' => $this->convertAmount($amount),
+                'used' => $this->convertAmount($used),
+                'percent' => $percent,
+                'remain' => $this->convertAmount($amount - $used),
+            ];
+
+            $data->push($wd2Data);
         }
-
-        $used = 0;
-        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
-        if ($expense) {
-            $used += $expense->used;
-        } else {
-            $used += '0';
-        }
-
-        if($amount > 0) {
-            $percent = round(($used / $amount) * 100, 2) . '%';
-        } else {
-            $percent = '0%';
-        }
-
-        $wd2Data = [
-            'pic' => config('global.staff.desc.wd2'),
-            'amount' => $this->convertAmount($amount),
-            'used' => $this->convertAmount($used),
-            'percent' => $percent,
-            'remain' => $this->convertAmount($amount - $used),
-        ];
-
-        $data->push($wd2Data);
 
         $wd3 = Data::select('division_id', 'id', 'amount')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.wd3'))->get()->toArray();
         $data_id = array_column($wd3, 'id');
-        
-        $amount = 0;
-        foreach($wd3 as $row) {
-            $amount += $this->convertAmount($row['amount'], true);    
+
+        if (!empty($data_id)) {
+            $amount = 0;
+            foreach ($wd3 as $row) {
+                $amount += $this->convertAmount($row['amount'], true);
+            }
+
+            $used = 0;
+            $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+            if ($expense) {
+                $used += $expense->used;
+            } else {
+                $used += '0';
+            }
+
+            if ($amount > 0) {
+                $percent = round(($used / $amount) * 100, 2) . '%';
+            } else {
+                $percent = '0%';
+            }
+
+            $wd3Data = [
+                'pic' => config('global.staff.desc.wd3'),
+                'amount' => $this->convertAmount($amount),
+                'used' => $this->convertAmount($used),
+                'percent' => $percent,
+                'remain' => $this->convertAmount($amount - $used),
+            ];
+
+            $data->push($wd3Data);
         }
-
-        $used = 0;
-        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
-        if ($expense) {
-            $used += $expense->used;
-        } else {
-            $used += '0';
-        }
-
-        if($amount > 0) {
-            $percent = round(($used / $amount) * 100, 2) . '%';
-        } else {
-            $percent = '0%';
-        }
-
-        $wd3Data = [
-            'pic' => config('global.staff.desc.wd3'),
-            'amount' => $this->convertAmount($amount),
-            'used' => $this->convertAmount($used),
-            'percent' => $percent,
-            'remain' => $this->convertAmount($amount - $used),
-        ];
-
-        $data->push($wd3Data);
 
         $wd4 = Data::select('division_id', 'id', 'amount')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.wd4'))->get()->toArray();
         $data_id = array_column($wd4, 'id');
-        
-        $amount = 0;
-        foreach($wd4 as $row) {
-            $amount += $this->convertAmount($row['amount'], true);    
+
+        if (!empty($data_id)) {
+            $amount = 0;
+            foreach ($wd4 as $row) {
+                $amount += $this->convertAmount($row['amount'], true);
+            }
+
+            $used = 0;
+            $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+            if ($expense) {
+                $used += $expense->used;
+            } else {
+                $used += '0';
+            }
+
+            if ($amount > 0) {
+                $percent = round(($used / $amount) * 100, 2) . '%';
+            } else {
+                $percent = '0%';
+            }
+
+            $wd4Data = [
+                'pic' => config('global.staff.desc.wd4'),
+                'amount' => $this->convertAmount($amount),
+                'used' => $this->convertAmount($used),
+                'percent' => $percent,
+                'remain' => $this->convertAmount($amount - $used),
+            ];
+
+            $data->push($wd4Data);
         }
-
-        $used = 0;
-        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
-        if ($expense) {
-            $used += $expense->used;
-        } else {
-            $used += '0';
-        }
-
-        if($amount > 0) {
-            $percent = round(($used / $amount) * 100, 2) . '%';
-        } else {
-            $percent = '0%';
-        }
-
-        $wd4Data = [
-            'pic' => config('global.staff.desc.wd4'),
-            'amount' => $this->convertAmount($amount),
-            'used' => $this->convertAmount($used),
-            'percent' => $percent,
-            'remain' => $this->convertAmount($amount - $used),
-        ];
-
-        $data->push($wd4Data);
 
         $table = DataTables::of($data);
 
@@ -529,7 +541,7 @@ class RecapitulationController extends Controller
             $data =  Expense::whereIn('id', $map)->with('map')->get();
 
             $collect = collect();
-            foreach($data as $value) {
+            foreach ($data as $value) {
                 $collection = [
                     'reff_no' => $value->reff_no,
                     'description' => $value->description,
@@ -537,8 +549,8 @@ class RecapitulationController extends Controller
                     'amount' => 0
                 ];
 
-                foreach($value->map as $val) {
-                    if($val['data_id'] == $data_id) {
+                foreach ($value->map as $val) {
+                    if ($val['data_id'] == $data_id) {
                         $collection['amount'] = $this->convertAmount($val['amount']);
                     }
                 }
