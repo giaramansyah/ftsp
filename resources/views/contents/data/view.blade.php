@@ -131,6 +131,11 @@
     $('.table').DataTable({
       responsive: true,
       autoWidth: true,
+      fnInitComplete : function() {
+        $('.table').on('click', 'button[data-button="button-action"]', function() {
+          $.fn.ButtonAction.call($(this))
+        })
+      }
     })
   </script>
 @endsection
