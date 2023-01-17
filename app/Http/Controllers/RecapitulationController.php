@@ -102,10 +102,11 @@ class RecapitulationController extends Controller
 
         $expense =  MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $plainId)->first()->toArray();
         if ($expense) {
-            $used = $this->convertAmount($expense['amount'], true);
+            $used = $expense['amount'];
         } else {
             $used = 0;
         }
+
         $total = $this->convertAmount($data['amount'], true);
         $remain = ($total - $used);
         $percent = round(($used / $total) * 100, 2);

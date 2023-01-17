@@ -130,6 +130,7 @@ class DataController extends Controller
 
         $map = MapExpense::where('data_id', $plainId)->get()->toArray();
         $map = array_column($map, 'expense_id');
+        
         $data['history'] = Expense::whereIn('id', $map)->get()->toArray();
 
         $view = ['is_update' => $this->hasPrivilege($this->_update), 'is_delete' => $this->hasPrivilege($this->_delete)];
