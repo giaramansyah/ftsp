@@ -116,7 +116,7 @@ class DataController extends Controller
 
         $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $plainId)->first()->toArray();
         if ($expense) {
-            $used = $this->convertAmount($expense['amount'], true);
+            $used = $expense['amount'];
         } else {
             $used = 0;
         }
