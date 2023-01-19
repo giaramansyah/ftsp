@@ -791,7 +791,7 @@ class ExpenseController extends Controller
             'Expires: 0'
         );
 
-        return response()->download($file->path, $headers);
+        return response()->download($file->path, $file->name, $headers);
     }
 
     private function generate()
