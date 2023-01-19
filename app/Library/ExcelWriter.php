@@ -39,8 +39,10 @@ class ExcelWriter
             $this->accountability($sheet);
         } else if ($this->_type == config('global.report.code.accountability_fakultas')) {
             $this->accountability_fakultas($sheet);
-        } else {
+        } else if ($this->_type == config('global.report.code.accountability_umd')) {
             $this->accountability_umd($sheet);
+        } else {
+            $this->daily($sheet);
         }
 
         $spreadsheet->setActiveSheetIndex(0);
@@ -642,5 +644,77 @@ class ExcelWriter
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->getFont()->setBold(true);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->getFont()->setBaseLine(true);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    }
+
+    private function daily(Worksheet $sheet)
+    {
+        $row = 1;
+        $sheet->setCellValue($this->_columns[1] . $row, 'LAPORAN HARIAN KAS-UMD');
+        $sheet->getStyle($this->_columns[1] . $row)->applyFromArray($this->_style['title']);
+
+        $row++;
+        $sheet->setCellValue($this->_columns[1] . $row, $this->_data['header']);
+        $sheet->getStyle($this->_columns[1] . $row)->applyFromArray($this->_style['subtitle']);
+
+        $row++;
+        $sheet->setCellValue($this->_columns[1] . $row, 'TANGGAL : ' . $this->_data['report_date']);
+        $sheet->getStyle($this->_columns[1] . $row)->applyFromArray($this->_style['subtitle']);
+
+        $row++;
+        $row++;
+        $width = [34, 100, 454, 100, 100, 200];
+        foreach ($this->_header as $key => $value) {
+            $sheet->setCellValue($this->_columns[$key] . $row, $value);
+            $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['header']);
+            $sheet->getStyle($this->_columns[$key] . $row)->getAlignment()->setWrapText(true);
+            $sheet->getColumnDimension($this->_columns[$key])->setWidth($width[$key], 'px');
+        }
+
+        $row++;
+        if (!empty($this->_data['expense'])) {
+            foreach ($this->_data['expense'] as $key => $value) {
+                $i = 0;
+                $sheet->setCellValue($this->_columns[$i] . $row, ($key + 1));
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+                $i++;
+                $sheet->setCellValue($this->_columns[$i] . $row, $value['expense_date']);
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setWrapText(true);
+
+                $i++;
+                $sheet->setCellValue($this->_columns[$i] . $row, $value['description']);
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+                $i++;
+                $sheet->setCellValue($this->_columns[$i] . $row, $value['amount']);
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+                $i++;
+                $sheet->setCellValue($this->_columns[$i] . $row, $value['account']);
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+                $i++;
+                $sheet->setCellValue($this->_columns[$i] . $row, $value['name']);
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setWrapText(true);
+
+                $row++;
+            }
+        } else {
+            $lastkey = (count($this->_header) - 1);
+            $sheet->setCellValue($this->_columns[0] . $row, 'Tidak Ada');
+            $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row);
+            $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->applyFromArray($this->_style['body']);
+            $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[$lastkey] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            $row++;
+        }
     }
 }

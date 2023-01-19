@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Library\ExcelWriter;
 use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Data;
 use App\Models\Expense;
+use App\Models\MapExpense;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -67,7 +69,7 @@ class DailyController extends Controller
         $divisions = array_combine(config('global.compact_division.code'), config('global.compact_division.report'));
         $date = Carbon::createFromFormat('Y-m-d', $param['daily_date']);
 
-        $filename = $reports[config('global.report.code.daily')] . ' ' . date('d F y') . '.' . $ext;
+        $filename = $reports[config('global.report.code.daily')] . ' ' . date('d F y', strtotime($param['daily_date'])) . '.' . $ext;
 
         $data = [
             'header' => $divisions[$division_id],
@@ -84,7 +86,10 @@ class DailyController extends Controller
 
         $ma = array_column($ma, 'id');
 
-        $expense = Expense::where('expense_date', $param['daily_date'])->whereIn('data_id', $ma)->get();
+        $map = MapExpense::whereIn('data_id', $ma)->get()->toArray();
+        $map = array_column($map, 'expense_id');
+
+        $expense = Expense::where('expense_date', $param['daily_date'])->whereIn('id', $map)->get();
 
         foreach ($expense as $value) {
             $data['expense'][] = [
@@ -97,8 +102,8 @@ class DailyController extends Controller
         }
 
         if ($ext == 'xlsx') {
-            $response = new Response(false, 'Not Supported yet');
-            return response()->json($response->responseJson());
+            $excel = new ExcelWriter($filename, config('global.report.code.daily'), config('global.report.header.daily'), $data);
+            $filepath = $excel->write();
         } else {
             $orientation = 'potrait';
             $pdf = Pdf::loadView('partials.print.daily', $data);
