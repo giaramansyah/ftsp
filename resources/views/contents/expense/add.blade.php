@@ -97,16 +97,16 @@
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label text-right">Deskripsi<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Deskripsi<code>*</code></label>
           <div class="col-sm-7">
-            <input type="text" class="form-control form-control-sm" name="description" {{ isset($mandatory) &&
+            <input type="text" class="form-control form-control-sm" name="description" maxlength="350" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
         </div>
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Sub Deskripsi</label>
           <div class="col-sm-7">
-            <textarea class="form-control form-control-sm" name="sub_description" rows="4"></textarea>
+            <textarea class="form-control form-control-sm" name="sub_description" maxlength="350" rows="4"></textarea>
           </div>
         </div>
         <div class="form-group row">

@@ -84,21 +84,20 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Deskripsi<code>*</code></label>
           <div class="col-sm-7">
-            <input type="text" class="form-control form-control-sm" name="description" {{ isset($mandatory) &&
+            <input type="text" class="form-control form-control-sm" name="description" maxlength="350" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
         </div>
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Sub Deskripsi</label>
           <div class="col-sm-7">
-            <textarea class="form-control form-control-sm" name="sub_description" rows="4"></textarea>
+            <textarea class="form-control form-control-sm" name="sub_description" maxlength="350" rows="4"></textarea>
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">A/N<code>*</code></label>
+          <label class="col-sm-2 col-form-label">A/N</label>
           <div class="col-sm-2">
-            <select class="form-control form-control-sm select2" name="name" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+            <select class="form-control form-control-sm select2" name="name">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($employeeArr as $key => $value)
               <option value="{{ $value['id'] }}">{{

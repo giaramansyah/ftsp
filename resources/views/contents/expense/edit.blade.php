@@ -89,7 +89,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Deskripsi<code>*</code></label>
           <div class="col-sm-7">
-            <input type="text" class="form-control form-control-sm" name="description"
+            <input type="text" class="form-control form-control-sm" maxlength="350" name="description"
               value="{{ isset($description) && $description ? $description : '' }}" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
@@ -97,7 +97,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Sub Deskripsi</label>
           <div class="col-sm-7">
-            <textarea class="form-control form-control-sm" name="sub_description"
+            <textarea class="form-control form-control-sm" name="sub_description" maxlength="350"
               rows="4">{{ isset($sub_description) ? $sub_description : '' }}</textarea>
           </div>
         </div>

@@ -83,10 +83,15 @@ class ReceptionController extends Controller
 
         $from_ma = false;
         $staffArr = array();
-        if ($data['data_id']) {
+        if ($data['expense_id']) {
             $from_ma = true;
-            $data['data'] = Data::find($data['data_id'])->toArray();
-            $map = MapData::where('data_id', $data['data_id'])->get()->toArray();
+
+            $data['data'] = Expense::find($data['expense_id'])->toArray();
+
+            $map = MapExpense::where('expense_id', $data['expense_id'])->get()->toArray();
+            $data_id = array_column($map, 'data_id');
+
+            $map = MapData::where('data_id', $data_id[0])->get()->toArray();
             foreach ($map as $value) {
                 $staffArr[] = array(
                     'id' => $value['staff_id'],
@@ -315,7 +320,7 @@ class ReceptionController extends Controller
                     'sub_description' => $param['sub_description'],
                     'expense_id' => isset($param['from_ma_id']) && $param['from_ma_id'] == 1 ? SecureHelper::unsecure($param['expense_id']) : null,
                     'ma_id' => isset($param['from_ma_id']) && $param['from_ma_id'] == 1 ? $param['ma_id'] : null,
-                    'name' => $param['name'],
+                    'name' => isset($param['name']) && $param['name'] != '' ? $param['name'] : 0,
                     'staff_id' => isset($param['from_ma_id']) && $param['from_ma_id'] == 1 ? $param['staff_id'] : null,
                     'amount' => $param['amount'],
                     'text_amount' => $param['text_amount'],
@@ -367,7 +372,7 @@ class ReceptionController extends Controller
                 $reception->sub_description = $param['sub_description'];
                 $reception->ma_id = isset($param['expense_id']) ? $param['ma_id'] : null;
                 $reception->staff_id = isset($param['expense_id']) ? $param['staff_id'] : null;
-                $reception->name = $param['name'];
+                $reception->name = isset($param['name']) && $param['name'] != '' ? $param['name'] : 0;
                 $reception->amount = $param['amount'];
                 $reception->text_amount = $param['text_amount'];
                 $reception->created_by = Auth::user()->username;

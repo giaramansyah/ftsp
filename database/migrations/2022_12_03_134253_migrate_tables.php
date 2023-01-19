@@ -164,8 +164,8 @@ class MigrateTables extends Migration
                 $table->date('expense_date')->nullable(false);
                 $table->string('reff_no', 50)->nullable(false);
                 $table->date('reff_date')->nullable(false);
-                $table->string('description', 100)->nullable(false);
-                $table->string('sub_description', 250)->nullable(true);
+                $table->text('description')->nullable(false);
+                $table->text('sub_description')->nullable(true);
                 $table->string('ma_id', 20)->nullable(true);
                 $table->string('name', 50)->nullable(false);
                 $table->tinyInteger('staff_id')->nullable(false);
@@ -198,8 +198,8 @@ class MigrateTables extends Migration
                 $table->date('reception_date')->nullable(false);
                 $table->integer('year')->nullable(false);
                 $table->tinyInteger('division_id')->nullable(false);
-                $table->string('description', 100)->nullable(false);
-                $table->string('sub_description', 250)->nullable(true);
+                $table->text('description')->nullable(false);
+                $table->text('sub_description')->nullable(true);
                 $table->string('expense_id', 20)->nullable(true);
                 $table->string('ma_id', 20)->nullable(true);
                 $table->string('name', 50)->nullable(false);

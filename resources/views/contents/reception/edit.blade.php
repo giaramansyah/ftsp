@@ -57,12 +57,14 @@
                 <tr>
                   <th class="text-center">No. M.A.</th>
                   <th class="text-center">Deskripsi</th>
+                  <th class="text-center">Nominal</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>{{ $data['ma_id'] }}</td>
                   <td>{{ $data['description'] }}</td>
+                  <td>{{ $data['amount'] }}</td>
                 </tr>
               </tbody>
             </table>
@@ -72,7 +74,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Deskripsi<code>*</code></label>
           <div class="col-sm-7">
-            <input type="text" class="form-control form-control-sm" name="description"
+            <input type="text" class="form-control form-control-sm" name="description" maxlength="350"
               value="{{ isset($description) && $description ? $description : '' }}" {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
@@ -80,15 +82,14 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Sub Deskripsi</label>
           <div class="col-sm-7">
-            <textarea class="form-control form-control-sm" name="sub_description"
+            <textarea class="form-control form-control-sm" name="sub_description" maxlength="350"
               rows="4">{{ isset($sub_description) ? $sub_description : '' }}</textarea>
           </div>
         </div>
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">A/N<code>*</code></label>
           <div class="col-sm-2">
-            <select class="form-control form-control-sm select2" name="name" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+            <select class="form-control form-control-sm select2" name="name">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($employeeArr as $key => $value)
               <option value="{{ $value['id'] }}" {{ isset($name) && $name == $value['id'] ? 'selected' : '' }}>{{
