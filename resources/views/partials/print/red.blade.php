@@ -5,102 +5,103 @@
   <title>Bon Merah</title>
   <style>
     @page {
-      margin: 0px;
+      size: 21cm 29.7cm;
+      margin: 0cm;
     }
 
     .ma {
       position: absolute;
       font-size: 0.875rem;
-      left: 11.25%;
-      top: 30.71428571428571%;
+      left: 16.5mm;
+      top: 54mm;
     }
 
     .desc {
       position: absolute;
       font-size: 0.875rem;
-      width: 47.5%;
+      width: 114mm;
       white-space: normal;
-      left: 20.833333333333336%;
-      top: 30.71428571428571%;
+      left: 45mm;
+      top: 54mm;
     }
 
     .note {
       position: absolute;
       font-size: 0.875rem;
       text-align: right;
-      width: 47.5%;
+      width: 114mm;
       white-space: normal;
-      left: 20.833333333333336%;
-      top: 60.71428571428571%;
+      left: 45mm;
+      top: 92mm;
     }
 
     .amount {
       position: absolute;
       font-size: 0.875rem;
       text-align: right;
-      width: 16.666666666666664%;
+      width: 40mm;
       white-space: normal;
-      right: 11.25%;
-      top: 60.71428571428571%;
+      right: 16.5mm;
+      top: 92mm;
     }
 
     .text-amount {
       position: absolute;
       font-size: 0.875rem;
-      width: 47.5%;
+      width: 114mm;
       white-space: normal;
-      left: 20.833333333333336%;
-      top: 67.85714285714286%;
+      left: 45mm;
+      top: 107mm;
     }
 
     .total-amount {
       position: absolute;
       font-size: 0.875rem;
-      width: 16.666666666666664%;
+      width: 40mm;
       text-align: right;
       white-space: normal;
-      right: 11.25%;
-      top: 67.85714285714286%;
+      right: 16.5mm;
+      top: 107mm;
     }
 
     .ttd-1 {
       position: absolute;
       font-size: 0.875rem;
-      width: 12.916666666666668%;
+      width: 31mm;
       text-align: center;
       white-space: nowrap;
-      left: 11.25%;
-      bottom: 5%;
+      left: 16.5mm;
+      top: 148mm;
     }
 
     .ttd-2 {
       position: absolute;
       font-size: 0.875rem;
-      width: 12.916666666666668%;
+      width: 31mm;
       text-align: center;
       white-space: nowrap;
-      left: 32.916666666666664%;
-      bottom: 5%;
+      left: 70mm;
+      top: 148mm;
     }
 
     .ttd-3 {
       position: absolute;
       font-size: 0.875rem;
-      width: 12.916666666666668%;
+      width: 31mm;
       text-align: center;
       white-space: nowrap;
-      left: 54.58333333333333%;
-      bottom: 5%;
+      left: 122mm;
+      top: 148mm;
     }
 
     .ttd-4 {
       position: absolute;
       font-size: 0.875rem;
-      width: 12.916666666666668%;
+      width: 31mm;
       text-align: center;
       white-space: nowrap;
-      left: 78.33333333333333%;
-      bottom: 5%;
+      left: 175mm;
+      top: 148mm;
     }
   </style>
 </head>

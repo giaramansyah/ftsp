@@ -6,6 +6,7 @@ use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Balance;
 use App\Models\Data;
+use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\HistoryBalance;
 use App\Models\MapData;
@@ -731,10 +732,11 @@ class ExpenseController extends Controller
         }
 
         $data = Expense::find($plainId)->toArray();
-        $data['knowing'] = $param['knowing'];
-        $data['approver'] = $param['approver'];
-        $data['sender'] = $param['sender'];
-        $data['reciever'] = $param['reciever'];
+        
+        $data['knowing'] = Employee::find($param['knowing'])->name;
+        $data['approver'] = Employee::find($param['approver'])->name;
+        $data['sender'] = Employee::find($param['sender'])->name;
+        $data['reciever'] = Employee::find($param['reciever'])->name;
 
         $types = array_combine(config('global.type.code'), config('global.type.desc'));
         $filename = date('d_M_Y_H_i_s') . '_' . $types[$data['type']] . ' ' . $data['ma_id'] . '.pdf';
@@ -758,7 +760,7 @@ class ExpenseController extends Controller
             File::makeDirectory($pathMonth, 0777, true, true);
         }
 
-        $pdf->setPaper([0, 0, 680.315, 396.85], 'portrait');
+        $pdf->setPaper('a4', 'portrait');
         $pdf->save($pathMonth . '/' . $filename);
 
         $id = SecureHelper::pack(['file' => $filename, 'path' => public_path('download')]);
