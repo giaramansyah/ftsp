@@ -39,6 +39,7 @@ mix.scripts(
         plugins + "datatables-responsive/js/dataTables.responsive.min.js",
         plugins + "datatables-responsive/js/responsive.bootstrap4.min.js",
         plugins + "select2/js/select2.full.min.js",
+        plugins + "chart.js/dist/chart.min.js",
         plugins + "adminlte/dist/js/adminlte.min.js",
         plugins + "crypto-js/crypto-js.min.js",
         plugins + "bs-custom-file-input/bs-custom-file-input.min.js",
