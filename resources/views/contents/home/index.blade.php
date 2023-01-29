@@ -32,13 +32,13 @@
       <div class="card" id="{{ $value }}">
         <div class="card-body p-2">
           <div class="row px-2">
-            <div class="col-12 p-2">
+            <div class="col-12 col-sm-12 p-2">
               <h5 class="chart-title text-center mb-0"></h5>
             </div>
-            <div class="col-8 p-2">
+            <div class="col-12 col-sm-8 p-2">
               <canvas class="chart-canvas"></canvas>
             </div>
-            <div class="col-4 d-table p-2">
+            <div class="col-12 col-sm-4 d-table p-2">
               <ul class="chart-legend d-table-cell align-middle"></ul>
             </div>
           </div>
