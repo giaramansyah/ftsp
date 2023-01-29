@@ -40,7 +40,7 @@ Route::group(['middleware' => ['guest']], function() {
 
     Route::get('/migrate', function(){
         // Artisan::call('migrate:refresh --seed');
-        Artisan::call('optimize');
+        Artisan::call('optimize:clear');
     });
 });
 
