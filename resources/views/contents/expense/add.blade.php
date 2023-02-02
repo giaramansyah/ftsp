@@ -7,11 +7,12 @@
       <div class="card-body">
         <input type="hidden" name="type" value="{{ isset($type) ? $type : '' }}">
         <input type="hidden" name="is_multiple" value="0">
-        <input type="hidden" name="status" value="{{ isset($type) && $type == config('global.type.code.white') ? config('global.status.code.unfinished') : config('global.status.code.finished') }}">
+        <input type="hidden" name="status"
+          value="{{ isset($type) && $type == config('global.type.code.white') ? config('global.status.code.unfinished') : config('global.status.code.finished') }}">
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
           <div class="col-sm-2">
-            <select class="form-control form-control-sm select2" name="year" onchange="getData()">
+            <select class="form-control form-control-sm select2" name="year" onchange="getData();getId();">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($yearArr as $key => $value)
               <option value="{{ Secure::secure($value['id']) }}">{{ $value['name'] }}</option>
@@ -22,7 +23,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Unit<code>*</code></label>
           <div class="col-sm-2">
-            <select class="form-control form-control-sm select2" name="division_id" onchange="getData()">
+            <select class="form-control form-control-sm select2" name="division_id" onchange="getData();getId();">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($divisionArr as $key => $value)
               <option value="{{ Secure::secure($value['id']) }}">{{
@@ -34,8 +35,8 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">No. Kas<code>*</code></label>
           <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" name="expense_id"
-              value="{{ isset($expense_id) ? $expense_id : '' }}" readonly {{ isset($mandatory) && $mandatory? 'required' : '' }}>
+            <input type="text" class="form-control form-control-sm" name="expense_id" id="expense_id" readonly {{
+              isset($mandatory) && $mandatory? 'required' : '' }}>
           </div>
           <label class="col-sm-2 offset-sm-1 col-form-label">Tgl. Transaksi<code>*</code></label>
           <div class="col-sm-2">
@@ -92,15 +93,16 @@
               <div class="input-group-prepend">
                 <span class="input-group-text">Rp</span>
               </div>
-              <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="total_amount" readonly>
+              <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="total_amount"
+                readonly>
             </div>
           </div>
         </div>
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Deskripsi<code>*</code></label>
           <div class="col-sm-7">
-            <input type="text" class="form-control form-control-sm" name="description" maxlength="350" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+            <input type="text" class="form-control form-control-sm" name="description" maxlength="350" {{
+              isset($mandatory) && $mandatory? 'required' : '' }}>
           </div>
         </div>
         <div class="form-group row">
@@ -137,8 +139,9 @@
                 <span class="input-group-text">Rp</span>
               </div>
               <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="amount"
-                onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)" onblur="numberFormat(this, true);amountText(this.value, '#text_amount')" {{
-                isset($mandatory) && $mandatory? 'required' : '' }}>
+                onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)"
+                onblur="numberFormat(this, true);amountText(this.value, '#text_amount')" {{ isset($mandatory) &&
+                $mandatory? 'required' : '' }}>
             </div>
           </div>
           <label class="col-sm-2 offset-sm-1 col-form-label">No. Rekening<code>*</code></label>
@@ -151,8 +154,8 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Terbilang<code>*</code></label>
           <div class="col-sm-7">
-            <input type="text" class="form-control form-control-sm" name="text_amount" id="text_amount" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }} readonly>
+            <input type="text" class="form-control form-control-sm" name="text_amount" id="text_amount" {{
+              isset($mandatory) && $mandatory? 'required' : '' }} readonly>
           </div>
         </div>
         @if($is_red)
@@ -253,6 +256,34 @@
         }
       );
     }
+  }
+
+  function getId() {
+    var year = $('select[name="year"]').val();
+    var division_id = $('select[name="division_id"]').val();
+
+    if(year != '' && division_id != '') {
+      var data = {
+        year : year,
+        division_id : division_id
+      };
+
+      $.ajax({
+        method: 'get',
+        url: "{{ route('transaction.expense.generate') }}",
+        data: data,
+        dataType: 'json',
+        beforeSend: function() {
+          $('#expense_id').val('');
+        },
+        success: function(response) {
+          if(response.status) {
+            $('#expense_id').val(response.data);
+          }
+        }
+      });
+    }
+
   }
 
   function getPic(data_id) {

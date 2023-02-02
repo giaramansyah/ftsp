@@ -66,14 +66,13 @@ class ExpenseController extends Controller
         $years = $this->getYears();
         $divisions = $this->getDivisions();
         $employees = $this->getEmployees();
-        $expense_id = $this->generate();
 
         $is_red = false;
         if ($type == config('global.type.code.red')) {
             $is_red = true;
         }
 
-        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'employeeArr' => $employees, 'type' => $type, 'expense_id' => $expense_id, 'action' => route('transaction.expense.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'is_red' => $is_red, 'typeDesc' => $typeDesc, 'mandatory' => $this->hasPrivilege($this->_create)];
+        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'employeeArr' => $employees, 'type' => $type, 'action' => route('transaction.expense.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'is_red' => $is_red, 'typeDesc' => $typeDesc, 'mandatory' => $this->hasPrivilege($this->_create)];
 
         return view('contents.expense.add', $view);
     }
@@ -99,15 +98,15 @@ class ExpenseController extends Controller
         $map = MapExpense::where('expense_id', $plainId)->get()->toArray();
         $data_id = array_column($map, 'data_id');
         $data['data'] = Data::where('id', $data_id[0])->first()->toArray();
-        if($data['is_multiple'] == 1) {
+        if ($data['is_multiple'] == 1) {
             $description = array();
             $amount = 0;
 
             $datas = Data::whereIn('id', $data_id)->get();
-            foreach($datas as $value) {
+            foreach ($datas as $value) {
                 $description[] = $value->description;
                 $amount += $this->convertAmount($value->amount, true);
-            } 
+            }
 
             $data['data']['description'] = implode('<br>', $description);
             $data['data']['amount'] = $this->convertAmount($amount);
@@ -182,7 +181,11 @@ class ExpenseController extends Controller
             $map = MapExpense::whereIn('data_id', $data)->groupBy('expense_id')->get()->toArray();
             $map = array_column($map, 'expense_id');
 
-            $expense = Expense::select(['id', 'expense_id', 'ma_id', 'expense_date', 'reff_no', 'reff_date', 'staff_id', 'amount', 'type', 'updated_at', 'status'])->whereIn('id', $map)->orderBY('updated_at', 'desc');
+            $expense = Expense::select(['id', 'expense_id', 'ma_id', 'expense_date', 'reff_no', 'reff_date', 'staff_id', 'amount', 'type', 'updated_at', 'status'])->whereIn('id', $map);
+            if (Auth::user()->staff_id != config('global.staff.code.admin')) {
+                $expense->where('staff_id', Auth::user()->staff_id);
+            }
+            $expense->orderBY('updated_at', 'desc');
             $table = DataTables::eloquent($expense);
             $rawColumns = array('expense', 'status_desc');
             $table->addIndexColumn();
@@ -329,19 +332,19 @@ class ExpenseController extends Controller
 
         $data['id'] = $id;
 
-        if($data['is_multiple'] == 1) {
+        if ($data['is_multiple'] == 1) {
             $map = MapExpense::where('expense_id', $plainId)->get()->toArray();
             $data_id = array_column($map, 'data_id');
-            
+
             $description = array();
             $amount = 0;
             $data['data'] = Data::where('id', $data_id[0])->first()->toArray();
 
             $datas = Data::whereIn('id', $data_id)->get();
-            foreach($datas as $value) {
+            foreach ($datas as $value) {
                 $description[] = $value->description;
                 $amount += $this->convertAmount($value->amount, true);
-            } 
+            }
 
             $data['data']['description'] = implode('<br>', $description);
             $data['data']['amount'] = $this->convertAmount($amount);
@@ -492,10 +495,10 @@ class ExpenseController extends Controller
                     if ($expense->id) {
                         $totalAmount = $this->convertAmount($param['amount'], true);
 
-                        foreach($param['data_id'] as $value) {
+                        foreach ($param['data_id'] as $value) {
                             $value = SecureHelper::unsecure($value);
 
-                            if(!$value) {
+                            if (!$value) {
                                 continue;
                             }
 
@@ -505,11 +508,11 @@ class ExpenseController extends Controller
                                 'amount' => 0
                             ];
 
-                            if($param['is_multiple'] == 1) {
+                            if ($param['is_multiple'] == 1) {
                                 $data = Data::find($value);
-                                if($data) {
+                                if ($data) {
                                     $amount = $this->convertAmount($data->amount, true);
-                                    if($amount < $totalAmount) {
+                                    if ($amount < $totalAmount) {
                                         $map['amount'] = $amount;
                                         $totalAmount -= $amount;
                                     } else {
@@ -636,7 +639,7 @@ class ExpenseController extends Controller
                             if ($file->move($pathMonth, $filename)) {
                                 $image = $filename;
                                 $apply_date = $param['apply_date'];
-                                if($param['type'] == config('global.type.code.white') && $param['status'] == config('global.status.code.unfinished')) {
+                                if ($param['type'] == config('global.type.code.white') && $param['status'] == config('global.status.code.unfinished')) {
                                     $status = config('global.status.code.finished');
                                 }
                             } else {
@@ -666,12 +669,12 @@ class ExpenseController extends Controller
                             $totalAmount = $this->convertAmount($param['amount'], true);
 
                             $map = MapExpense::where('expense_id', $plainId)->get();
-                            foreach($map as $value){
-                                if($expense->is_multiple == 1) {
+                            foreach ($map as $value) {
+                                if ($expense->is_multiple == 1) {
                                     $data = Data::find($value->data_id);
-                                    if($data) {
+                                    if ($data) {
                                         $amount = $this->convertAmount($data->amount, true);
-                                        if($amount < $totalAmount) {
+                                        if ($amount < $totalAmount) {
                                             $value->amount = $amount;
                                             $totalAmount -= $amount;
                                         } else {
@@ -732,7 +735,7 @@ class ExpenseController extends Controller
         }
 
         $data = Expense::find($plainId)->toArray();
-        
+
         $data['knowing'] = Employee::find($param['knowing'])->name;
         $data['approver'] = Employee::find($param['approver'])->name;
         $data['sender'] = Employee::find($param['sender'])->name;
@@ -796,10 +799,46 @@ class ExpenseController extends Controller
         return response()->download($file->path, $file->name, $headers);
     }
 
-    private function generate()
+    public function generate(Request $request)
     {
-        $prefix = 'PM';
-        $year = date('y');
+        if (($request->input('year') == null && $request->input('year') == '') || ($request->input('division_id') == null && $request->input('division_id') == '')) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $year = SecureHelper::unsecure($request->input('year'));
+        if (!$year) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $division_id = SecureHelper::unsecure($request->input('division_id'));
+        if (!$division_id) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $prefix = '';
+        $year = substr(strval($year), 2, 2);
+
+        switch ($division_id) {
+            case config('global.division.code.fakultas'):
+            case config('global.division.code.arsitektur'):
+            case config('global.division.code.sipil'):
+                $prefix = 'F';
+                break;
+            case config('global.division.code.mta'):
+                $prefix = 'MTA';
+                break;
+            case config('global.division.code.mts'):
+                $prefix = 'MTS';
+                break;
+            default:
+                $response = new Response();
+                return response()->json($response->responseJson());
+                break;
+        }
+
         $number = '0001';
 
         $expense = Expense::select('expense_id')->where('expense_id', 'like', '%' . $prefix . $year . '%')->orderBy('expense_id', 'desc')->first();
@@ -815,6 +854,8 @@ class ExpenseController extends Controller
             $number = $temp . $currentNumber;
         }
 
-        return $prefix . $year . $number;
+        $response = new Response(true, 'Success', 1);
+        $response->setData($prefix . $year . $number);
+        return response()->json($response->responseJson());
     }
 }

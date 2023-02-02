@@ -18,8 +18,8 @@ class HomeController extends Controller
 
     function __construct()
     {
-        $this->_year = 2022;
-        // $this->_year = date('Y');
+        // $this->_year = 2022;
+        $this->_year = date('Y');
     }
 
     public function index()

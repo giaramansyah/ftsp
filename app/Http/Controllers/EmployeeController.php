@@ -34,7 +34,7 @@ class EmployeeController extends Controller
 
     public function upload()
     {
-        if(!$this->hasPrivilege($this->_create)) {
+        if (!$this->hasPrivilege($this->_create)) {
             return abort(404);
         }
 
@@ -42,10 +42,10 @@ class EmployeeController extends Controller
 
         return view('contents.employee.upload', $view);
     }
-    
+
     public function add()
     {
-        if(!$this->hasPrivilege($this->_create)) {
+        if (!$this->hasPrivilege($this->_create)) {
             return abort(404);
         }
 
@@ -58,10 +58,10 @@ class EmployeeController extends Controller
 
     public function edit($id)
     {
-        if(!$this->hasPrivilege($this->_update)) {
+        if (!$this->hasPrivilege($this->_update)) {
             return abort(404);
         }
-        
+
         $plainId = SecureHelper::unsecure($id);
 
         if (!$plainId) {
@@ -92,25 +92,23 @@ class EmployeeController extends Controller
             $table = DataTables::eloquent($data);
             $table->addIndexColumn();
 
-            if($this->hasPrivilege($this->_update) || $this->hasPrivilege($this->_delete)) {
-                $table->addColumn('action', function($row) {
-                    $column = '';
+            $table->addColumn('action', function ($row) {
+                $column = '';
 
-                    if($this->hasPrivilege($this->_update)) {
-                        $param = array('class' => 'btn-xs', 'action' => route('master.employee.edit', ['id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.edit', $param)->render();
-                    }
+                if ($this->hasPrivilege($this->_update)) {
+                    $param = array('class' => 'btn-xs', 'action' => route('master.employee.edit', ['id' => SecureHelper::secure($row->id)]));
+                    $column .= view('partials.button.edit', $param)->render();
+                }
 
-                    if($this->hasPrivilege($this->_delete)) {
-                        $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('master.employee.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.delete', $param)->render();
-                    }
+                if ($this->hasPrivilege($this->_delete)) {
+                    $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('master.employee.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
+                    $column .= view('partials.button.delete', $param)->render();
+                }
 
-                    return $column;
-                });
+                return $column;
+            });
 
-                $table->rawColumns(['action']);
-            }
+            $table->rawColumns(['action']);
 
             $this->writeAppLog($this->_readall);
 
@@ -173,20 +171,20 @@ class EmployeeController extends Controller
                     return response()->json($response->responseJson());
                 }
 
-                if(!$this->hasPrivilege($this->_readid)) {
+                if (!$this->hasPrivilege($this->_readid)) {
                     $employee = Employee::find($plainId);
-    
-                    if(isset($param['nik']) && $param['nik'] != '') $employee->nik = $param['nik'];
-                    if(isset($param['unit_id']) && $param['unit_id'] != '') $employee->unit_id = $param['unit_id'];
-                    if(isset($param['name']) && $param['name'] != '') $employee->name = $param['name'];
-                    if(isset($param['account']) && $param['account'] != '') $employee->account = $param['account'];
+
+                    if (isset($param['nik']) && $param['nik'] != '') $employee->nik = $param['nik'];
+                    if (isset($param['unit_id']) && $param['unit_id'] != '') $employee->unit_id = $param['unit_id'];
+                    if (isset($param['name']) && $param['name'] != '') $employee->name = $param['name'];
+                    if (isset($param['account']) && $param['account'] != '') $employee->account = $param['account'];
                     $employee->updated_by = Auth::user()->username;
-    
-                    if($employee->save()) {
+
+                    if ($employee->save()) {
                         $response = new Response(true, __('Employee updated successfuly'), 1);
                         $response->setRedirect(route('master.employee.index'));
-    
-                        $this->writeAppLog($this->_update, 'Employee Name : '.$employee->name);
+
+                        $this->writeAppLog($this->_update, 'Employee Name : ' . $employee->name);
                     } else {
                         $response = new Response(false, __('Employee update failed. Please try again'));
                     }
@@ -197,12 +195,12 @@ class EmployeeController extends Controller
                     $employee->name = $param['name'];
                     $employee->account = $param['account'];
                     $employee->updated_by = Auth::user()->username;
-    
-                    if($employee->save()) {
+
+                    if ($employee->save()) {
                         $response = new Response(true, __('Employee updated successfuly'), 1);
                         $response->setRedirect(route('master.employee.index'));
-    
-                        $this->writeAppLog($this->_update, 'Employee Name : '.$employee->name);
+
+                        $this->writeAppLog($this->_update, 'Employee Name : ' . $employee->name);
                     } else {
                         $response = new Response(false, __('Employee update failed. Please try again'));
                     }

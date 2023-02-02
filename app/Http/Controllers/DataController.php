@@ -160,7 +160,14 @@ class DataController extends Controller
                 }
             }
 
+            
             $data = Data::select(['id', 'ma_id', 'description', 'amount', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('ma_id');
+            if(Auth::user()->staff_id != config('global.staff.code.admin')) {
+                $map = MapData::where('staff_id',  Auth::user()->staff_id)->get()->toArray();
+                $map = array_column($map, 'data_id');
+                $data->whereIn('id', $map);
+            }
+            $data->orderBy('ma_id');
             $table = DataTables::eloquent($data);
             $rawColumns = array('ma', 'used', 'remain', 'percent');
             $table->addIndexColumn();

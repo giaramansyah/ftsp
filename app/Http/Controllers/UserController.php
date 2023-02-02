@@ -23,9 +23,9 @@ class UserController extends Controller
     protected $_readall = 'USRA';
     protected $_readid = 'USRD';
 
-    public function index() 
+    public function index()
     {
-        if(!$this->hasPrivilege($this->_readall)) {
+        if (!$this->hasPrivilege($this->_readall)) {
             return abort(404);
         }
 
@@ -34,49 +34,49 @@ class UserController extends Controller
 
     public function add()
     {
-        if(!$this->hasPrivilege($this->_create)) {
+        if (!$this->hasPrivilege($this->_create)) {
             return abort(404);
         }
 
         $group = PrivilegeGroup::select(['id', 'name'])->where('id', '!=', config('global.sysadmin.privilege'))->get()->toArray();
-        foreach($group as $key => $value) {
+        foreach ($group as $key => $value) {
             $group[$key]['id'] = SecureHelper::secure($value['id']);
         }
 
         $division = $this->getDivisions();
         $staff = $this->getStaffs();
 
-        $view = ['groupArr' => $group, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('settings.user.post', ['action' => config('global.action.form.add'), 'id' => 0 ]), 'mandatory' => $this->hasPrivilege($this->_create)];
+        $view = ['groupArr' => $group, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('settings.user.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
 
         return view('contents.user.form', $view);
     }
 
     public function edit($id)
     {
-        if(!$this->hasPrivilege($this->_update)) {
+        if (!$this->hasPrivilege($this->_update)) {
             return abort(404);
         }
-        
+
         $plainId = SecureHelper::unsecure($id);
 
-        if(!$plainId) {
+        if (!$plainId) {
             return abort(404);
         }
 
         $user = User::find($plainId)->toArray();
-        
-        if(!$user) {
+
+        if (!$user) {
             return abort(404);
         }
 
-        if(!$this->hasPrivilege($this->_readid)) {
+        if (!$this->hasPrivilege($this->_readid)) {
             $user = array('username' => $user['username']);
         }
 
         $group = PrivilegeGroup::select(['id', 'name'])->where('id', '!=', config('global.sysadmin.privilege'))->get()->toArray();
-        foreach($group as $key => $value) {
+        foreach ($group as $key => $value) {
             $encId = SecureHelper::secure($value['id']);
-            if(isset($user['privilege_group_id']) && $user['privilege_group_id'] == $value['id']) {
+            if (isset($user['privilege_group_id']) && $user['privilege_group_id'] == $value['id']) {
                 $user['privilege_group_id'] = $encId;
             }
             $group[$key]['id'] = $encId;
@@ -85,7 +85,7 @@ class UserController extends Controller
         $division = $this->getDivisions();
         $division = Arr::except($division, 0);
         $staff = $this->getStaffs();
-        
+
         $view = ['groupArr' => $group, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('settings.user.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'mandatory' => $this->hasPrivilege($this->_readid)];
 
         return view('contents.user.form', array_merge($user, $view));
@@ -99,9 +99,9 @@ class UserController extends Controller
             $rawColumns = array('user_fullname');
             $table->addIndexColumn();
 
-            $table->addColumn('user_fullname', function($row) {
-                if($this->hasPrivilege($this->_readid)) {
-                    $column = $row->getFullnameAttribute() . ' (<a href="'.route('settings.user.view', ['id' => SecureHelper::secure($row->id)]).'">' . $row->username . '</a>)';
+            $table->addColumn('user_fullname', function ($row) {
+                if ($this->hasPrivilege($this->_readid)) {
+                    $column = $row->getFullnameAttribute() . ' (<a href="' . route('settings.user.view', ['id' => SecureHelper::secure($row->id)]) . '">' . $row->username . '</a>)';
                 } else {
                     $column = $row->getFullnameAttribute() . ' (' . $row->username . ')';
                 }
@@ -110,25 +110,23 @@ class UserController extends Controller
             });
 
 
-            if($this->hasPrivilege($this->_update) || $this->hasPrivilege($this->_delete)) {
-                $table->addColumn('action', function($row) {
-                    $column = '';
+            $table->addColumn('action', function ($row) {
+                $column = '';
 
-                    if($this->hasPrivilege($this->_update)) {
-                        $param = array('class' => 'btn-xs', 'action' => route('settings.user.edit', ['id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.edit', $param)->render();
-                    }
+                if ($this->hasPrivilege($this->_update)) {
+                    $param = array('class' => 'btn-xs', 'action' => route('settings.user.edit', ['id' => SecureHelper::secure($row->id)]));
+                    $column .= view('partials.button.edit', $param)->render();
+                }
 
-                    if($this->hasPrivilege($this->_delete)) {
-                        $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.user.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.delete', $param)->render();
-                    }
+                if ($this->hasPrivilege($this->_delete)) {
+                    $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.user.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
+                    $column .= view('partials.button.delete', $param)->render();
+                }
 
-                    return $column;
-                });
+                return $column;
+            });
 
-                $rawColumns[] = 'action';
-            }
+            $rawColumns[] = 'action';
 
             $table->rawColumns($rawColumns);
 
@@ -140,43 +138,42 @@ class UserController extends Controller
 
     public function view($id)
     {
-        if(!$this->hasPrivilege($this->_readid)) {
+        if (!$this->hasPrivilege($this->_readid)) {
             return abort(404);
         }
 
         $plainId = SecureHelper::unsecure($id);
 
-        if(!$plainId) {
+        if (!$plainId) {
             return abort(404);
         }
 
         $user = User::find($plainId)->toArray();
-        
-        if(!$user) {
+
+        if (!$user) {
             return abort(404);
         }
 
         $modules = array_combine(config('global.modules.code'), config('global.modules.desc'));
 
-        $parent = ParentMenu::select(['id','label', 'alias'])->where('is_active', 1)->orderBy('id')->get()->toArray();
-        foreach($parent as $key => $value) {
-            foreach($value['menu'] as $k => $val) {
-                if(in_array($value['alias'], config('global.privilege.hidden'))) {
+        $parent = ParentMenu::select(['id', 'label', 'alias'])->where('is_active', 1)->orderBy('id')->get()->toArray();
+        foreach ($parent as $key => $value) {
+            foreach ($value['menu'] as $k => $val) {
+                if (in_array($value['alias'], config('global.privilege.hidden'))) {
                     unset($parent[$key]['menu'][$k]);
                     continue;
                 }
 
-                $privilege = Privilege::select(['id','code', 'modules'])->where('menu_id', $value['id'])->orderBy('modules')->get()->toArray();
-                if(count($privilege) < count($modules)) {
+                $privilege = Privilege::select(['id', 'code', 'modules'])->where('menu_id', $value['id'])->orderBy('modules')->get()->toArray();
+                if (count($privilege) < count($modules)) {
                     $diff = count($privilege);
-                    while($diff < count($modules)) {
+                    while ($diff < count($modules)) {
                         $privilege[] = array();
                         $diff++;
                     }
                 }
                 $parent[$key]['menu'][$k]['privileges'] = $privilege;
             }
-
         }
 
 
@@ -190,19 +187,19 @@ class UserController extends Controller
 
         $view = ['modulesArr' => $modules, 'privilegeArr' => $parent, 'privileges' => $privileges, 'is_update' => $this->hasPrivilege($this->_update), 'is_delete' => $this->hasPrivilege($this->_delete)];
 
-        $this->writeAppLog($this->_readid, 'User Account : '.$user['username']);
+        $this->writeAppLog($this->_readid, 'User Account : ' . $user['username']);
 
-        return view('contents.user.view', array_merge($view,$user));
+        return view('contents.user.view', array_merge($view, $user));
     }
 
-    public function post(Request $request, $action, $id) 
+    public function post(Request $request, $action, $id)
     {
-        if(!in_array($action, config('global.action.form'))) {
+        if (!in_array($action, config('global.action.form'))) {
             $response = new Response();
             return response()->json($response->responseJson());
         }
 
-        if(in_array($action, Arr::only(config('global.action.form'), ['add', 'edit']))) {
+        if (in_array($action, Arr::only(config('global.action.form'), ['add', 'edit']))) {
             $param = SecureHelper::unpack($request->input('json'));
 
             if (!is_array($param)) {
@@ -210,18 +207,18 @@ class UserController extends Controller
                 return response()->json($response->responseJson());
             }
 
-            if($action === config('global.action.form.add')) {
-                if(!$this->hasPrivilege($this->_create)) {
+            if ($action === config('global.action.form.add')) {
+                if (!$this->hasPrivilege($this->_create)) {
                     $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
                     return response()->json($response->responseJson());
                 }
 
                 $user = User::where('username', $param['username'])->where('is_trash', 0)->first();
-                if(!$user) {
+                if (!$user) {
                     $user = User::where('email', $param['email'])->where('is_trash', 0)->first();
-                    if(!$user) {
+                    if (!$user) {
                         $hash = md5(sha1(date('ymdHis')));
-                        $password = $param['username'].$param['username'].$hash;
+                        $password = $param['username'] . $param['username'] . $hash;
                         $user = User::create([
                             'first_name' => $param['first_name'],
                             'last_name' => $param['last_name'],
@@ -235,63 +232,63 @@ class UserController extends Controller
                             'created_by' => Auth::user()->username,
                             'updated_by' => Auth::user()->username,
                         ]);
-                        if($user->id) {
+                        if ($user->id) {
                             $response = new Response(true, __('Account created successfuly'), 1);
                             $response->setRedirect(route('settings.user.index'));
 
-                            $this->writeAppLog($this->_create, 'User Account : '.$param['username']);
+                            $this->writeAppLog($this->_create, 'User Account : ' . $param['username']);
                         } else {
                             $response = new Response(false, __('Account create failed. Please try again'));
                         }
                     } else {
                         $response = new Response(false, __('Account with this email already registered'));
                     }
-                } else{
+                } else {
                     $response = new Response(false, __('Account with this username already registered'));
                 }
             }
 
-            if($action === config('global.action.form.edit')) {
-                if(!$this->hasPrivilege($this->_update)) {
+            if ($action === config('global.action.form.edit')) {
+                if (!$this->hasPrivilege($this->_update)) {
                     $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
                     return response()->json($response->responseJson());
                 }
 
                 $plainId = SecureHelper::unsecure($id);
-                if(!$plainId) {
+                if (!$plainId) {
                     $response = new Response();
                     return response()->json($response->responseJson());
                 }
 
-                if(!$this->hasPrivilege($this->_readid)) {
+                if (!$this->hasPrivilege($this->_readid)) {
                     $user = User::find($plainId);
-                    if(isset($param['email']) && $param['email'] != '') {
+                    if (isset($param['email']) && $param['email'] != '') {
                         $exist = User::where('email', $param['email'])->where('id', '!=', $plainId)->where('is_trash', 0)->first();
-                        if($exist) {
+                        if ($exist) {
                             $response = new Response(false, __('Account with this email already registered'));
                             return response()->json($response->responseJson());
                         }
                     }
 
-                    if(isset($param['first_name']) && $param['first_name'] != '') $user->first_name = $param['first_name'];
-                    if(isset($param['last_name']) && $param['last_name'] != '') $user->last_name = $param['last_name'];
-                    if(isset($param['email']) && $param['email'] != '') $user->email = $param['email'];
-                    if(isset($param['staff_id']) && $param['staff_id'] != '') $user->staff_id = $param['staff_id'];
-                    if(isset($param['division_id']) && $param['division_id'] != '') $user->division_id = $param['staff_id'] == 1 ? 0 : $param['division_id'];
-                    if(isset($param['privilege_group_id']) && $param['privilege_group_id'] != '') $user->privilege_group_id = SecureHelper::unsecure($param['privilege_group_id']);
+                    if (isset($param['first_name']) && $param['first_name'] != '') $user->first_name = $param['first_name'];
+                    if (isset($param['last_name']) && $param['last_name'] != '') $user->last_name = $param['last_name'];
+                    if (isset($param['email']) && $param['email'] != '') $user->email = $param['email'];
+                    if (isset($param['staff_id']) && $param['staff_id'] != '') $user->staff_id = $param['staff_id'];
+                    if (isset($param['division_id']) && $param['division_id'] != '') $user->division_id = $param['staff_id'] == 1 ? 0 : $param['division_id'];
+                    if (isset($param['privilege_group_id']) && $param['privilege_group_id'] != '') $user->privilege_group_id = SecureHelper::unsecure($param['privilege_group_id']);
                     $user->updated_by = Auth::user()->username;
 
-                    if($user->save()) {
+                    if ($user->save()) {
                         $response = new Response(true, __('Account updated successfuly'), 1);
                         $response->setRedirect(route('settings.user.index'));
 
-                        $this->writeAppLog($this->_update, 'User Account : '.$param['username']);
+                        $this->writeAppLog($this->_update, 'User Account : ' . $param['username']);
                     } else {
                         $response = new Response(false, __('Account update failed. Please try again'));
                     }
                 } else {
                     $user = User::where('email', $param['email'])->where('id', '!=', $plainId)->where('is_trash', 0)->first();
-                    if(!$user) {
+                    if (!$user) {
                         $user = User::find($plainId);
                         $user->first_name = $param['first_name'];
                         $user->last_name = $param['last_name'];
@@ -300,12 +297,12 @@ class UserController extends Controller
                         $user->division_id = $param['staff_id'] == 1 ? 0 : $param['division_id'];
                         $user->privilege_group_id = SecureHelper::unsecure($param['privilege_group_id']);
                         $user->updated_by = Auth::user()->username;
-    
-                        if($user->save()) {
+
+                        if ($user->save()) {
                             $response = new Response(true, __('Account updated successfuly'), 1);
                             $response->setRedirect(route('settings.user.index'));
-    
-                            $this->writeAppLog($this->_update, 'User Account : '.$param['username']);
+
+                            $this->writeAppLog($this->_update, 'User Account : ' . $param['username']);
                         } else {
                             $response = new Response(false, __('Account update failed. Please try again'));
                         }
@@ -313,19 +310,18 @@ class UserController extends Controller
                         $response = new Response(false, __('Account with this email already registered'));
                     }
                 }
-
             }
         }
 
-        if($action === config('global.action.form.delete')) {
-            if(!$this->hasPrivilege($this->_delete)) {
+        if ($action === config('global.action.form.delete')) {
+            if (!$this->hasPrivilege($this->_delete)) {
                 $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
                 return response()->json($response->responseJson());
             }
 
             $plainId = SecureHelper::unsecure($id);
 
-            if(!$plainId) {
+            if (!$plainId) {
                 $response = new Response();
                 return response()->json($response->responseJson());
             }
@@ -333,11 +329,11 @@ class UserController extends Controller
             $user = User::find($plainId);
             $user->is_trash = 1;
 
-            if($user->save()) {
+            if ($user->save()) {
                 $response = new Response(true, __('Account deleted successfuly'), 1);
                 $response->setRedirect(route('settings.user.index'));
 
-                $this->writeAppLog($this->_delete, 'User Account : '.$user->username);
+                $this->writeAppLog($this->_delete, 'User Account : ' . $user->username);
             } else {
                 $response = new Response(false, __('Account delete failed. Please try again'));
             }
@@ -348,30 +344,30 @@ class UserController extends Controller
 
     public function reset(Request $request, $id)
     {
-        if(!$this->hasPrivilege($this->_update)) {
+        if (!$this->hasPrivilege($this->_update)) {
             $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
             return response()->json($response->responseJson());
         }
 
         $plainId = SecureHelper::unsecure($id);
-        if(!$plainId) {
+        if (!$plainId) {
             $response = new Response();
             return response()->json($response->responseJson());
         }
 
         $user = User::find($plainId);
         $hash = md5(sha1(date('ymdHis')));
-        $password = $user->username.$user->username.$hash;
+        $password = $user->username . $user->username . $hash;
         $user->hash = $hash;
         $user->password = $password;
         $user->is_new = 1;
         $user->updated_by = Auth::user()->username;
 
-        if($user->save()) {
+        if ($user->save()) {
             $response = new Response(true, __('Account password reset successfuly'), 1);
             $response->setRedirect(route('settings.user.view', ['id' => $id]));
 
-            $this->writeAppLog($this->_update, 'Reset Password Account : '.$user->username);
+            $this->writeAppLog($this->_update, 'Reset Password Account : ' . $user->username);
         } else {
             $response = new Response(false, __('Account password reset failed. Please try again'));
         }

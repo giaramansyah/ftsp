@@ -130,7 +130,11 @@ class ReceptionController extends Controller
                     $division = $param['id'];
                 }
             }
-            $reception = Reception::select(['id', 'reception_id', 'ma_id', 'reception_date', 'amount', 'updated_at'])->where('year', $year)->where('division_id', $division)->orderBY('updated_at', 'desc');
+            $reception = Reception::select(['id', 'reception_id', 'ma_id', 'reception_date', 'amount', 'updated_at'])->where('year', $year)->where('division_id', $division);
+            if (Auth::user()->staff_id != config('global.staff.code.admin')) {
+                $reception->where('staff_id', Auth::user()->staff_id);
+            }
+            $reception->orderBY('updated_at', 'desc');
             $table = DataTables::eloquent($reception);
             $rawColumns = array('reception');
             $table->addIndexColumn();

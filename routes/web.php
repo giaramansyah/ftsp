@@ -124,6 +124,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/expense/list', [ExpenseController::class, 'getList'])->name('transaction.expense.list');
     Route::get('/expense/data', [ExpenseController::class, 'getData'])->name('transaction.expense.data');
     Route::get('/expense/pic', [ExpenseController::class, 'getPic'])->name('transaction.expense.pic');
+    Route::get('/expense/generate', [ExpenseController::class, 'generate'])->name('transaction.expense.generate');
     Route::get('/expense/view/{id}', [ExpenseController::class, 'view'])->name('transaction.expense.view');
     Route::get('/expense/add/{type}', [ExpenseController::class, 'add'])->name('transaction.expense.add');
     Route::get('/expense/edit/{id}', [ExpenseController::class, 'edit'])->name('transaction.expense.edit');

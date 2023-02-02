@@ -6,11 +6,14 @@ use App\Library\ExcelWriter;
 use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Data;
+use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\MapExpense;
+use App\Models\Reception;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
 class DailyController extends Controller
@@ -91,15 +94,56 @@ class DailyController extends Controller
 
         $expense = Expense::where('expense_date', $param['daily_date'])->whereIn('id', $map)->get();
 
+        $reception = Reception::where('reception_date', $param['daily_date'])->get();
+
+        $years = $this->getYears();
+        $yearsDesc = array_combine(array_column($years, 'id'), array_column($years, 'name'));
+
+        $knowing = Employee::find($param['knowing']);
+        $approve1 = Employee::find($param['approve1']);
+        $approve2 = Employee::find($param['approve2']);
+
+        $data['total_credit'] = 0;
+        $data['total_debet'] = 0;
+        $data['total_amount'] = 0;
+        $data['year'] = $yearsDesc[$year];
+        $data['knowing'] = $knowing->name;
+        $data['approve1'] = $approve1->name;
+        $data['approve2'] = $approve2->name;
+        $data['user'] = Auth::user()->full_name;
+
+        foreach ($reception as $value) {
+            $data['data'][] = [
+                'date' => $value->reception_date_format,
+                'description' => $value->description,
+                'credit' => $value->amount,
+                'debet' => '',
+                'amount' => '',
+                'account' => $value->account,
+                'name' => 'a/n. ' . $value->name_desc,
+            ];
+
+            $data['total_credit'] += $this->convertAmount($value->amount, true);
+        }
+
         foreach ($expense as $value) {
-            $data['expense'][] = [
-                'expense_date' => $value->expense_date_format,
+            $data['data'][] = [
+                'date' => $value->expense_date_format,
                 'description' => ($value->type == config('global.type.code.white') ? 'UMD/ ' : '') . $value->description,
+                'credit' => '',
+                'debet' => $value->amount,
                 'amount' => $value->amount,
                 'account' => $value->account,
                 'name' => 'a/n. ' . $value->name_desc,
             ];
+
+            $data['total_debet'] += $this->convertAmount($value->amount, true);
+            $data['total_amount'] += $this->convertAmount($value->amount, true);
         }
+
+        $data['total_credit'] = $this->convertAmount($data['total_credit']);
+        $data['total_debet'] = $this->convertAmount($data['total_debet']);
+        $data['total_amount'] = $this->convertAmount($data['total_amount']);
 
         if ($ext == 'xlsx') {
             $excel = new ExcelWriter($filename, config('global.report.code.daily'), config('global.report.header.daily'), $data);

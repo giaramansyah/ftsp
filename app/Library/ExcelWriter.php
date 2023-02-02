@@ -649,7 +649,7 @@ class ExcelWriter
     private function daily(Worksheet $sheet)
     {
         $row = 1;
-        $sheet->setCellValue($this->_columns[1] . $row, 'LAPORAN HARIAN KAS-UMD');
+        $sheet->setCellValue($this->_columns[1] . $row, 'LAPORAN HARIAN KAS-UMD (' . $this->_data['year'] . ')');
         $sheet->getStyle($this->_columns[1] . $row)->applyFromArray($this->_style['title']);
 
         $row++;
@@ -662,7 +662,7 @@ class ExcelWriter
 
         $row++;
         $row++;
-        $width = [34, 100, 454, 100, 100, 200];
+        $width = [34, 100, 454, 100, 100, 100, 100, 200];
         foreach ($this->_header as $key => $value) {
             $sheet->setCellValue($this->_columns[$key] . $row, $value);
             $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['header']);
@@ -671,15 +671,15 @@ class ExcelWriter
         }
 
         $row++;
-        if (!empty($this->_data['expense'])) {
-            foreach ($this->_data['expense'] as $key => $value) {
+        if (!empty($this->_data['data'])) {
+            foreach ($this->_data['data'] as $key => $value) {
                 $i = 0;
                 $sheet->setCellValue($this->_columns[$i] . $row, ($key + 1));
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $i++;
-                $sheet->setCellValue($this->_columns[$i] . $row, $value['expense_date']);
+                $sheet->setCellValue($this->_columns[$i] . $row, $value['date']);
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setWrapText(true);
@@ -688,6 +688,16 @@ class ExcelWriter
                 $sheet->setCellValue($this->_columns[$i] . $row, $value['description']);
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                 $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+                $i++;
+                $sheet->setCellValue($this->_columns[$i] . $row, $value['credit']);
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+                $i++;
+                $sheet->setCellValue($this->_columns[$i] . $row, $value['debet']);
+                $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                $sheet->getStyle($this->_columns[$i] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
                 $i++;
                 $sheet->setCellValue($this->_columns[$i] . $row, $value['amount']);
@@ -716,5 +726,78 @@ class ExcelWriter
 
             $row++;
         }
+
+        $values = ['', '', 'JUMLAH', $this->_data['total_credit'], $this->_data['total_debet'], $this->_data['total_amount'], '', ''];
+        foreach ($values as $key => $value) {
+            $sheet->setCellValue($this->_columns[$key] . $row, $value);
+            $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['body']);
+            $sheet->getStyle($this->_columns[$key] . $row)->getFont()->setBold(true);
+            if (in_array($key, [3, 4, 5])) {
+                $sheet->getStyle($this->_columns[$key] . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            }
+        }
+
+        $row++;
+        $row++;
+        $row++;
+        $sheet->setCellValue($this->_columns[1] . $row, 'Mengetahui,');
+         $sheet->mergeCells($this->_columns[1] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[1] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[3] . $row, 'Setuju,');
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[4] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[4] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[5] . $row, 'Setuju,');
+        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[6] . $row);
+        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[6] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[7] . $row, 'Jakarta, ' . $this->_data['report_date']);
+        $sheet->mergeCells($this->_columns[7] . $row . ':' . $this->_columns[8] . $row);
+        $sheet->getStyle($this->_columns[7] . $row . ':' . $this->_columns[8] . $row)->applyFromArray($this->_style['footer']);
+
+        $row++;
+        $sheet->setCellValue($this->_columns[1] . $row, 'Wakil Dekan II');
+        $sheet->mergeCells($this->_columns[1] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[1] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[3] . $row, 'Kabag TU');
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[4] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[4] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[5] . $row, 'Kasubag Umum & Keuangan');
+        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[6] . $row);
+        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[6] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[7] . $row, 'Kasir FTSP');
+        $sheet->mergeCells($this->_columns[7] . $row . ':' . $this->_columns[8] . $row);
+        $sheet->getStyle($this->_columns[7] . $row . ':' . $this->_columns[8] . $row)->applyFromArray($this->_style['footer']);
+
+        $row++;
+        $row++;
+        $row++;
+        $sheet->setCellValue($this->_columns[1] . $row, $this->_data['knowing']);
+        $sheet->mergeCells($this->_columns[1] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[1] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[1] . $row . ':' . $this->_columns[2] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[1] . $row . ':' . $this->_columns[2] . $row)->getFont()->setBaseLine(true);
+
+        $sheet->setCellValue($this->_columns[3] . $row, $this->_data['approve1']);
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[4] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[4] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[4] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[4] . $row)->getFont()->setBaseLine(true);
+
+        $sheet->setCellValue($this->_columns[5] . $row, $this->_data['approve2']);
+        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[6] . $row);
+        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[6] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[6] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[6] . $row)->getFont()->setBaseLine(true);
+
+        $sheet->setCellValue($this->_columns[7] . $row, $this->_data['user']);
+        $sheet->mergeCells($this->_columns[7] . $row . ':' . $this->_columns[8] . $row);
+        $sheet->getStyle($this->_columns[7] . $row . ':' . $this->_columns[8] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[7] . $row . ':' . $this->_columns[8] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[7] . $row . ':' . $this->_columns[8] . $row)->getFont()->setBaseLine(true);
     }
 }

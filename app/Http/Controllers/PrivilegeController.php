@@ -22,7 +22,7 @@ class PrivilegeController extends Controller
 
     public function index()
     {
-        if(!$this->hasPrivilege($this->_readall)) {
+        if (!$this->hasPrivilege($this->_readall)) {
             return abort(404);
         }
 
@@ -31,35 +31,35 @@ class PrivilegeController extends Controller
 
     public function add()
     {
-        if(!$this->hasPrivilege($this->_create)) {
+        if (!$this->hasPrivilege($this->_create)) {
             return abort(404);
         }
 
         $menu = ParentMenu::select(['id', 'label'])->where('is_active', 1)->get()->toArray();
-        foreach($menu as $key => $value) {
+        foreach ($menu as $key => $value) {
             $menu[$key]['menu'] = ParentMenu::find($value['id'])->menus()->select(['id', 'label'])->where('is_active', 1)->get()->toArray();
         }
 
         $modules = array_combine(config('global.modules.code'), config('global.modules.desc'));
 
-        $view = ['menuArr' => $menu, 'modulesArr' => $modules, 'action' => route('settings.privilege.post', ['action' => config('global.action.form.add'), 'id' => 0 ])];
+        $view = ['menuArr' => $menu, 'modulesArr' => $modules, 'action' => route('settings.privilege.post', ['action' => config('global.action.form.add'), 'id' => 0])];
 
         return view('contents.privilege.form', $view);
     }
 
     public function edit($id)
     {
-        if(!$this->hasPrivilege($this->_update)) {
+        if (!$this->hasPrivilege($this->_update)) {
             return abort(404);
         }
-        
+
         $plainId = SecureHelper::unsecure($id);
-        if(!$plainId) {
+        if (!$plainId) {
             return abort(404);
         }
 
         $menu = ParentMenu::select(['id', 'label'])->where('is_active', 1)->get()->toArray();
-        foreach($menu as $key => $value) {
+        foreach ($menu as $key => $value) {
             $menu[$key]['menu'] = ParentMenu::find($value['id'])->menus()->select(['id', 'label'])->where('is_active', 1)->get()->toArray();
         }
 
@@ -67,7 +67,7 @@ class PrivilegeController extends Controller
 
         $privilege = Privilege::find($plainId)->toArray();
 
-        if(!$privilege) {
+        if (!$privilege) {
             return abort(404);
         }
 
@@ -82,25 +82,24 @@ class PrivilegeController extends Controller
             $data = Privilege::select(['id', 'code', 'modules', 'desc'])->orderBy('id');
             $table = DataTables::eloquent($data);
             $table->addIndexColumn();
-            if($this->hasPrivilege($this->_update) || $this->hasPrivilege($this->_delete)) {
-                $table->addColumn('action', function($row) {
-                    $column = '';
+            
+            $table->addColumn('action', function ($row) {
+                $column = '';
 
-                    if($this->hasPrivilege($this->_update)) {
-                        $param = array('class' => 'btn-xs', 'action' => route('settings.privilege.edit', ['id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.edit', $param)->render();
-                    }
+                if ($this->hasPrivilege($this->_update)) {
+                    $param = array('class' => 'btn-xs', 'action' => route('settings.privilege.edit', ['id' => SecureHelper::secure($row->id)]));
+                    $column .= view('partials.button.edit', $param)->render();
+                }
 
-                    if($this->hasPrivilege($this->_delete)) {
-                        $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.privilege.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.delete', $param)->render();
-                    }
+                if ($this->hasPrivilege($this->_delete)) {
+                    $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.privilege.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
+                    $column .= view('partials.button.delete', $param)->render();
+                }
 
-                    return $column;
-                });
+                return $column;
+            });
 
-                $table->rawColumns(['action']);
-            }
+            $table->rawColumns(['action']);
 
             $this->writeAppLog($this->_readall);
 
@@ -108,14 +107,14 @@ class PrivilegeController extends Controller
         }
     }
 
-    public function post(Request $request, $action, $id) 
+    public function post(Request $request, $action, $id)
     {
-        if(!in_array($action, config('global.action.form'))) {
+        if (!in_array($action, config('global.action.form'))) {
             $response = new Response();
             return response()->json($response->responseJson());
         }
 
-        if(in_array($action, Arr::only(config('global.action.form'), ['add', 'edit']))) {
+        if (in_array($action, Arr::only(config('global.action.form'), ['add', 'edit']))) {
             $param = SecureHelper::unpack($request->input('json'));
 
             if (!is_array($param)) {
@@ -123,21 +122,21 @@ class PrivilegeController extends Controller
                 return response()->json($response->responseJson());
             }
 
-            if($action === config('global.action.form.add')) {
-                if(!$this->hasPrivilege($this->_create)) {
+            if ($action === config('global.action.form.add')) {
+                if (!$this->hasPrivilege($this->_create)) {
                     $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
                     return response()->json($response->responseJson());
                 }
 
                 $privilege = Privilege::where('code', $param['code'])->first();
-                if(!$privilege) {
+                if (!$privilege) {
                     $privilege = Privilege::create([
                         'code' => Str::upper($param['code']),
                         'menu_id' => $param['menu_id'],
                         'modules' => $param['modules'],
                         'desc' => $param['desc'],
                     ]);
-                    if($privilege->id) {
+                    if ($privilege->id) {
                         MapPrivilege::create([
                             'privilege_group_id' => config('global.sysadmin.privilege'),
                             'privilege_id' => $privilege->id,
@@ -145,23 +144,23 @@ class PrivilegeController extends Controller
                         $response = new Response(true, __('Privilege created successfuly'), 1);
                         $response->setRedirect(route('settings.privilege.index'));
 
-                        $this->writeAppLog($this->_create, 'Privilege : '.$param['code']);
+                        $this->writeAppLog($this->_create, 'Privilege : ' . $param['code']);
                     } else {
                         $response = new Response(false, __('Privilege create failed. Please try again'));
                     }
-                } else{
+                } else {
                     $response = new Response(false, __('Privilege code already exist'));
                 }
             }
 
-            if($action === config('global.action.form.edit')) {
-                if(!$this->hasPrivilege($this->_update)) {
+            if ($action === config('global.action.form.edit')) {
+                if (!$this->hasPrivilege($this->_update)) {
                     $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
                     return response()->json($response->responseJson());
                 }
 
                 $plainId = SecureHelper::unsecure($id);
-                if(!$plainId) {
+                if (!$plainId) {
                     $response = new Response();
                     return response()->json($response->responseJson());
                 }
@@ -172,26 +171,26 @@ class PrivilegeController extends Controller
                 $privilege->modules = $param['modules'];
                 $privilege->desc = $param['desc'];
 
-                if($privilege->save()) {
+                if ($privilege->save()) {
                     $response = new Response(true, __('Privilege updated successfuly'), 1);
                     $response->setRedirect(route('settings.privilege.index'));
 
-                    $this->writeAppLog($this->_update, 'Privilege : '.$param['code']);
+                    $this->writeAppLog($this->_update, 'Privilege : ' . $param['code']);
                 } else {
                     $response = new Response(false, __('Privilege update failed. Please try again'));
                 }
             }
         }
 
-        if($action === config('global.action.form.delete')) {
-            if(!$this->hasPrivilege($this->_delete)) {
+        if ($action === config('global.action.form.delete')) {
+            if (!$this->hasPrivilege($this->_delete)) {
                 $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
                 return response()->json($response->responseJson());
             }
 
             $plainId = SecureHelper::unsecure($id);
 
-            if(!$plainId) {
+            if (!$plainId) {
                 $response = new Response();
                 return response()->json($response->responseJson());
             }
@@ -204,7 +203,7 @@ class PrivilegeController extends Controller
             $response = new Response(true, __('Privilege deleted successfuly'), 1);
             $response->setRedirect(route('settings.privilege.index'));
 
-            $this->writeAppLog($this->_delete, 'Privilege : '.$param);
+            $this->writeAppLog($this->_delete, 'Privilege : ' . $param);
         }
 
         return response()->json($response->responseJson());

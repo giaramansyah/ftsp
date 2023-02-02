@@ -279,6 +279,8 @@ return [
                 'NO',
                 'TGL. TRANSAKSI',
                 'DESKRIPSI',
+                'KREDIT (RP)',
+                'DEBET (RP)',
                 'NOMINAL (RP)',
                 'NO. REKENING',
                 'A/N',

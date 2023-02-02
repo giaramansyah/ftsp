@@ -73,7 +73,23 @@ class BalanceController extends Controller
     public function getList(Request $request)
     {
         if ($request->ajax()) {
-            $data = Balance::select(['id', 'division_id', 'amount', 'updated_at'])->where('is_trash', 0)->orderBy('id');
+            $data = Balance::select(['id', 'division_id', 'amount', 'updated_at'])->where('is_trash', 0);
+            if (Auth::user()->staff_id != config('global.staff.code.admin')) {
+                switch (Auth::user()->staff_id) {
+                    case config('global.division.code.fakultas'):
+                    case config('global.division.code.arsitektur'):
+                    case config('global.division.code.sipil'):
+                        $data->where('division_id', config('global.compact_division.code.fakultas'));
+                        break;
+                    case config('global.division.code.mta'):
+                        $data->where('division_id', config('global.compact_division.code.mta'));
+                        break;
+                    case config('global.division.code.mts'):
+                        $data->where('division_id', config('global.compact_division.code.mts'));
+                        break;
+                }
+            }
+            $data->orderBy('id');
             $table = DataTables::eloquent($data);
             $rawColumns = array('balance', 'action');
             $table->addIndexColumn();
@@ -88,23 +104,21 @@ class BalanceController extends Controller
                 return $column;
             });
 
-            if ($this->hasPrivilege($this->_update) || $this->hasPrivilege($this->_delete)) {
-                $table->addColumn('action', function ($row) {
-                    $column = '';
+            $table->addColumn('action', function ($row) {
+                $column = '';
 
-                    if ($this->hasPrivilege($this->_update)) {
-                        $param = array('class' => 'btn-xs', 'action' => route('master.balance.edit', ['id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.edit', $param)->render();
-                    }
+                if ($this->hasPrivilege($this->_update)) {
+                    $param = array('class' => 'btn-xs', 'action' => route('master.balance.edit', ['id' => SecureHelper::secure($row->id)]));
+                    $column .= view('partials.button.edit', $param)->render();
+                }
 
-                    if ($this->hasPrivilege($this->_delete)) {
-                        $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('master.balance.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.delete', $param)->render();
-                    }
+                if ($this->hasPrivilege($this->_delete)) {
+                    $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('master.balance.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
+                    $column .= view('partials.button.delete', $param)->render();
+                }
 
-                    return $column;
-                });
-            }
+                return $column;
+            });
 
             $table->rawColumns($rawColumns);
 

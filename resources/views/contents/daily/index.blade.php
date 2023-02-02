@@ -38,6 +38,45 @@
               value="{{ date('Y-m-d') }}" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
           </div>
         </div>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Mengetahui<code>*</code></label>
+          <div class="col-sm-4">
+            <select class="form-control form-control-sm select2" name="knowing" {{ isset($mandatory) &&
+              $mandatory? 'required' : '' }}>
+              <option value="test">-- Silakan Pilih --</option>
+              @foreach ($employeeArr as $key => $value)
+              <option value="{{ $value['id'] }}">{{
+                $value['name'] }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Setuju<code>*</code></label>
+          <div class="col-sm-4">
+            <select class="form-control form-control-sm select2" name="approve1" {{ isset($mandatory) &&
+              $mandatory? 'required' : '' }}>
+              <option value="test">-- Silakan Pilih --</option>
+              @foreach ($employeeArr as $key => $value)
+              <option value="{{ $value['id'] }}">{{
+                $value['name'] }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Setuju<code>*</code></label>
+          <div class="col-sm-4">
+            <select class="form-control form-control-sm select2" name="approve2" {{ isset($mandatory) &&
+              $mandatory? 'required' : '' }}>
+              <option value="test">-- Silakan Pilih --</option>
+              @foreach ($employeeArr as $key => $value)
+              <option value="{{ $value['id'] }}">{{
+                $value['name'] }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
       </div>
       <div class="card-footer">
         <div class="form-button">
