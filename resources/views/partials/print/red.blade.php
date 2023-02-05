@@ -49,7 +49,6 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
-      font-weight: 600;
       text-align: right;
       width: 40mm;
       white-space: normal;
@@ -62,7 +61,6 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
-      font-weight: 600;
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -74,7 +72,6 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
-      font-weight: 600;
       width: 40mm;
       text-align: right;
       white-space: normal;
@@ -87,7 +84,6 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
-      font-weight: 600;
       width: 31mm;
       white-space: nowrap;
       left: 7mm;
@@ -99,7 +95,6 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
-      font-weight: 600;
       width: 31mm;
       white-space: nowrap;
       left: 61mm;
@@ -111,7 +106,6 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
-      font-weight: 600;
       width: 31mm;
       white-space: nowrap;
       left: 122mm;
@@ -123,7 +117,6 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
-      font-weight: 600;
       width: 31mm;
       text-align: right;
       white-space: nowrap;
@@ -136,34 +129,34 @@
 <body>
   <div width="100%">
     <div class="ma">
-      {{ $ma_id }}
+      <b>{{ $ma_id }}</b>
     </div>
     <div class="desc">
-      {{ $description }}<br>a/n. {{ $name }}
+      <b>{{ $description }}<br>a/n. {{ $name }}</b>
     </div>
     <div class="note">
-      Sebesar :
+      <b>Sebesar :</b>
     </div>
     <div class="amount">
-      Rp. {{ $amount }}
+      <b>Rp. {{ $amount }}</b>
     </div>
     <div class="text-amount">
-      {{ $text_amount }}
+      <b>{{ $text_amount }}</b>
     </div>
     <div class="total-amount">
-      Rp. {{ $amount }}
+      <b>Rp. {{ $amount }}</b>
     </div>
     <div class="ttd-1">
-      {{ $knowing }}
+      <b>{{ $knowing }}</b>
     </div>
     <div class="ttd-2">
-      {{ $approver }}
+      <b>{{ $approver }}</b>
     </div>
     <div class="ttd-3">
-      {{ $sender }}
+      <b>{{ $sender }}</b>
     </div>
     <div class="ttd-4">
-      {{ $reciever }}
+      <b>{{ $reciever }}</b>
     </div>
   </div>
 </body>
