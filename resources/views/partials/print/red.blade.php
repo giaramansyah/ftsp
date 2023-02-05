@@ -14,6 +14,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       left: 7mm;
       top: 54mm;
     }
@@ -23,6 +24,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -34,6 +36,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       text-align: right;
       width: 114mm;
       white-space: normal;
@@ -46,6 +49,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       text-align: right;
       width: 40mm;
       white-space: normal;
@@ -58,6 +62,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -69,6 +74,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       width: 40mm;
       text-align: right;
       white-space: normal;
@@ -81,6 +87,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       width: 31mm;
       white-space: nowrap;
       left: 7mm;
@@ -92,6 +99,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       width: 31mm;
       white-space: nowrap;
       left: 61mm;
@@ -103,6 +111,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       width: 31mm;
       white-space: nowrap;
       left: 122mm;
@@ -114,6 +123,7 @@
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       color: rgba(0, 0, 0, 1);
+      font-weight: 600;
       width: 31mm;
       text-align: right;
       white-space: nowrap;
