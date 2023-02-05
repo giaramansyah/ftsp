@@ -12,7 +12,7 @@
     .ma {
       position: absolute;
       font-size: 0.875rem;
-      left: 16.5mm;
+      left: 8mm;
       top: 54mm;
     }
 
@@ -21,8 +21,8 @@
       font-size: 0.875rem;
       width: 114mm;
       white-space: normal;
-      left: 45mm;
-      top: 54mm;
+      left: 36mm;
+      top: 53.5mm;
     }
 
     .note {
@@ -31,8 +31,8 @@
       text-align: right;
       width: 114mm;
       white-space: normal;
-      left: 45mm;
-      top: 92mm;
+      left: 36mm;
+      top: 89mm;
     }
 
     .amount {
@@ -41,8 +41,8 @@
       text-align: right;
       width: 40mm;
       white-space: normal;
-      right: 16.5mm;
-      top: 92mm;
+      right: 2mm;
+      top: 88.5mm;
     }
 
     .text-amount {
@@ -50,8 +50,8 @@
       font-size: 0.875rem;
       width: 114mm;
       white-space: normal;
-      left: 45mm;
-      top: 107mm;
+      left: 36mm;
+      top: 100mm;
     }
 
     .total-amount {
@@ -60,48 +60,45 @@
       width: 40mm;
       text-align: right;
       white-space: normal;
-      right: 16.5mm;
-      top: 107mm;
+      right: 2mm;
+      top: 100.5mm;
     }
 
     .ttd-1 {
       position: absolute;
       font-size: 0.875rem;
       width: 31mm;
-      text-align: center;
       white-space: nowrap;
-      left: 16.5mm;
-      top: 148mm;
+      left: 7mm;
+      top: 135mm;
     }
 
     .ttd-2 {
       position: absolute;
       font-size: 0.875rem;
       width: 31mm;
-      text-align: center;
       white-space: nowrap;
-      left: 70mm;
-      top: 148mm;
+      left: 61mm;
+      top: 135mm;
     }
 
     .ttd-3 {
       position: absolute;
       font-size: 0.875rem;
       width: 31mm;
-      text-align: center;
       white-space: nowrap;
       left: 122mm;
-      top: 148mm;
+      top: 135mm;
     }
 
     .ttd-4 {
       position: absolute;
       font-size: 0.875rem;
       width: 31mm;
-      text-align: center;
+      text-align: right;
       white-space: nowrap;
-      left: 175mm;
-      top: 148mm;
+      right: 2mm;
+      top: 135mm;
     }
   </style>
 </head>
@@ -124,7 +121,7 @@
       {{ $text_amount }}
     </div>
     <div class="total-amount">
-      {{ $amount }}
+      <strong>Rp. </strong>{{ $amount }}
     </div>
     <div class="ttd-1">
       {{ $knowing }}
