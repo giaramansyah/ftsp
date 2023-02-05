@@ -11,13 +11,15 @@
 
     .ma {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      left: 8mm;
+      left: 7mm;
       top: 54mm;
     }
 
     .desc {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       width: 114mm;
       white-space: normal;
@@ -27,6 +29,7 @@
 
     .note {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       text-align: right;
       width: 114mm;
@@ -37,6 +40,7 @@
 
     .amount {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       text-align: right;
       width: 40mm;
@@ -47,6 +51,7 @@
 
     .text-amount {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       width: 114mm;
       white-space: normal;
@@ -56,6 +61,7 @@
 
     .total-amount {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       width: 40mm;
       text-align: right;
@@ -66,6 +72,7 @@
 
     .ttd-1 {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       width: 31mm;
       white-space: nowrap;
@@ -75,6 +82,7 @@
 
     .ttd-2 {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       width: 31mm;
       white-space: nowrap;
@@ -84,6 +92,7 @@
 
     .ttd-3 {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       width: 31mm;
       white-space: nowrap;
@@ -93,6 +102,7 @@
 
     .ttd-4 {
       position: absolute;
+      font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
       width: 31mm;
       text-align: right;
