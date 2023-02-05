@@ -13,7 +13,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       left: 7mm;
       top: 54mm;
     }
@@ -22,7 +22,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -33,7 +33,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       text-align: right;
       width: 114mm;
       white-space: normal;
@@ -45,7 +45,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       text-align: right;
       width: 40mm;
       white-space: normal;
@@ -57,7 +57,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -68,7 +68,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       width: 40mm;
       text-align: right;
       white-space: normal;
@@ -80,7 +80,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       width: 31mm;
       white-space: nowrap;
       left: 7mm;
@@ -91,7 +91,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       width: 31mm;
       white-space: nowrap;
       left: 61mm;
@@ -102,7 +102,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       width: 31mm;
       white-space: nowrap;
       left: 122mm;
@@ -113,7 +113,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
-      color: rgba(0, 0, 0, 0);
+      color: rgba(0, 0, 0, 1);
       width: 31mm;
       text-align: right;
       white-space: nowrap;
