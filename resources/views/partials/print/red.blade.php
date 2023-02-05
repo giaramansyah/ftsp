@@ -120,7 +120,7 @@
       width: 31mm;
       text-align: right;
       white-space: nowrap;
-      right: 2mm;
+      right: 0mm;
       top: 135mm;
     }
   </style>
