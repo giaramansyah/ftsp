@@ -11,14 +11,14 @@
 
     .ma {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       left: 8mm;
       top: 54mm;
     }
 
     .desc {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -27,7 +27,7 @@
 
     .note {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       text-align: right;
       width: 114mm;
       white-space: normal;
@@ -37,7 +37,7 @@
 
     .amount {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       text-align: right;
       width: 40mm;
       white-space: normal;
@@ -47,7 +47,7 @@
 
     .text-amount {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -56,7 +56,7 @@
 
     .total-amount {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       width: 40mm;
       text-align: right;
       white-space: normal;
@@ -66,7 +66,7 @@
 
     .ttd-1 {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       width: 31mm;
       white-space: nowrap;
       left: 7mm;
@@ -75,7 +75,7 @@
 
     .ttd-2 {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       width: 31mm;
       white-space: nowrap;
       left: 61mm;
@@ -84,7 +84,7 @@
 
     .ttd-3 {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       width: 31mm;
       white-space: nowrap;
       left: 122mm;
@@ -93,7 +93,7 @@
 
     .ttd-4 {
       position: absolute;
-      font-size: 0.875rem;
+      font-size: 11pt;
       width: 31mm;
       text-align: right;
       white-space: nowrap;
@@ -106,34 +106,34 @@
 <body>
   <div width="100%">
     <div class="ma">
-      {{ $ma_id }}
+      <strong>{{ $ma_id }}</strong>
     </div>
     <div class="desc">
-      {{ $description }}<br>a/n. {{ $name }}
+      <strong>{{ $description }}<br>a/n. {{ $name }}</strong>
     </div>
     <div class="note">
-      Sebesar :
+      <strong>Sebesar :</strong>
     </div>
     <div class="amount">
-      <strong>Rp. </strong>{{ $amount }}
+      <strong>Rp. {{ $amount }}</strong>
     </div>
     <div class="text-amount">
-      {{ $text_amount }}
+      <strong>{{ $text_amount }}</strong>
     </div>
     <div class="total-amount">
-      <strong>Rp. </strong>{{ $amount }}
+      <strong>Rp. {{ $amount }}</strong>
     </div>
     <div class="ttd-1">
-      {{ $knowing }}
+      <strong>{{ $knowing }}</strong>
     </div>
     <div class="ttd-2">
-      {{ $approver }}
+      <strong>{{ $approver }}</strong>
     </div>
     <div class="ttd-3">
-      {{ $sender }}
+      <strong>{{ $sender }}</strong>
     </div>
     <div class="ttd-4">
-      {{ $reciever }}
+      <strong>{{ $reciever }}</strong>
     </div>
   </div>
 </body>
