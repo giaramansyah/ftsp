@@ -13,6 +13,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       left: 7mm;
       top: 54mm;
     }
@@ -21,6 +22,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -31,6 +33,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       text-align: right;
       width: 114mm;
       white-space: normal;
@@ -42,6 +45,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       text-align: right;
       width: 40mm;
       white-space: normal;
@@ -53,6 +57,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       width: 114mm;
       white-space: normal;
       left: 36mm;
@@ -63,6 +68,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       width: 40mm;
       text-align: right;
       white-space: normal;
@@ -74,6 +80,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       width: 31mm;
       white-space: nowrap;
       left: 7mm;
@@ -84,6 +91,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       width: 31mm;
       white-space: nowrap;
       left: 61mm;
@@ -94,6 +102,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       width: 31mm;
       white-space: nowrap;
       left: 122mm;
@@ -104,6 +113,7 @@
       position: absolute;
       font-family: Cambria,Georgia,serif; 
       font-size: 11pt;
+      color: rgba(0, 0, 0, 0);
       width: 31mm;
       text-align: right;
       white-space: nowrap;
@@ -116,34 +126,34 @@
 <body>
   <div width="100%">
     <div class="ma">
-      <strong>{{ $ma_id }}</strong>
+      {{ $ma_id }}
     </div>
     <div class="desc">
-      <strong>{{ $description }}<br>a/n. {{ $name }}</strong>
+      {{ $description }}<br>a/n. {{ $name }}
     </div>
     <div class="note">
-      <strong>Sebesar :</strong>
+      Sebesar :
     </div>
     <div class="amount">
-      <strong>Rp. {{ $amount }}</strong>
+      Rp. {{ $amount }}
     </div>
     <div class="text-amount">
-      <strong>{{ $text_amount }}</strong>
+      {{ $text_amount }}
     </div>
     <div class="total-amount">
-      <strong>Rp. {{ $amount }}</strong>
+      Rp. {{ $amount }}
     </div>
     <div class="ttd-1">
-      <strong>{{ $knowing }}</strong>
+      {{ $knowing }}
     </div>
     <div class="ttd-2">
-      <strong>{{ $approver }}</strong>
+      {{ $approver }}
     </div>
     <div class="ttd-3">
-      <strong>{{ $sender }}</strong>
+      {{ $sender }}
     </div>
     <div class="ttd-4">
-      <strong>{{ $reciever }}</strong>
+      {{ $reciever }}
     </div>
   </div>
 </body>
