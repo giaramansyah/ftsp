@@ -82,11 +82,20 @@
               ['id'
               => $id])))
             </div>
+            @if($status == config('global.status.code.finished'))
             <div class="col-auto">
-              <button type="button" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#modalPrint">
-                <i class="fas fa-print"></i> {{ $is_red ? 'Cetak Bon' : 'Buat UMD' }}
+              <button type="button" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#modalPrintRed">
+                <i class="fas fa-print"></i> Cetak Bon Merah
               </button>
             </div>
+            @endif
+            @if($type == config('global.type.code.white'))
+            <div class="col-auto">
+              <button type="button" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#modalPrintWhite">
+                <i class="fas fa-print"></i> Buat UMD
+              </button>
+            </div>
+            @endif
             @endif
           </div>
         </div>
@@ -100,7 +109,7 @@
           <p class="text-muted text-center mb-0">Tahun Akademik</p>
           <p class="text-muted text-center">{{ $data['years'] }}</p>
           @if($is_multiple == 1)
-            <p class="text-md badge badge-info">Multi Anggaran</p>
+          <p class="text-md badge badge-info">Multi Anggaran</p>
           @endif
           <ul class="list-group list-group-unbordered mb-3">
             <li class="list-group-item">
@@ -125,7 +134,9 @@
     </div>
   </div>
 </div>
-@include('partials.modal.modalprint', ['modal_action' => route('transaction.expense.print', ['id' => $id]),
+@include('partials.modal.modalprintred', ['modal_action' => route('transaction.expense.print', ['id' => $id]),
+'employeeArr' => $employeeArr])
+@include('partials.modal.modalprintwhite', ['modal_action' => route('transaction.expense.print', ['id' => $id]),
 'employeeArr' => $employeeArr])
 @endsection
 @section('push-js')

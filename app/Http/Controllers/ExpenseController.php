@@ -718,7 +718,8 @@ class ExpenseController extends Controller
     public function print(Request $request, $id)
     {
         if (!$this->hasPrivilege($this->_update)) {
-            return abort(404);
+            $response = new Response();
+            return response()->json($response->responseJson());
         }
 
         $param = SecureHelper::unpack($request->input('json'));
@@ -727,23 +728,40 @@ class ExpenseController extends Controller
             $response = new Response();
             return response()->json($response->responseJson());
         }
-
+        
         $plainId = SecureHelper::unsecure($id);
-
+        
         if (!$plainId) {
-            return abort(404);
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $type = $param['type'];
+
+        if(!in_array($type, config('global.type.code'))) {
+            $response = new Response();
+            return response()->json($response->responseJson());
         }
 
         $data = Expense::find($plainId)->toArray();
 
-        $data['knowing'] = Employee::find($param['knowing'])->name;
-        $data['approver'] = Employee::find($param['approver'])->name;
-        $data['sender'] = Employee::find($param['sender'])->name;
-        $data['reciever'] = Employee::find($param['reciever'])->name;
-
         $types = array_combine(config('global.type.code'), config('global.type.desc'));
         $filename = date('d_M_Y_H_i_s') . '_' . $types[$data['type']] . ' ' . $data['ma_id'] . '.pdf';
-        $pdf = Pdf::loadView('partials.print.red', $data);
+
+        if($type == config('global.type.code.red')) {
+            $data['knowing'] = Employee::find($param['knowing'])->name;
+            $data['approver'] = Employee::find($param['approver'])->name;
+            $data['sender'] = Employee::find($param['sender'])->name;
+            $data['reciever'] = Employee::find($param['reciever'])->name;
+            $pdf = Pdf::loadView('partials.print.red', $data);
+        }
+
+        if($type == config('global.type.code.white')) {
+            $data['knowing'] = Employee::find($param['knowing'])->name;
+            $data['approver'] = Employee::find($param['approver'])->name;
+            $data['reciever'] = Employee::find($param['reciever'])->name;
+            $pdf = Pdf::loadView('partials.print.white', $data);
+        }
 
         $descMonth = config('global.months');
 

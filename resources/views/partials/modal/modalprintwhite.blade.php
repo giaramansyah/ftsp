@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalPrint">
+<div class="modal fade" id="modalPrintWhite">
   <div class="modal-dialog">
     <div class="modal-content">
       <form class="form-lazy-control" data-action="{{ $modal_action }}">
@@ -6,8 +6,9 @@
           <h4 class="modal-title">Bertanda Tangan Dibawah ini</h4>
         </div>
         <div class="modal-body p-2">
+          <input type="hidden" name="type" value="{{ config('global.type.code.white') }}">
           <div class="form-group row">
-            <label class="col-form-label col-sm-4">Mengetahui</label>
+            <label class="col-form-label col-sm-4">Dibayar Oleh</label>
             <div class="col-sm-8">
               <select class="form-control form-control-sm select2" name="knowing" required>
                 <option value="">-- Silakan Pilih --</option>
@@ -19,21 +20,9 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-form-label col-sm-4">Setujui</label>
+            <label class="col-form-label col-sm-4">Menyetujui</label>
             <div class="col-sm-8">
               <select class="form-control form-control-sm select2" name="approver" required>
-                <option value="">-- Silakan Pilih --</option>
-                @foreach ($employeeArr as $key => $value)
-                <option value="{{ $value['id'] }}">{{
-                  $value['name'] }}</option>
-                @endforeach
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-form-label col-sm-4">Yang Membayar</label>
-            <div class="col-sm-8">
-              <select class="form-control form-control-sm select2" name="sender" required>
                 <option value="">-- Silakan Pilih --</option>
                 @foreach ($employeeArr as $key => $value)
                 <option value="{{ $value['id'] }}">{{
