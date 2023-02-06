@@ -738,7 +738,7 @@ class ExpenseController extends Controller
 
         $type = $param['type'];
 
-        if(!in_array($type, config('global.type.code'))) {
+        if(!in_array($type, [config('global.type.code.red'), config('global.type.code.white')])) {
             $response = new Response();
             return response()->json($response->responseJson());
         }

@@ -6,14 +6,18 @@ use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Balance;
 use App\Models\Data;
+use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\HistoryBalance;
 use App\Models\MapData;
 use App\Models\MapExpense;
 use App\Models\Reception;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
 
@@ -264,21 +268,21 @@ class ReceptionController extends Controller
             $from_ma = true;
 
             $expense = Expense::find($data['expense_id']);
-            
-            if($expense['is_multiple'] == 1) {
+
+            if ($expense['is_multiple'] == 1) {
                 $map = MapExpense::where('expense_id', $data['expense_id'])->get()->toArray();
                 $data_id = array_column($map, 'data_id');
-                
+
                 $description = array();
                 $amount = 0;
                 $data['data'] = Data::where('id', $data_id[0])->first()->toArray();
-    
+
                 $datas = Data::whereIn('id', $data_id)->get();
-                foreach($datas as $value) {
+                foreach ($datas as $value) {
                     $description[] = $value->description;
                     $amount += $this->convertAmount($value->amount, true);
-                } 
-    
+                }
+
                 $data['data']['description'] = implode('<br>', $description);
                 $data['data']['amount'] = $this->convertAmount($amount);
             } else {
@@ -287,7 +291,9 @@ class ReceptionController extends Controller
             }
         }
 
-        $view = ['from_ma' => $from_ma, 'is_update' => $this->hasPrivilege($this->_update)];
+        $employeeArr = $this->getEmployees();
+
+        $view = ['employeeArr' => $employeeArr, 'from_ma' => $from_ma, 'is_update' => $this->hasPrivilege($this->_update)];
 
         $this->writeAppLog($this->_readid, 'Reception : ' . $data['reception_id']);
 
@@ -405,6 +411,98 @@ class ReceptionController extends Controller
         }
 
         return response()->json($response->responseJson());
+    }
+
+    public function print(Request $request, $id)
+    {
+        if (!$this->hasPrivilege($this->_update)) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $param = SecureHelper::unpack($request->input('json'));
+
+        if (!is_array($param)) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $plainId = SecureHelper::unsecure($id);
+
+        if (!$plainId) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $type = $param['type'];
+
+        if ($type != config('global.type.code.green')) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $data = Reception::find($plainId)->toArray();
+
+        $filename = date('d_M_Y_H_i_s') . '_' . config('global.type.desc.green') . '_' . $data['reception_id'] . '.pdf';
+
+        $data['knowing'] = Employee::find($param['knowing'])->name;
+        $data['approver'] = Employee::find($param['approver'])->name;
+        $data['sender'] = Employee::find($param['sender'])->name;
+        $data['reciever'] = Employee::find($param['reciever'])->name;
+        $pdf = Pdf::loadView('partials.print.green', $data);
+
+        $descMonth = config('global.months');
+
+        $today = Carbon::now();
+        $year = $today->year;
+        $month = $today->month;
+        $month = $month < 10 ? '0' . $month : $month;
+
+        $pathYear = public_path('download') . '/' . $year;
+        $pathMonth = public_path('download') . '/' . $year . '/' . $descMonth[$month];
+
+        if (!File::exists($pathYear)) {
+            File::makeDirectory($pathYear, 0777, true, true);
+        }
+
+        if (!File::exists($pathMonth)) {
+            File::makeDirectory($pathMonth, 0777, true, true);
+        }
+
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->save($pathMonth . '/' . $filename);
+
+        $id = SecureHelper::pack(['file' => $filename, 'path' => public_path('download')]);
+
+        $response = new Response(true, 'Report successfuly printed', 1);
+        $response->setRedirect(route('transaction.reception.download', ['id' => $id]));
+
+        return response()->json($response->responseJson());
+    }
+
+    public function download($id)
+    {
+        if (!$this->hasPrivilege($this->_readid)) {
+            return abort(404);
+        }
+
+        $param = SecureHelper::unpack($id);
+
+        if (!is_array($param)) {
+            return abort(404);
+        }
+
+        $file = $this->getFile($param['file'], $param['path']);
+
+        $headers = array(
+            'Content-Type: application/pdf',
+            'Content-Disposition: attachment;filename=' . $file->name,
+            'Cache-Control: max-age=0',
+            'Pragma: no-cache',
+            'Expires: 0'
+        );
+
+        return response()->download($file->path, $file->name, $headers);
     }
 
     private function generate()

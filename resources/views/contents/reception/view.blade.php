@@ -64,8 +64,9 @@
               => $id])))
             </div>
             <div class="col-auto">
-              @include('partials.button.print', array('class' => 'btn-sm', 'label' => 'Cetak Bon', 'action' =>
-              route('transaction.reception.index')))
+              <button type="button" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#modalPrintGreen">
+                <i class="fas fa-print"></i> Cetak Bon
+              </button>
             </div>
             @endif
           </div>
@@ -104,4 +105,11 @@
     @endif
   </div>
 </div>
+@include('partials.modal.modalprintgreen', ['modal_action' => route('transaction.reception.print', ['id' => $id]),
+'employeeArr' => $employeeArr])
+@endsection
+@section('push-js')
+<script type="text/javascript">
+  $('.select2').select2({theme: 'bootstrap4'});
+</script>
 @endsection

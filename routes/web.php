@@ -117,6 +117,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/reception/view/{id}', [ReceptionController::class, 'view'])->name('transaction.reception.view');
     Route::get('/reception/add', [ReceptionController::class, 'add'])->name('transaction.reception.add');
     Route::get('/reception/edit/{id}', [ReceptionController::class, 'edit'])->name('transaction.reception.edit');
+    Route::get('/reception/download/{id}', [ReceptionController::class, 'download'])->name('transaction.reception.download');
+    Route::post('/reception/print/{id}', [ReceptionController::class, 'print'])->name('transaction.reception.print');
     Route::post('/reception/post/{action}/{id}', [ReceptionController::class, 'post'])->name('transaction.reception.post');
 
     //expense
