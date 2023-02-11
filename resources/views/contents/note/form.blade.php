@@ -244,8 +244,14 @@
 
     $('select[name="division_id"]').trigger('change')
 
-    amountText($('input[name=amount]').val(), '#text_amount')
-    amountText($('input[name=amount_requested]').val(), '#text_amount_request')
-    amountText($('input[name=amount_approved]').val(), '#text_amount_approve')
+    if($('input[name=amount]').val() != '') {
+      amountText($('input[name=amount]').val(), '#text_amount')
+    }
+    if($('input[name=amount_requested]').val() != '') {
+      amountText($('input[name=amount_requested]').val(), '#text_amount_request')
+    }
+    if($('input[name=amount_approved]').val() != '') {
+      amountText($('input[name=amount_approved]').val(), '#text_amount_approve')
+    }
 </script>
 @endsection
