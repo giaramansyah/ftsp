@@ -142,6 +142,16 @@ return [
             'wd4' => 'wadekiv',
             'kaprodis1' => 'kaprodis1',
             'kaprodis2' => 'kaprodis2',
+        ],
+        'export' => [
+            'admin' => '',
+            'dekan' => 'Dekan',
+            'wd1' => 'Wadek I',
+            'wd2' => 'Wadek II',
+            'wd3' => 'Wadek III',
+            'wd4' => 'Wadek IV',
+            'kaprodis1' => 'Kaprodi S1',
+            'kaprodis2' => 'Kaprodi S2',
         ]
     ],
 
@@ -230,12 +240,14 @@ return [
             'accountability' => 2,
             'accountability_umd' => 3,
             'daily' => 4,
+            'masterdata' => 5,
         ],
         'desc' => [
             'accountability_fakultas' => 'Lap. Pertanggung Jawaban (Fakultas)',
             'accountability' => 'Lap. Pertanggung Jawaban',
             'accountability_umd' => 'Lap. Pertanggung Jawaban (UMD)',
             'daily' => 'Lap. Harian',
+            'masterdata' => 'Data Mata Anggaran',
         ],
         'header' => [
             'accountability_fakultas' => [
@@ -285,6 +297,13 @@ return [
                 'NO. REKENING',
                 'A/N',
             ],
+            'masterdata' => [
+                'MA',
+                'DESKRIPSI',
+                'PIC',
+                'DANA',
+                'UNIT',
+            ]
         ],
         'excel' => [
             'title' => [

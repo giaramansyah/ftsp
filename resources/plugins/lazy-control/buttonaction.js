@@ -91,6 +91,44 @@
             });
         };
 
+        _proto._download = function _download() {
+            var _this = this;
+
+            $_default["default"].ajaxSetup({
+                headers: {
+                    "X-CSRF-TOKEN": $_default["default"](
+                        'meta[name="csrf-token"]'
+                    ).attr("content"),
+                },
+            });
+
+            $_default["default"].ajax({
+                type: "GET",
+                url: _this._settings.action,
+                data: _this._settings.data,
+                success: function (response) {
+                    _this._toast.fire({
+                        icon: response.alert,
+                        text: response.message,
+                        willClose: () => {
+                            $_default["default"](_this._element)
+                                .find("p.text-center")
+                                .removeClass("text-info");
+                            if (response.status) {
+                                window.location.href = response.redirect;
+                            }
+                        },
+                    });
+                },
+                error: function () {
+                    _this._toast.fire({
+                        icon: "error",
+                        text: "Internal Server Error"
+                    });
+                },
+            });
+        };
+
         _proto.createModal = function createModal() {
             var modal =
                 (dialog =
@@ -188,7 +226,7 @@
             }
 
             if (this._settings.method == Static.download) {
-                //this._download();
+                this._download();
             }
         };
 

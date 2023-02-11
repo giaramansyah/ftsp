@@ -18,6 +18,7 @@ use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\YearController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\DailyController;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\RecapitulationController;
 use Illuminate\Support\Facades\Artisan;
 
@@ -169,5 +170,15 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/recapitulation/data/{id}', [RecapitulationController::class, 'data'])->name('report.recapitulation.data');
     Route::get('/recapitulation/detail/division/', [RecapitulationController::class, 'getDetailDivision'])->name('report.recapitulation.division.detail');
     Route::get('/recapitulation/detail/data/', [RecapitulationController::class, 'getDetailData'])->name('report.recapitulation.data.detail');
+
+    //note
+    Route::get('/note/reff/{year?}', [NoteController::class, 'index'])->name('master.note.index');
+    Route::get('/note/list', [NoteController::class, 'getList'])->name('master.note.list');
+    Route::get('/note/view/{id}', [NoteController::class, 'view'])->name('master.note.view');
+    Route::get('/note/add', [NoteController::class, 'add'])->name('master.note.add');
+    Route::get('/note/edit/{id}', [NoteController::class, 'edit'])->name('master.note.edit');
+    Route::post('/note/post/{action}/{id}', [NoteController::class, 'post'])->name('master.note.post');
+    Route::get('/note/export/{year}', [NoteController::class, 'export'])->name('master.note.export');
+    Route::get('/note/download/{id}', [NoteController::class, 'download'])->name('master.note.download');
 });
 

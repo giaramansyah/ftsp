@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
                         'label' => 'Dosen & Tendik',
                         'alias' => 'employee',
                         'url' => 'master.employee.index',
-                        'order' => 1,
+                        'order' => 2,
                         'privilege' => array(
                             array(
                                 'code' => 'EMCR',
@@ -80,7 +80,7 @@ class DatabaseSeeder extends Seeder
                         'label' => 'Mata Anggaran',
                         'alias' => 'data',
                         'url' => 'master.data.index',
-                        'order' => 1,
+                        'order' => 3,
                         'privilege' => array(
                             array(
                                 'code' => 'DACR',
@@ -113,7 +113,7 @@ class DatabaseSeeder extends Seeder
                         'label' => 'Saldo Rekening',
                         'alias' => 'balance',
                         'url' => 'master.balance.index',
-                        'order' => 2,
+                        'order' => 4,
                         'privilege' => array(
                             array(
                                 'code' => 'BACR',
@@ -162,6 +162,39 @@ class DatabaseSeeder extends Seeder
                                 'code' => 'YRRA',
                                 'modules' => Config::get('global.modules.code.readall'),
                                 'desc' => 'Read list of master years'
+                            ),
+                        )
+                    ),
+                    array(
+                        'label' => 'Surat Pengajuan',
+                        'alias' => 'note',
+                        'url' => 'master.note.index',
+                        'order' => 1,
+                        'privilege' => array(
+                            array(
+                                'code' => 'NTCR',
+                                'modules' => Config::get('global.modules.code.create'),
+                                'desc' => 'Add new master note'
+                            ),
+                            array(
+                                'code' => 'NTUP',
+                                'modules' => Config::get('global.modules.code.update'),
+                                'desc' => 'Update new master note'
+                            ),
+                            array(
+                                'code' => 'NTRM',
+                                'modules' => Config::get('global.modules.code.delete'),
+                                'desc' => 'Remove existing master note'
+                            ),
+                            array(
+                                'code' => 'NTRA',
+                                'modules' => Config::get('global.modules.code.readall'),
+                                'desc' => 'Read list of master note'
+                            ),
+                            array(
+                                'code' => 'NTRD',
+                                'modules' => Config::get('global.modules.code.readid'),
+                                'desc' => 'Read detail of master note'
                             ),
                         )
                     )
@@ -254,7 +287,7 @@ class DatabaseSeeder extends Seeder
                         'label' => 'Harian',
                         'alias' => 'daily',
                         'url' => 'report.daily.index',
-                        'order' => 1,
+                        'order' => 2,
                         'privilege' => array(
                             array(
                                 'code' => 'DLCR',
@@ -267,7 +300,7 @@ class DatabaseSeeder extends Seeder
                         'label' => 'Rekapitulasi',
                         'alias' => 'recapitulation',
                         'url' => 'report.recapitulation.index',
-                        'order' => 1,
+                        'order' => 3,
                         'privilege' => array(
                             array(
                                 'code' => 'RCRA',

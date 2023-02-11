@@ -41,8 +41,10 @@ class ExcelWriter
             $this->accountability_fakultas($sheet);
         } else if ($this->_type == config('global.report.code.accountability_umd')) {
             $this->accountability_umd($sheet);
-        } else {
+        } else if ($this->_type == config('global.report.code.daily')) {
             $this->daily($sheet);
+        } else {
+            $this->masterdata($sheet);
         }
 
         $spreadsheet->setActiveSheetIndex(0);
@@ -147,7 +149,7 @@ class ExcelWriter
                 $i++;
                 $sheet->setCellValue($this->_columns[$i] . $row, '');
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
-                
+
                 $i++;
                 $sheet->setCellValue($this->_columns[$i] . $row, '');
                 $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
@@ -741,7 +743,7 @@ class ExcelWriter
         $row++;
         $row++;
         $sheet->setCellValue($this->_columns[1] . $row, 'Mengetahui,');
-         $sheet->mergeCells($this->_columns[1] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->mergeCells($this->_columns[1] . $row . ':' . $this->_columns[2] . $row);
         $sheet->getStyle($this->_columns[1] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
 
         $sheet->setCellValue($this->_columns[3] . $row, 'Setuju,');
@@ -799,5 +801,27 @@ class ExcelWriter
         $sheet->getStyle($this->_columns[7] . $row . ':' . $this->_columns[8] . $row)->applyFromArray($this->_style['footer']);
         $sheet->getStyle($this->_columns[7] . $row . ':' . $this->_columns[8] . $row)->getFont()->setBold(true);
         $sheet->getStyle($this->_columns[7] . $row . ':' . $this->_columns[8] . $row)->getFont()->setBaseLine(true);
+    }
+
+    private function masterdata(Worksheet $sheet)
+    {
+        $row = 1;
+        foreach ($this->_header as $key => $value) {
+            $sheet->setCellValue($this->_columns[$key] . $row, $value);
+            $sheet->getStyle($this->_columns[$key] . $row)->applyFromArray($this->_style['header']);
+            $sheet->getStyle($this->_columns[$key] . $row)->getAlignment()->setWrapText(true);
+        }
+
+        $row++;
+        if (!empty($this->_data['data'])) {
+            foreach ($this->_data['data'] as $key => $value) {
+                $i = 0;
+                foreach ($value as $val) {
+                    $sheet->setCellValue($this->_columns[$i] . $row, $val);
+                    $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                    $i++;
+                }
+            }
+        }
     }
 }

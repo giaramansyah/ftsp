@@ -259,6 +259,36 @@ class MigrateTables extends Migration
                 $table->timestamps();
             });
         }
+
+        if (!Schema::hasTable('ms_note')) {
+            Schema::create('ms_note', function (Blueprint $table) {
+                $table->id();
+                $table->integer('year')->nullable(false);
+                $table->tinyInteger('division_id')->nullable(false);
+                $table->string('ma_id', 20)->nullable(false);
+                $table->string('note_reff', 20)->nullable(false);
+                $table->date('note_date')->nullable(false);
+                $table->date('note_upload')->nullable(false);
+                $table->text('program')->nullable(false);
+                $table->string('regarding', 200)->nullable(false);
+                $table->string('link_url', 200)->nullable(false);
+                $table->bigInteger('amount')->nullable(false);
+                $table->bigInteger('amount_requested')->nullable(false);
+                $table->bigInteger('amount_approved')->nullable(false);
+                $table->tinyInteger('status')->nullable(false)->default(0);
+                $table->tinyInteger('is_trash')->nullable(false)->default(0);
+                $table->string('created_by', 100)->nullable(false);
+                $table->string('updated_by', 100)->nullable(false);
+                $table->timestamps();
+            });
+        }
+
+        if (!Schema::hasTable('map_note')) {
+            Schema::create('map_note', function (Blueprint $table) {
+                $table->bigInteger('note_id')->nullable(false);
+                $table->bigInteger('staff_id')->nullable(false);
+            });
+        }
     }
 
     /**
@@ -268,24 +298,26 @@ class MigrateTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ms_user');
-        Schema::dropIfExists('log_user');
-        Schema::dropIfExists('ms_parent_menus');
-        Schema::dropIfExists('ms_menus');
-        Schema::dropIfExists('ms_privilege');
-        Schema::dropIfExists('ms_privilege_group');
-        Schema::dropIfExists('map_privilege');
-        Schema::dropIfExists('ms_data');
-        Schema::dropIfExists('map_data');
-        Schema::dropIfExists('log_data');
-        Schema::dropIfExists('ms_balance');
-        Schema::dropIfExists('ts_history_balance');
-        Schema::dropIfExists('ts_expense');
-        Schema::dropIfExists('map_expense');
-        Schema::dropIfExists('ts_reception');
-        Schema::dropIfExists('ms_year');
-        Schema::dropIfExists('ts_report');
-        Schema::dropIfExists('map_report');
-        Schema::dropIfExists('ms_employee');
+        // Schema::dropIfExists('ms_user');
+        // Schema::dropIfExists('log_user');
+        // Schema::dropIfExists('ms_parent_menus');
+        // Schema::dropIfExists('ms_menus');
+        // Schema::dropIfExists('ms_privilege');
+        // Schema::dropIfExists('ms_privilege_group');
+        // Schema::dropIfExists('map_privilege');
+        // Schema::dropIfExists('ms_data');
+        // Schema::dropIfExists('map_data');
+        // Schema::dropIfExists('log_data');
+        // Schema::dropIfExists('ms_balance');
+        // Schema::dropIfExists('ts_history_balance');
+        // Schema::dropIfExists('ts_expense');
+        // Schema::dropIfExists('map_expense');
+        // Schema::dropIfExists('ts_reception');
+        // Schema::dropIfExists('ms_year');
+        // Schema::dropIfExists('ts_report');
+        // Schema::dropIfExists('map_report');
+        // Schema::dropIfExists('ms_employee');
+        Schema::dropIfExists('ms_note');
+        Schema::dropIfExists('map_note');
     }
 }
