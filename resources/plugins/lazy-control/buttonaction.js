@@ -102,9 +102,8 @@
 
             $_default["default"].ajaxSetup({
                 headers: {
-                    "X-CSRF-TOKEN": $_default["default"](
-                        'meta[name="csrf-token"]'
-                    ).attr("content"),
+                    "X-CSRF-TOKEN":
+                        $_default["default"](X_CSR_TOKEN).attr("content"),
                 },
             });
 
@@ -129,7 +128,7 @@
                 error: function () {
                     _this._toast.fire({
                         icon: "error",
-                        text: "Internal Server Error"
+                        text: "Internal Server Error",
                     });
                 },
             });
