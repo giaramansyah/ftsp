@@ -145,13 +145,13 @@ class HomeController extends Controller
                 array(
                     'text' => 'Realisasi',
                     'value' => $this->convertAmount($expense),
-                    'percent' => round(($expense / $budget * 100), 2),
+                    'percent' => $budget > 0 ? round(($expense / $budget * 100), 2) : 0.00,
                     'color' => 'text-danger'
                 ),
                 array(
                     'text' => 'Sisa',
                     'value' => $this->convertAmount($budget - $expense),
-                    'percent' => round((($budget - $expense) / $budget * 100), 2),
+                    'percent' => $budget > 0 ? round((($budget - $expense) / $budget * 100), 2) : 0.00,
                     'color' => 'text-gray'
                 ),
             ),
