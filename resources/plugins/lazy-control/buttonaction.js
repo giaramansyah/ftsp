@@ -54,6 +54,12 @@
                 Defaults,
                 settings
             );
+            this._toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+            });
         }
 
         var _proto = ButtonAction.prototype;

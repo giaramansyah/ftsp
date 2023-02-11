@@ -385,7 +385,7 @@ class NoteController extends Controller
         }
 
         $data = Note::where('year', $year)->where('status', config('global.status.code.finished'))->orderBy('division_id', 'asc')->get()->toArray();
-
+        
         $export = array();
         $division_flip = array_flip(config('global.division.code'));
         foreach ($data as $value) {

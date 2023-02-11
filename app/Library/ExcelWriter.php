@@ -813,14 +813,15 @@ class ExcelWriter
         }
 
         $row++;
-        if (!empty($this->_data['data'])) {
-            foreach ($this->_data['data'] as $key => $value) {
+        if (!empty($this->_data)) {
+            foreach ($this->_data as $key => $value) {
                 $i = 0;
                 foreach ($value as $val) {
                     $sheet->setCellValue($this->_columns[$i] . $row, $val);
                     $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
                     $i++;
                 }
+                $row++;
             }
         }
     }
