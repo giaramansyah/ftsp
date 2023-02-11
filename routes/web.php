@@ -40,7 +40,7 @@ Route::group(['middleware' => ['guest']], function() {
     Route::post('/password/{action}/{id}', [PasswordController::class, 'post'])->name('password.guest.post');
 
     Route::get('/migrate', function(){
-        // Artisan::call('migrate:refresh --seed');
+        Artisan::call('migrate:refresh --seed');
         Artisan::call('optimize');
     });
 });
