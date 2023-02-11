@@ -41,6 +41,9 @@ Route::group(['middleware' => ['guest']], function() {
 
     Route::get('/migrate', function(){
         Artisan::call('migrate:refresh --seed');
+    });
+
+    Route::get('/optimize', function(){
         Artisan::call('optimize');
     });
 });
