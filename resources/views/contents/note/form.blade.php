@@ -73,6 +73,25 @@
               ? 'required' : '' }}>
           </div>
         </div>
+        @if(!isset($id) && $id != 0)
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Mata Anggaran<code>*</code></label>
+          <div class="col-sm-10">
+            <table class="table table-sm table-bordered table-striped" width="100%">
+              <thead>
+                <tr>
+                  <th class="text-center">#</th>
+                  <th class="text-center">No. M.A.</th>
+                  <th class="text-center">Program</th>
+                  <th class="text-center">Dana</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        @endif
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">{{ __('No. M.A.') }}<code>*</code></label>
           <div class="col-sm-2">
@@ -209,49 +228,96 @@
 @section('push-js')
 <script type="text/javascript">
   $('.select2').select2({theme: 'bootstrap4'});
+  $('.table').DataTable({dom: 'rf'});
 
-    $('select[name="division_id"]').on('change', function(){
-      if($(this).val() == "{{ config('global.division.code.fakultas') }}") {
-        $('.form-staff-select').removeClass('d-none');
-        $('.form-staff-input-1').addClass('d-none');
-        $('.form-staff-input-2').addClass('d-none');
-        $('.form-staff-select').find('input').attr('disabled', false);
-        $('.form-staff-input-1').find('input').attr('disabled', true);
-        $('.form-staff-input-2').find('input').attr('disabled', true);
-      } else if($(this).val() == "{{ config('global.division.code.arsitektur') }}" || $(this).val() == "{{ config('global.division.code.sipil') }}") {
-        $('.form-staff-select').addClass('d-none');
-        $('.form-staff-input-1').removeClass('d-none');
-        $('.form-staff-input-2').addClass('d-none');
-        $('.form-staff-select').find('input').attr('disabled', true);
-        $('.form-staff-input-1').find('input').attr('disabled', false);
-        $('.form-staff-input-2').find('input').attr('disabled', true);
-      } else if($(this).val() == "{{ config('global.division.code.mta') }}" || $(this).val() == "{{ config('global.division.code.mts') }}") {
-        $('.form-staff-select').addClass('d-none');
-        $('.form-staff-input-1').addClass('d-none');
-        $('.form-staff-input-2').removeClass('d-none');
-        $('.form-staff-select').find('input').attr('disabled', true);
-        $('.form-staff-input-1').find('input').attr('disabled', true);
-        $('.form-staff-input-2').find('input').attr('disabled', false);
-      } else {
-        $('.form-staff-select').addClass('d-none');
-        $('.form-staff-input-1').addClass('d-none');
-        $('.form-staff-input-2').addClass('d-none');
-        $('.form-staff-select').find('input').attr('disabled', true);
-        $('.form-staff-input-1').find('input').attr('disabled', true);
-        $('.form-staff-input-2').find('input').attr('disabled', true);
-      }
-    })
+  $('select[name="division_id"]').on('change', function(){
+    if($(this).val() == "{{ config('global.division.code.fakultas') }}") {
+      $('.form-staff-select').removeClass('d-none');
+      $('.form-staff-input-1').addClass('d-none');
+      $('.form-staff-input-2').addClass('d-none');
+      $('.form-staff-select').find('input').attr('disabled', false);
+      $('.form-staff-input-1').find('input').attr('disabled', true);
+      $('.form-staff-input-2').find('input').attr('disabled', true);
+    } else if($(this).val() == "{{ config('global.division.code.arsitektur') }}" || $(this).val() == "{{ config('global.division.code.sipil') }}") {
+      $('.form-staff-select').addClass('d-none');
+      $('.form-staff-input-1').removeClass('d-none');
+      $('.form-staff-input-2').addClass('d-none');
+      $('.form-staff-select').find('input').attr('disabled', true);
+      $('.form-staff-input-1').find('input').attr('disabled', false);
+      $('.form-staff-input-2').find('input').attr('disabled', true);
+    } else if($(this).val() == "{{ config('global.division.code.mta') }}" || $(this).val() == "{{ config('global.division.code.mts') }}") {
+      $('.form-staff-select').addClass('d-none');
+      $('.form-staff-input-1').addClass('d-none');
+      $('.form-staff-input-2').removeClass('d-none');
+      $('.form-staff-select').find('input').attr('disabled', true);
+      $('.form-staff-input-1').find('input').attr('disabled', true);
+      $('.form-staff-input-2').find('input').attr('disabled', false);
+    } else {
+      $('.form-staff-select').addClass('d-none');
+      $('.form-staff-input-1').addClass('d-none');
+      $('.form-staff-input-2').addClass('d-none');
+      $('.form-staff-select').find('input').attr('disabled', true);
+      $('.form-staff-input-1').find('input').attr('disabled', true);
+      $('.form-staff-input-2').find('input').attr('disabled', true);
+    }
+  })
 
-    $('select[name="division_id"]').trigger('change')
+  $('select[name="division_id"]').trigger('change')
 
-    if($('input[name=amount]').val() != '') {
-      amountText($('input[name=amount]').val(), '#text_amount')
+  if($('input[name=amount]').val() != '') {
+    amountText($('input[name=amount]').val(), '#text_amount')
+  }
+
+  if($('input[name=amount_requested]').val() != '') {
+    amountText($('input[name=amount_requested]').val(), '#text_amount_request')
+  }
+
+  if($('input[name=amount_approved]').length && $('input[name=amount_approved]').val() != '') {
+    amountText($('input[name=amount_approved]').val(), '#text_amount_approve')
+  }
+
+  function getData() {
+    var year = $('select[name="year"]').val();
+    var division_id = $('select[name="division_id"]').val();
+
+    if(year != '' && division_id != '') {
+      $('.table').dataTable().fnClearTable();
+      $('.table').dataTable().fnDestroy();
+      var data = {
+        year : year,
+        division_id : division_id
+      };
+      $('.table').DataTable(
+        {
+          responsive: true,
+          autoWidth: true,
+          processing: true,
+          paging: false,
+          info: false,
+          ajax : {
+            method : 'get',
+            url : "{{ route('transaction.expense.data') }}",
+            data: data
+          },
+          dom: 'rf',
+          order: [],
+          columns : [
+            {data: 'input', name: 'input', orderable: false, searchable: false, class: "text-center"},
+            {data: 'ma_id', name: 'ma_id', orderable: true, searchable: true},
+            {data: 'description', name: 'description', orderable: true, searchable: true, class: "text-wrap"},
+            {data: 'remain', name: 'remain', orderable: true, searchable: true, class: "text-right"},
+          ],
+          fnInitComplete : function() {
+            $('.table').off().on('click', 'input[name="data_id[]"]', function() {
+              var result = multidata(this)
+              $('input[name="ma_id"]').val(result.ma)
+              $('input[name="program"]').val(result.desription)
+              $('input[name="amount"]').val(formatCurrency(result.amount))
+            })
+          }
+        }
+      );
     }
-    if($('input[name=amount_requested]').val() != '') {
-      amountText($('input[name=amount_requested]').val(), '#text_amount_request')
-    }
-    if($('input[name=amount_approved]').val() != '') {
-      amountText($('input[name=amount_approved]').val(), '#text_amount_approve')
-    }
+  }
 </script>
 @endsection
