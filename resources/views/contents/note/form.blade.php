@@ -9,7 +9,7 @@
           <label class="col-sm-2 col-form-label">{{ __('Tahun Akademik') }}<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="year" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+              $mandatory? 'required' : '' }} onchange="getData();">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($yearArr as $key => $value)
               <option value="{{ $value['id'] }}" {{ isset($year) && $year==$value['id'] ? 'selected' : '' }}>{{
@@ -22,7 +22,7 @@
           <label class="col-sm-2 col-form-label">{{ __('Unit') }}<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="division_id" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+              $mandatory? 'required' : '' }} onchange="getData();">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($divisionArr as $key => $value)
               <option value="{{ $value['id'] }}" {{ isset($division_id) && $division_id==$value['id'] ? 'selected' : ''
@@ -77,7 +77,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Mata Anggaran<code>*</code></label>
           <div class="col-sm-10">
-            <table class="table table-sm table-bordered table-striped" width="100%">
+            <table class="table table-sm table-bordered table-striped table-ma" width="100%">
               <thead>
                 <tr>
                   <th class="text-center">#</th>
@@ -210,7 +210,7 @@
           <div class="row justify-content-center">
             <div class="col-sm-1">
               @include('partials.button.back', ['class' => 'btn-sm btn-block', 'action' =>
-              route('master.data.index')])
+              route('master.note.index')])
             </div>
             <div class="col-sm-1">
               @include('partials.button.submit')
@@ -229,8 +229,8 @@
 <script type="text/javascript">
   $('.select2').select2({theme: 'bootstrap4'});
 
-  if($('.table').length) {
-    $('.table').DataTable({dom: 'rf'});
+  if($('.table-ma').length) {
+    $('.table-ma').DataTable({dom: 'rf'});
   }
 
   $('select[name="division_id"]').on('change', function(){
@@ -264,7 +264,6 @@
       $('.form-staff-input-2').find('input').attr('disabled', true);
     }
   })
-  @endif
 
   $('select[name="division_id"]').trigger('change')
 
@@ -284,14 +283,14 @@
     var year = $('select[name="year"]').val();
     var division_id = $('select[name="division_id"]').val();
 
-    if(year != '' && division_id != '') {
-      $('.table').dataTable().fnClearTable();
-      $('.table').dataTable().fnDestroy();
+    if(year != '' && division_id != '' && $('.table-ma').length) {
+      $('.table-ma').dataTable().fnClearTable();
+      $('.table-ma').dataTable().fnDestroy();
       var data = {
         year : year,
         division_id : division_id
       };
-      $('.table').DataTable(
+      $('.table-ma').DataTable(
         {
           responsive: true,
           autoWidth: true,
@@ -300,7 +299,7 @@
           info: false,
           ajax : {
             method : 'get',
-            url : "{{ route('transaction.expense.data') }}",
+            url : "{{ route('master.note.data') }}",
             data: data
           },
           dom: 'rf',
@@ -309,14 +308,14 @@
             {data: 'input', name: 'input', orderable: false, searchable: false, class: "text-center"},
             {data: 'ma_id', name: 'ma_id', orderable: true, searchable: true},
             {data: 'description', name: 'description', orderable: true, searchable: true, class: "text-wrap"},
-            {data: 'remain', name: 'remain', orderable: true, searchable: true, class: "text-right"},
+            {data: 'amount', name: 'amount', orderable: true, searchable: true, class: "text-right"},
           ],
           fnInitComplete : function() {
-            $('.table').off().on('click', 'input[name="data_id[]"]', function() {
-              var result = multidata(this)
-              $('input[name="ma_id"]').val(result.ma)
-              $('input[name="program"]').val(result.desription)
-              $('input[name="amount"]').val(formatCurrency(result.amount))
+            $('.table-ma').off().on('click', 'input[name="data_id"]', function() {
+              $('input[name="ma_id"]').val($(this).data('ma'))
+              $('input[name="program"]').val($(this).data('description'))
+              $('input[name="amount"]').val(formatCurrency($(this).data('amount')))
+              amountText($('input[name=amount]').val(), '#text_amount')
             })
           }
         }

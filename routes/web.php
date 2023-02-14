@@ -177,6 +177,7 @@ Route::group(['middleware' => ['auth']], function() {
     //note
     Route::get('/note/reff/{year?}', [NoteController::class, 'index'])->name('master.note.index');
     Route::get('/note/list', [NoteController::class, 'getList'])->name('master.note.list');
+    Route::get('/note/data', [NoteController::class, 'getData'])->name('master.note.data');
     Route::get('/note/view/{id}', [NoteController::class, 'view'])->name('master.note.view');
     Route::get('/note/add', [NoteController::class, 'add'])->name('master.note.add');
     Route::get('/note/edit/{id}', [NoteController::class, 'edit'])->name('master.note.edit');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Library\ExcelWriter;
 use App\Library\Response;
 use App\Library\SecureHelper;
+use App\Models\Data;
 use App\Models\MapNote;
 use App\Models\Note;
 use Illuminate\Http\Request;
@@ -195,6 +196,39 @@ class NoteController extends Controller
             $table->rawColumns($rawColumns);
 
             $this->writeAppLog($this->_readall);
+
+            return $table->toJson();
+        }
+    }
+
+    public function getData(Request $request)
+    {
+        if ($request->ajax()) {
+            if (($request->input('year') == null && $request->input('year') == '') || ($request->input('division_id') == null && $request->input('division_id') == '')) {
+                $data = Data::where('data_id', 0);
+                $table = DataTables::eloquent($data);
+                return $table->toJson();
+            }
+
+            $year = $request->input('year');
+            $division_id = $request->input('division_id');
+
+            $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
+            $table = DataTables::eloquent($data);
+            $rawColumns = array('input');
+
+            $table->addColumn('input', function ($row) {
+                $column = '<div class="form-check">
+                <input class="form-check-input" type="radio" name="data_id" id="ma' . $row->ma_id . '" value="' . SecureHelper::secure($row->id) . '" data-ma="' . $row->ma_id . '" data-description="' . $row->description . '" data-amount="' . $this->convertAmount($row->amount, true) . '">
+                <label class="form-check-label">&nbsp;</label>
+                </div>';
+
+                return $column;
+            });
+
+            $table->rawColumns($rawColumns);
+
+            $this->writeAppLog('DARA');
 
             return $table->toJson();
         }
