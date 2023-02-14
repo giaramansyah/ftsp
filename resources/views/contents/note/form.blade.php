@@ -228,7 +228,10 @@
 @section('push-js')
 <script type="text/javascript">
   $('.select2').select2({theme: 'bootstrap4'});
-  $('.table').DataTable({dom: 'rf'});
+
+  if($('.table').length) {
+    $('.table').DataTable({dom: 'rf'});
+  }
 
   $('select[name="division_id"]').on('change', function(){
     if($(this).val() == "{{ config('global.division.code.fakultas') }}") {
@@ -261,6 +264,7 @@
       $('.form-staff-input-2').find('input').attr('disabled', true);
     }
   })
+  @endif
 
   $('select[name="division_id"]').trigger('change')
 
