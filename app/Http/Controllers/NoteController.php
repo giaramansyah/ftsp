@@ -390,11 +390,22 @@ class NoteController extends Controller
         $division_flip = array_flip(config('global.division.code'));
         foreach ($data as $value) {
             $export[] = array(
+                'year' => $value['years'],
                 'ma' => $value['ma_id'],
                 'description' => $value['program'],
                 'pic' => $value['staff_export'],
-                'dana' => $this->convertAmount($value['amount_approved'], true),
-                'unit' => Str::ucfirst($division_flip[$value['division_id']])
+                'amount' => $this->convertAmount($value['amount'], true),
+                'unit' => Str::ucfirst($division_flip[$value['division_id']]),
+                'reff' => $value['note_reff'],
+                'date' => $value['note_date'],
+                'upload' => $value['note_upload'],
+                'regarding' => $value['regarding'],
+                'link' => $value['link_url'],
+                'requested' => $this->convertAmount($value['amount_requested'], true),
+                'approved' => $this->convertAmount($value['amount_approved'], true),
+                'diff' => $this->convertAmount($value['amount_requested'], true) - $this->convertAmount($value['amount_approved'], true),
+                'remain' => $this->convertAmount($value['amount'], true) - $this->convertAmount($value['amount_approved'], true),
+                'status' => $value['status_desc'],
             );
         }
 

@@ -298,11 +298,22 @@ return [
                 'A/N',
             ],
             'masterdata' => [
+                'T.A.',
                 'MA',
                 'DESKRIPSI',
                 'PIC',
                 'DANA',
                 'UNIT',
+                'NO. SURAT',
+                'TGL. SURAT',
+                'TGL. UPLOAD SURAT',
+                'PERIHAL',
+                'LINK URL',
+                'PENGAJUAN DANA',
+                'REALISASI DANA',
+                'SELISIH DANA',
+                'SISA DANA TIDAK TERSERAP',
+                'STATUS',
             ]
         ],
         'excel' => [
