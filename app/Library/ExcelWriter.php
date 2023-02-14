@@ -819,6 +819,7 @@ class ExcelWriter
                 foreach ($value as $val) {
                     $sheet->setCellValue($this->_columns[$i] . $row, $val);
                     $sheet->getStyle($this->_columns[$i] . $row)->applyFromArray($this->_style['body']);
+                    $sheet->getColumnDimension($this->_columns[$i])->setAutoSize(true);
                     $i++;
                 }
                 $row++;
