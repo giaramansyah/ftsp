@@ -92,7 +92,7 @@
         order: [],
         columns : [
           {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-          {data: 'staff', name: 'staff', orderable: true, searchable: true},
+          {data: 'staff_export', name: 'staff_export', orderable: true, searchable: true},
           {data: 'ma', name: 'ma', orderable: true, searchable: true},
           {data: 'program', name: 'program', orderable: true, searchable: true, class: 'text-wrap'},
           {data: 'amount', name: 'amount', orderable: true, searchable: true, class: 'text-right text-bold'},
