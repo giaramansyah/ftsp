@@ -73,7 +73,7 @@
               ? 'required' : '' }}>
           </div>
         </div>
-        @if(!isset($id) && $id != 0)
+        @if(!isset($id) && $id == 0)
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Mata Anggaran<code>*</code></label>
           <div class="col-sm-10">
