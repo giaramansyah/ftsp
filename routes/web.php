@@ -56,9 +56,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/home/realization', [HomeController::class, 'getRealization'])->name('home.realization');
     Route::get('/home/pending', [HomeController::class, 'getPending'])->name('home.pending');
-
+    Route::get('/home/note', [HomeController::class, 'getNote'])->name('home.note');
+    
     //test
-    Route::get('/test', [HomeController::class, 'getNote'])->name('home.note');
+    Route::get('/test', [HomeController::class, 'getNote']);
 
     //myaccount
     Route::get('/myaccount', [AccountController::class, 'index'])->name('myaccount');
