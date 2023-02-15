@@ -9,6 +9,8 @@ use App\Models\Data;
 use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\MapExpense;
+use App\Models\Note;
+use App\Models\Year;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -112,6 +114,16 @@ class HomeController extends Controller
             $table->rawColumns($rawColumns);
 
             return $table->toJson();
+        }
+    }
+
+    public function getNote()
+    {
+        $years = $this->getYears();
+        $data = array();
+        foreach($years as $year) {
+            $requested = Note::where('year', $year['id'])->sum('amount_requested');
+            dd($requested);
         }
     }
 
