@@ -142,9 +142,9 @@ class HomeController extends Controller
         );
         foreach($years as $year) {
             $result['series'][] = $year['name'];
-            $request = Note::where('year', $year['id'])->sum('amount_requested');
+            $request = Note::where('year', $year['id'])->where('is_trash', 0)->sum('amount_requested');
             $result['requested'][] = $request ? $request : 0;
-            $approve = Note::where('year', $year['id'])->sum('amount_approved');
+            $approve = Note::where('year', $year['id'])->where('is_trash', 0)->sum('amount_approved');
             $result['approved'][] = $approve ? $approve : 0;
         }
 
