@@ -136,6 +136,8 @@ class HomeController extends Controller
 
         $response = new Response(true, 'Success', 1);
         $response->setData($result);
+
+        return response()->json($response->responseJson());
     }
 
     private function fakultas()
