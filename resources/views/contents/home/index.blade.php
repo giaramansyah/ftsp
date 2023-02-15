@@ -293,7 +293,7 @@
             callbacks: {
               label: function (context) {
                 console.log(context.dataset);
-                var xLabel = context.label;
+                var xLabel = context.dataset.label[context.dataIndex];
                 var yLabel = context.dataset.data[context.dataIndex];
                 return (
                   xLabel +
