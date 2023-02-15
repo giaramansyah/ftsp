@@ -328,7 +328,7 @@
                 size: 9,
               },
               callback: function (value, index, values) {
-                return "Rp " + _this._numberFormat(value);
+                return "Rp " + formatCurrency(value);
               },
             },
           },
