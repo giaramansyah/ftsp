@@ -12,6 +12,7 @@ use App\Models\MapExpense;
 use App\Models\Note;
 use App\Models\Year;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class HomeController extends Controller
@@ -119,6 +120,7 @@ class HomeController extends Controller
 
     public function getNote()
     {
+        dd(Auth::user()->privilege);
         $years = $this->getYears();
         $result = array(
             'series' => array(),
