@@ -120,7 +120,6 @@ class HomeController extends Controller
 
     public function getNote()
     {
-        dd(Auth::user()->privilege);
         $years = $this->getYears();
         $result = array(
             'series' => array(),

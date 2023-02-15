@@ -2,6 +2,21 @@
 @section('title', $header)
 @section('content')
 <div class="container-fluid">
+  @if(Auth::user()->id == 1 || Auth::user()->privilege == ['NTCR', 'NTUP', 'NTRM', 'NTRA', 'NTRD'])
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card" id="note">
+        <div class="card-body p-2">
+          <div class="row px-2">
+            <div class="col-12 col-sm-12 p-2">
+              <canvas class="chart-canvas" height="600px"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  @else
   <div class="row justify-content-center">
     @foreach ($result as $value)
     <div class="col-sm-3">
@@ -76,19 +91,7 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-sm-12">
-      <div class="card" id="note">
-        <div class="card-body p-2">
-          <div class="row px-2">
-            <div class="col-12 col-sm-12 p-2">
-              <canvas class="chart-canvas" height="600px"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  @endif
 </div>
 @endsection
 @section('push-js')
