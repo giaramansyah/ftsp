@@ -292,6 +292,7 @@
             intersect: true,
             callbacks: {
               label: function (context) {
+                console.log(context.dataset);
                 var xLabel = context.label;
                 var yLabel = context.dataset.data[context.dataIndex];
                 return (
