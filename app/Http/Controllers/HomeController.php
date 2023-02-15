@@ -120,11 +120,18 @@ class HomeController extends Controller
     public function getNote()
     {
         $years = $this->getYears();
-        $data = array();
+        $series = array();
+        $requested = array();
+        $approved = array();
         foreach($years as $year) {
-            $requested = Note::where('year', $year['id'])->sum('amount_requested');
-            dd($requested);
+            $series[] = $year['text'];
+            $request = Note::where('year', $year['id'])->sum('amount_requested');
+            $requested[] = $request ? $request : 0;
+            $approve = Note::where('year', $year['id'])->sum('amount_approved');
+            $approved[] = $approve ? $approve : 0;
         }
+
+        dd($requested);
     }
 
     private function fakultas()
