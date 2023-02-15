@@ -53,7 +53,7 @@
         <div class="card-body p-2">
           <div class="row px-2">
             <div class="col-12 col-sm-12 p-2">
-              <canvas class="chart-canvas"></canvas>
+              <canvas class="chart-canvas" height="400px"></canvas>
             </div>
           </div>
         </div>
@@ -280,7 +280,7 @@
         plugins: {
           title: {
             display: true,
-            text: 'Perbandingan Pengajuan dan Realisasi Mata Anggaran',
+            text: 'PERBANDINGAN PENGAJUAN DAN REALISASI MATA ANGGARAN',
             color: "#212529",
             font: {
               size: 20,
