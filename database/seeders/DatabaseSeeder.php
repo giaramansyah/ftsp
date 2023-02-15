@@ -453,12 +453,12 @@ class DatabaseSeeder extends Seeder
             'updated_by' => 'system',
         );
 
-        DB::table('ms_user')->truncate();
+        DB::table('ms_user')->where('id', 1)->delete();
         DB::table('ms_parent_menus')->truncate();
         DB::table('ms_menus')->truncate();
         DB::table('ms_privilege')->truncate();
-        DB::table('ms_privilege_group')->truncate();
-        DB::table('map_privilege')->truncate();
+        DB::table('ms_privilege_group')->where('id', 1)->delete();
+        DB::table('map_privilege')->where('user_id', 1)->delete();
 
         DB::table('ms_user')->insert($supersu);
 
