@@ -284,7 +284,6 @@
             color: "#212529",
             font: {
               size: 20,
-              weight: "bold",
             },
           },
           tooltip: {
@@ -292,8 +291,7 @@
             intersect: true,
             callbacks: {
               label: function (context) {
-                console.log(context.dataset);
-                var xLabel = context.dataset.label[context.dataIndex];
+                var xLabel = context.dataset.label;
                 var yLabel = context.dataset.data[context.dataIndex];
                 return (
                   xLabel +
@@ -309,7 +307,7 @@
             ticks: {
               color: "#212529",
               font: {
-                size: 9,
+                size: 12,
               },
             },
           },
@@ -326,7 +324,7 @@
               precision: 0,
               color: "#212529",
               font: {
-                size: 9,
+                size: 12,
               },
               callback: function (value, index, values) {
                 return "Rp " + formatCurrency(value);
