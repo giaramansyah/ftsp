@@ -70,7 +70,20 @@ class HomeController extends Controller
             );
         }
 
-        $view = ['result' => $result];
+        $is_note = false;
+        $is_general = false;
+        if(Auth::user()->id == 1) {
+            $is_note = true;
+            $is_general = true;
+        } else {
+            if(Auth::user()->privilege == ['NTCR', 'NTUP', 'NTRM', 'NTRA', 'NTRD']) {
+                $is_note = true;
+            } else {
+                $is_general = true;
+            }
+        }
+
+        $view = ['result' => $result, 'is_general' => $is_general, 'is_note' => $is_note];
 
         return view('contents.home.index', $view);
     }
