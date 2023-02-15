@@ -10,8 +10,8 @@
   @endif
 </div>
 @endsection
-@if($is_note)
 @section('push-js')
+@if($is_note)
 <script type="text/javascript">
   getBarChart();
 
@@ -121,10 +121,8 @@
     new Chart(canvas, options);
   }
 </script>
-@endsection
 @endif
 @if($is_general)
-@section('push-js')
 <script type="text/javascript">
   getPieChart();
   getPending();
@@ -273,5 +271,5 @@
     new Chart(canvas, options);
   }
 </script>
-@endsection
 @endif
+@endsection
