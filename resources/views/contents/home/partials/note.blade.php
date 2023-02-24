@@ -1,3 +1,20 @@
+
+<div class="row justify-content-center">
+  @foreach (['finished', 'unfinished'] as $value)
+  <div class="col-sm-3" id="{{ $value }}">
+    <div class="info-box">
+      <span class="info-box-icon elevation-1">
+        <i></i>
+      </span>
+      <div class="info-box-content">
+        <span class="info-box-text text-bold info-box-title"></span>
+        <span class="info-box-text info-box-label"></span>
+        <span class="info-box-number"></span>
+      </div>
+    </div>
+  </div>
+  @endforeach
+</div>
 <div class="row">
   <div class="col-sm-12">
     <div class="card" id="note">
@@ -25,22 +42,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-      <div class="row justify-content-center">
-        @foreach (['finished', 'unfinished'] as $value)
-        <div class="col-sm-3" id="{{ $value }}">
-          <div class="info-box">
-            <span class="info-box-icon elevation-1">
-              <i></i>
-            </span>
-            <div class="info-box-content">
-              <span class="info-box-text text-bold info-box-title"></span>
-              <span class="info-box-text info-box-label"></span>
-              <span class="info-box-number"></span>
-            </div>
-          </div>
-        </div>
-        @endforeach
       </div>
     </div>
   </div>
