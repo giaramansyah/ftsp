@@ -62,33 +62,6 @@ class HomeController extends Controller
             );
         }
 
-        $note_finished = Note::where('is_trash', 0)->where('year', $this->_year)->where('status', config('global.status.code.finished'))->count('id');
-        $note_unfinished = Note::where('is_trash', 0)->where('year', $this->_year)->where('status', config('global.status.code.unfinished'))->count('id');
-
-        $result_note = array(
-            array(
-                'title' => 'Total Status',
-                'label' => 'Surat Selesai ' . $yearsDesc[$this->_year],
-                'value' => $note_finished,
-                'class' => 'bg-success',
-                'prefix' => 'Surat',
-                'icon' => 'fas fa-check',
-                'is_prepend' => false,
-                'is_append' => true,
-            ),
-            array(
-                'title' => 'Total Status',
-                'label' => 'Surat Belum Selesai ' . $yearsDesc[$this->_year],
-                'value' => $note_unfinished,
-                'class' => 'bg-danger',
-                'prefix' => 'Surat',
-                'icon' => 'fas fa-rotate',
-                'is_prepend' => false,
-                'is_append' => true,
-            ),
-        );
-        
-
         $is_note = false;
         $is_general = false;
         if (Auth::user()->id == 1) {
@@ -104,7 +77,7 @@ class HomeController extends Controller
 
         $years = $this->getYears();
 
-        $view = ['result' => $result, 'result_note' => $result_note, 'is_general' => $is_general, 'is_note' => $is_note, 'yearArr' =>  $years];
+        $view = ['result' => $result, 'is_general' => $is_general, 'is_note' => $is_note, 'yearArr' =>  $years];
 
         return view('contents.home.index', $view);
     }
@@ -173,6 +146,9 @@ class HomeController extends Controller
         $years = $this->getYears();
         $yearsDesc = array_combine(array_column($years, 'id'), array_column($years, 'name'));
 
+        $note_finished = Note::where('is_trash', 0)->where('year', $year)->where('status', config('global.status.code.finished'))->count('id');
+        $note_unfinished = Note::where('is_trash', 0)->where('year', $year)->where('status', config('global.status.code.unfinished'))->count('id');
+
         $result = array(
             'series' => array(
                 'Dekan/Univ',
@@ -189,6 +165,28 @@ class HomeController extends Controller
             'approved' => array(0, 0, 0, 0, 0, 0, 0, 0, 0),
             'percentage' => array(0, 0, 0, 0, 0, 0, 0, 0, 0),
             'year' => $yearsDesc[$year],
+            'status' => array(
+                'finished' => array(
+                    'title' => 'Total Status',
+                    'label' => 'Surat Selesai ' . $yearsDesc[$year],
+                    'value' => $note_finished,
+                    'class' => 'bg-success',
+                    'prefix' => 'Surat',
+                    'icon' => 'fas fa-check',
+                    'is_prepend' => false,
+                    'is_append' => true,
+                ),
+                'unfinished' => array(
+                    'title' => 'Total Status',
+                    'label' => 'Surat Belum Selesai ' . $yearsDesc[$year],
+                    'value' => $note_unfinished,
+                    'class' => 'bg-danger',
+                    'prefix' => 'Surat',
+                    'icon' => 'fas fa-rotate',
+                    'is_prepend' => false,
+                    'is_append' => true,
+                ),
+            )
         );
         
         //dekan

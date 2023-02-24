@@ -38,6 +38,7 @@
         if(response.status) {
           drawBarChart(response.data);
           drawColumnTable(response.data);
+          drawInfoBox(response.data.status);
         }
       }
     });
@@ -54,13 +55,13 @@
         labels: data.series,
         datasets: [
           {
-            label: "Dana RAB",
+            label: "DANA RAB",
             backgroundColor: "#28a745",
             borderColor: "#28a745",
             data: data.requested,
           },
           {
-            label: "Dana Pengajuan",
+            label: "DANA USULAN",
             backgroundColor: "#00a2e9",
             borderColor: "#00a2e9",
             data: data.approved,
@@ -142,7 +143,7 @@
     $('#note').find('table tbody').html('');
 
     $.each(data, function(index, value){
-      if(index == 'year') {
+      if(index == 'year' || index == 'status') {
         return;
       }
 
@@ -168,6 +169,22 @@
       })
       row.append(col);
       $('#note').find('table tbody').append(row);
+    })
+  }
+
+  function drawInfoBox(data) {
+    $.each(data, function(index, value) {
+      var box = $('#'+index).find('.info-box');
+      box.find('.info-box-icon').addClass(value.class);
+      box.find('.info-box-icon i').addClass(value.icon);
+      box.find('.info-box-title').text(value.title);
+      box.find('.info-box-label').text(value.label);
+      if(value.is_prepend) {
+        box.find('.info-box-number').text(value.prefix + ' ' + value.value)
+      }
+      if(value.is_append) {
+        box.find('.info-box-number').text(value.value + ' ' + value.prefix)
+      }
     })
   }
 </script>

@@ -1,27 +1,3 @@
-<div class="row justify-content-center">
-  @foreach ($result_note as $value)
-  <div class="col-sm-3">
-    <div class="info-box">
-      <span class="info-box-icon {{ $value['class'] }} elevation-1">
-        <i class="{{ $value['icon'] }}"></i>
-      </span>
-      <div class="info-box-content">
-        <span class="info-box-text text-bold">{{ $value['title'] }}</span>
-        <span class="info-box-text">{{ $value['label'] }}</span>
-        <span class="info-box-number">
-          @if ($value['is_prepend'])
-          <small>{{ $value['prefix'] }}</small>
-          @endif
-          {{ $value['value'] }}
-          @if ($value['is_append'])
-          <small>{{ $value['prefix'] }}</small>
-          @endif
-        </span>
-      </div>
-    </div>
-  </div>
-  @endforeach
-</div>
 <div class="row">
   <div class="col-sm-12">
     <div class="card" id="note">
@@ -49,6 +25,22 @@
             </tbody>
           </table>
         </div>
+      </div>
+      <div class="row justify-content-center">
+        @foreach (['finished', 'unfinished'] as $value)
+        <div class="col-sm-3" id="{{ $value }}">
+          <div class="info-box">
+            <span class="info-box-icon elevation-1">
+              <i></i>
+            </span>
+            <div class="info-box-content">
+              <span class="info-box-text text-bold info-box-title"></span>
+              <span class="info-box-text info-box-label"></span>
+              <span class="info-box-number"></span>
+            </div>
+          </div>
+        </div>
+        @endforeach
       </div>
     </div>
   </div>
