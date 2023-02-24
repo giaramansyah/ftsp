@@ -46,7 +46,7 @@
   function drawBarChart(data) {
     var container = $('#note').find('#canvas-container');
     container.html('<canvas class="chart-canvas" height="600px"></canvas>')
-    
+
     var canvas = $('#note').find('.chart-canvas');
     var options = {
       type: "bar",
@@ -139,6 +139,8 @@
   }
 
   function drawColumnTable(data) {
+    $('#note').find('table tbody').html('');
+
     $.each(data, function(index, value){
       if(index == 'year') {
         return;
