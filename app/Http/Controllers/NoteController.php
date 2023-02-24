@@ -157,7 +157,7 @@ class NoteController extends Controller
             }
             $data->orderBy('ma_id');
             $table = DataTables::eloquent($data);
-            $rawColumns = array('ma', 'approved', 'status_desc');
+            $rawColumns = array('ma', 'approved', 'status_desc', 'percentage');
             $table->addIndexColumn();
 
             $table->addColumn('ma', function ($row) {
@@ -176,6 +176,15 @@ class NoteController extends Controller
                 } else {
                     $column = $row->amount_approved;
                 }
+
+                return $column;
+            });
+
+            $table->addColumn('percentage', function ($row) {
+                $amount = $this->convertAmount($row->amount, true);
+                $amount_requested = $this->convertAmount($row->amount_requested, true);
+
+                $column = round(($amount_requested/$amount)*100, 2) . '%';
 
                 return $column;
             });

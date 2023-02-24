@@ -51,6 +51,7 @@
                 <th>Tgl. Surat</th>
                 <th>Pengajuan</th>
                 <th>Realisasi</th>
+                <th>Persentase</th>
                 <th>Status</th>
                 <th>Updated</th>
               </tr>
@@ -100,6 +101,7 @@
           {data: 'note_date', name: 'program', orderable: true, searchable: true},
           {data: 'amount_requested', name: 'amount_requested', orderable: true, searchable: true, class: 'text-right text-bold'},
           {data: 'approved', name: 'approved', orderable: true, searchable: true, class: 'text-right text-bold'},
+          {data: 'percentage', name: 'percentage', orderable: true, searchable: true, class: 'text-center text-bold'},
           {data: 'status_desc', name: 'status_desc', orderable: true, searchable: true},
           {data: 'updated_at', name: 'updated_at', orderable: true, searchable: true},
         ]
