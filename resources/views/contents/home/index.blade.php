@@ -13,9 +13,14 @@
 @section('push-js')
 @if($is_note)
 <script type="text/javascript">
-  getBarChart();
+  $('select[name=year]').on('change', function(){
+    var id = $(this).val();
+    getBarChart(id);
+  })
 
-  function getBarChart() {
+  $('select[name=year]').trigger('change')
+
+  function getBarChart(id) {
     $.ajaxSetup({
       headers: {
         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -25,12 +30,14 @@
     $.ajax({
       type: "GET",
       url: "{{ route('home.note') }}",
+      data: {id:id},
       dataType: 'json',
       tryCount : 0,
       retryLimit : 3,
       success: function (response) {
         if(response.status) {
-          drawBarChart(response.data)
+          drawBarChart(response.data);
+          drawColumnTable(response.data);
         }
       }
     });
@@ -44,13 +51,13 @@
         labels: data.series,
         datasets: [
           {
-            label: "Pengajuan",
+            label: "Dana RAB",
             backgroundColor: "#28a745",
             borderColor: "#28a745",
             data: data.requested,
           },
           {
-            label: "Realisasi",
+            label: "Dana Pengajuan",
             backgroundColor: "#00a2e9",
             borderColor: "#00a2e9",
             data: data.approved,
@@ -63,7 +70,7 @@
         plugins: {
           title: {
             display: true,
-            text: 'PERBANDINGAN PENGAJUAN DAN REALISASI MATA ANGGARAN',
+            text: 'SERAPAN RAB FTSP USULAN TA ' + data.year,
             color: "#212529",
             font: {
               size: 20,
@@ -81,6 +88,13 @@
                   " : Rp " + formatCurrency(yLabel)
                 );
               },
+              footer: function(contexts) {
+                let index = 0;
+                contexts.forEach(function(context) {
+                  index = context.dataIndex;
+                });
+                return "Persentase : " + data.percentage[index] + "%";
+              }
             },
           },
         },
@@ -119,6 +133,37 @@
     };
 
     new Chart(canvas, options);
+  }
+
+  function drawColumnTable(data) {
+    $.each(data, function(index, value){
+      if(index == 'year') {
+        return;
+      }
+
+      var row = $('<tr class="text-bold">');
+      if(index == 'series') {
+        var col = '<td width="5%">&nbsp;</td>';
+      } else if(index == 'requested') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#28a745"></i> DANA RAB</td>';
+      } else if(index == 'approved') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#00a2e9"></i> DANA USULAN</td>';
+      } else if(index == 'percentage') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#6c757d"></i> PERSENTASE</td>';
+      } 
+
+      $.each(value, function(key, val) {
+        if(index == 'series') {
+          col += '<td width="10%" class="text-center">'+val+'</td>';
+        } else if(index == 'percentage') {
+          col += '<td width="10%" class="text-center">' + val + '%</td>';
+        } else {
+          col += '<td width="10%" class="text-center">' + formatCurrency(val) + '</td>';
+        }
+      })
+      row.append(col);
+      $('#note').find('table tbody').append(row);
+    })
   }
 </script>
 @endif

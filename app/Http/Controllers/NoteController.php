@@ -418,7 +418,7 @@ class NoteController extends Controller
             return response()->json($response->responseJson());
         }
 
-        $data = Note::where('year', $year)->where('status', config('global.status.code.finished'))->orderBy('division_id', 'asc')->get()->toArray();
+        $data = Note::where('year', $year)->where('is_trash', 0)->orderBy('division_id', 'asc')->get()->toArray();
         
         $export = array();
         $division_flip = array_flip(config('global.division.code'));
@@ -437,6 +437,7 @@ class NoteController extends Controller
                 'link' => $value['link_url'],
                 'requested' => $this->convertAmount($value['amount_requested'], true),
                 'approved' => $this->convertAmount($value['amount_approved'], true),
+                'percentage' => round(($this->convertAmount($value['amount_requested'], true)/$this->convertAmount($value['amount'], true))*100, 2),
                 'diff' => $this->convertAmount($value['amount_requested'], true) - $this->convertAmount($value['amount_approved'], true),
                 'remain' => $this->convertAmount($value['amount'], true) - $this->convertAmount($value['amount_approved'], true),
                 'status' => $value['status_desc'],

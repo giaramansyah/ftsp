@@ -311,8 +311,9 @@ return [
                 'LINK URL',
                 'PENGAJUAN DANA',
                 'REALISASI DANA',
+                'PERSENTASE',
                 'SELISIH DANA',
-                'SISA DANA TIDAK TERSERAP',
+                'BELUM TERSERAP',
                 'STATUS',
             ]
         ],
