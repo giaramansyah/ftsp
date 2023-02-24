@@ -41,7 +41,7 @@
       </div>
       <div class="card-body p-2">
         <div class="row px-2">
-          <div class="col-12 col-sm-12 p-2">
+          <div class="col-12 col-sm-12 p-2" id="canvas-container">
             <canvas class="chart-canvas" height="600px"></canvas>
           </div>
           <table class="table table-bordered table-sm" width="100%">
