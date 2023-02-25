@@ -298,25 +298,25 @@ class MigrateTables extends Migration
      */
     public function down()
     {
-        // Schema::dropIfExists('ms_user');
-        // Schema::dropIfExists('log_user');
-        // Schema::dropIfExists('ms_parent_menus');
-        // Schema::dropIfExists('ms_menus');
-        // Schema::dropIfExists('ms_privilege');
-        // Schema::dropIfExists('ms_privilege_group');
-        // Schema::dropIfExists('map_privilege');
-        // Schema::dropIfExists('ms_data');
-        // Schema::dropIfExists('map_data');
-        // Schema::dropIfExists('log_data');
-        // Schema::dropIfExists('ms_balance');
-        // Schema::dropIfExists('ts_history_balance');
-        // Schema::dropIfExists('ts_expense');
-        // Schema::dropIfExists('map_expense');
-        // Schema::dropIfExists('ts_reception');
-        // Schema::dropIfExists('ms_year');
-        // Schema::dropIfExists('ts_report');
-        // Schema::dropIfExists('map_report');
-        // Schema::dropIfExists('ms_employee');
+        Schema::dropIfExists('ms_user');
+        Schema::dropIfExists('log_user');
+        Schema::dropIfExists('ms_parent_menus');
+        Schema::dropIfExists('ms_menus');
+        Schema::dropIfExists('ms_privilege');
+        Schema::dropIfExists('ms_privilege_group');
+        Schema::dropIfExists('map_privilege');
+        Schema::dropIfExists('ms_data');
+        Schema::dropIfExists('map_data');
+        Schema::dropIfExists('log_data');
+        Schema::dropIfExists('ms_balance');
+        Schema::dropIfExists('ts_history_balance');
+        Schema::dropIfExists('ts_expense');
+        Schema::dropIfExists('map_expense');
+        Schema::dropIfExists('ts_reception');
+        Schema::dropIfExists('ms_year');
+        Schema::dropIfExists('ts_report');
+        Schema::dropIfExists('map_report');
+        Schema::dropIfExists('ms_employee');
         Schema::dropIfExists('ms_note');
         Schema::dropIfExists('map_note');
     }
