@@ -151,20 +151,6 @@ class HomeController extends Controller
         $note_unfinished = Note::where('is_trash', 0)->where('year', $year)->where('status', config('global.status.code.unfinished'))->count('id');
 
         $result = array(
-            'series' => array(
-                'Dekan/Univ',
-                'WD 1',
-                'WD 2',
-                'WD 3',
-                'WD 4',
-                'Tek. Sipil',
-                'Arsitektur',
-                'MTS',
-                'MTA',
-            ),
-            'requested' => array(0, 0, 0, 0, 0, 0, 0, 0, 0),
-            'approved' => array(0, 0, 0, 0, 0, 0, 0, 0, 0),
-            'percentage' => array(0, 0, 0, 0, 0, 0, 0, 0, 0),
             'year' => $yearsDesc[$year],
             'status' => array(
                 'finished' => array(
@@ -190,142 +176,84 @@ class HomeController extends Controller
             )
         );
 
-        $pics = config('global.staff.code');
-        $pics = Arr::except($pics, config('global.staff.code.admin'));
-        dd($pics);
-         
-        $index = 0;
-        foreach($pics as $value) {
-            $division = config('global.division.code.fakultas');
-            if($value == ''){}
+        $arrData = array(
+            array(
+                'unit' => 'Dekan/Univ',
+                'pic' => config('global.staff.code.dekan'),
+                'division' => config('global.division.code.fakultas'),
+            ),
+            array(
+                'unit' => 'WD 1',
+                'pic' => config('global.staff.code.wd1'),
+                'division' => config('global.division.code.fakultas'),
+            ),
+            array(
+                'unit' => 'WD 2',
+                'pic' => config('global.staff.code.wd2'),
+                'division' => config('global.division.code.fakultas'),
+            ),
+            array(
+                'unit' => 'WD 3',
+                'pic' => config('global.staff.code.wd3'),
+                'division' => config('global.division.code.fakultas'),
+            ),
+            array(
+                'unit' => 'WD 4',
+                'pic' => config('global.staff.code.wd4'),
+                'division' => config('global.division.code.fakultas'),
+            ),
+            array(
+                'unit' => 'Tek. Sipil',
+                'pic' => config('global.staff.code.kaprodis1'),
+                'division' => config('global.division.code.sipil'),
+            ),
+            array(
+                'unit' => 'Arsitektur',
+                'pic' => config('global.staff.code.kaprodis1'),
+                'division' => config('global.division.code.arsitektur'),
+            ),
+            array(
+                'unit' => 'MTS',
+                'pic' => config('global.staff.code.kaprodis2'),
+                'division' => config('global.division.code.mts'),
+            ),
+            array(
+                'unit' => 'MTA',
+                'pic' => config('global.staff.code.kaprodis2'),
+                'division' => config('global.division.code.mta'),
+            ),
+        );
+
+        foreach($arrData as $key => $value) {
+            $note = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', $value['division'])->whereRelation('staffs', 'staff_id', $value['pic']);
+
+            if($value['pic'] == config('global.staff.code.wd2')) {
+                $note->has('staffs', '=', 1);
+            }
+            
+            $data = $note->get()->toArray();
+
+            $request = 0;
+            $approve = 0;
+            $percentage = 0;
+
+            if(!empty($data)) {
+                foreach ($data as $row) {
+                    $request += $this->convertAmount($row['amount'], true);
+                    $approve += $this->convertAmount($row['amount_requested'], true);
+                }
+
+                if($request > 0) {
+                    $percentage = round($approve/$request*100, 2);
+                }
+            }
+
+            $result['requested'][$key] = $request;
+            $result['approved'][$key] = $approve;
+            $result['percentage'][$key] = $percentage;
+            $result['series'][$key] = $value['unit'];
         }
         
-        //dekan
-        $dekan = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.dekan'))->get()->toArray();
-        $data_id = array_column($dekan, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][0] = 0;
-            $result['approved'][0] = 0;
-            foreach ($dekan as $row) {
-                $result['requested'][0] += $this->convertAmount($row['amount'], true);
-                $result['approved'][0] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][0] = round(($result['approved'][0]/$result['requested'][0])*100, 2);
-        }
-
-        //wd1
-        $wd1 = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.wd1'))->get()->toArray();
-        $data_id = array_column($wd1, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][1] = 0;
-            $result['approved'][1] = 0;
-            foreach ($wd1 as $row) {
-                $result['requested'][1] += $this->convertAmount($row['amount'], true);
-                $result['approved'][1] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][1] = round($result['approved'][1]/$result['requested'][1]*100, 2);
-        }
-
-        //wd2
-        $wd2 = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.wd2'))->has('staffs', '=', 1)->get()->toArray();
-        $data_id = array_column($wd2, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][2] = 0;
-            $result['approved'][2] = 0;
-            foreach ($wd2 as $row) {
-                $result['requested'][2] += $this->convertAmount($row['amount'], true);
-                $result['approved'][2] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][2] = round($result['approved'][2]/$result['requested'][2]*100, 2);
-        }
-
-        //wd3
-        $wd3 = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.wd3'))->get()->toArray();
-        $data_id = array_column($wd3, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][3] = 0;
-            $result['approved'][3] = 0;
-            foreach ($wd3 as $row) {
-                $result['requested'][3] += $this->convertAmount($row['amount'], true);
-                $result['approved'][3] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][3] = round($result['approved'][3]/$result['requested'][3]*100, 2);
-        }
-
-        //wd4
-        $wd4 = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.wd4'))->get()->toArray();
-        $data_id = array_column($wd4, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][4] = 0;
-            $result['approved'][4] = 0;
-            foreach ($wd4 as $row) {
-                $result['requested'][4] += $this->convertAmount($row['amount'], true);
-                $result['approved'][4] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][4] = round($result['approved'][4]/$result['requested'][4]*100, 2);
-        }
-
-        //sipil
-        $sipil = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.sipil'))->whereRelation('staffs', 'staff_id', config('global.staff.code.kaprodis1'))->get()->toArray();
-        $data_id = array_column($sipil, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][5] = 0;
-            $result['approved'][5] = 0;
-            foreach ($sipil as $row) {
-                $result['requested'][5] += $this->convertAmount($row['amount'], true);
-                $result['approved'][5] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][5] = round($result['approved'][5]/$result['requested'][5]*100, 2);
-        }
-        
-        //arsitek
-        $arsitek = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.arsitektur'))->whereRelation('staffs', 'staff_id', config('global.staff.code.kaprodis1'))->get()->toArray();
-        $data_id = array_column($arsitek, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][6] = 0;
-            $result['approved'][6] = 0;
-            foreach ($arsitek as $row) {
-                $result['requested'][6] += $this->convertAmount($row['amount'], true);
-                $result['approved'][6] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][6] = round($result['approved'][6]/$result['requested'][6]*100, 2);
-        }
-
-        //mts
-        $mts = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.mts'))->whereRelation('staffs', 'staff_id', config('global.staff.code.kaprodis2'))->get()->toArray();
-        $data_id = array_column($mts, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][7] = 0;
-            $result['approved'][7] = 0;
-            foreach ($mts as $row) {
-                $result['requested'][7] += $this->convertAmount($row['amount'], true);
-                $result['approved'][7] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][7] = round($result['approved'][7]/$result['requested'][7]*100, 2);
-        }
-        
-        //mta
-        $mta = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.mta'))->whereRelation('staffs', 'staff_id', config('global.staff.code.kaprodis2'))->get()->toArray();
-        $data_id = array_column($mta, 'id');
-
-        if (!empty($data_id)) {
-            $result['requested'][8] = 0;
-            $result['approved'][8] = 0;
-            foreach ($mta as $row) {
-                $result['requested'][8] += $this->convertAmount($row['amount'], true);
-                $result['approved'][8] += $this->convertAmount($row['amount_requested'], true);
-            }
-            $result['percentage'][8] = round($result['approved'][8]/$result['requested'][8]*100, 2);
-        }
-
         $response = new Response(true, 'Success', 1);
         $response->setData($result);
 
