@@ -11,6 +11,7 @@ use App\Models\Expense;
 use App\Models\MapExpense;
 use App\Models\Note;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -188,6 +189,16 @@ class HomeController extends Controller
                 ),
             )
         );
+
+        $pics = config('global.staff.code');
+        $pics = Arr::except($pics, config('global.staff.code.admin'));
+        dd($pics);
+        
+        $index = 0;
+        foreach($pics as $value) {
+            $division = config('global.division.code.fakultas');
+            if($value == ''){}
+        }
         
         //dekan
         $dekan = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', config('global.division.code.fakultas'))->whereRelation('staffs', 'staff_id', config('global.staff.code.dekan'))->get()->toArray();
