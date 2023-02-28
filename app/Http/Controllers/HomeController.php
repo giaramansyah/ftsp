@@ -193,7 +193,7 @@ class HomeController extends Controller
         $pics = config('global.staff.code');
         $pics = Arr::except($pics, config('global.staff.code.admin'));
         dd($pics);
-        
+         
         $index = 0;
         foreach($pics as $value) {
             $division = config('global.division.code.fakultas');
