@@ -142,6 +142,8 @@ class HomeController extends Controller
                     $year = $param;
                 }
             }
+        } else {
+            abort(404);
         }
 
         $years = $this->getYears();
@@ -225,7 +227,7 @@ class HomeController extends Controller
         );
 
         foreach($arrData as $key => $value) {
-            $note = Note::select('id', 'amount', 'amount_requested')->where('is_trash', 0)->where('year', $year)->where('division_id', $value['division'])->whereRelation('staffs', 'staff_id', $value['pic']);
+            $note = Note::select('id', 'amount', 'amount_requested', 'amount_approved', 'status')->where('is_trash', 0)->where('year', $year)->where('division_id', $value['division'])->whereRelation('staffs', 'staff_id', $value['pic']);
 
             if($value['pic'] == config('global.staff.code.wd2')) {
                 $note->has('staffs', '=', 1);
@@ -233,25 +235,43 @@ class HomeController extends Controller
             
             $data = $note->get()->toArray();
 
+            $amount = 0;
             $request = 0;
             $approve = 0;
+            $process = 0;
             $percentage = 0;
+            $finished = 0;
+            $unfinished = 0;
 
             if(!empty($data)) {
                 foreach ($data as $row) {
-                    $request += $this->convertAmount($row['amount'], true);
-                    $approve += $this->convertAmount($row['amount_requested'], true);
-                }
+                    $amount += $this->convertAmount($row['amount'], true);
+                    $request += $this->convertAmount($row['amount_requested'], true);
+                    $approve += $this->convertAmount($row['amount_approved'], true);
 
-                if($request > 0) {
-                    $percentage = round($approve/$request*100, 2);
+                    if($row['status'] == config('global.status.code.finished')) {
+                        $finished += 1;
+                    } else {
+                        $unfinished += 1;
+                    }
+
                 }
+                
+                if($request > 0) {
+                    $percentage = round($approve/$amount*100, 2);
+                }
+                $process = ($request - $approve);
+                
             }
 
+            $result['series'][$key] = $value['unit'];
+            $result['amount'][$key] = $amount;
             $result['requested'][$key] = $request;
             $result['approved'][$key] = $approve;
+            $result['process'][$key] = $process;
             $result['percentage'][$key] = $percentage;
-            $result['series'][$key] = $value['unit'];
+            $result['finished'][$key] = $finished;
+            $result['unfinished'][$key] = $unfinished;
         }
         
         $response = new Response(true, 'Success', 1);

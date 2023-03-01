@@ -56,15 +56,27 @@
         datasets: [
           {
             label: "DANA RAB",
-            backgroundColor: "#28a745",
-            borderColor: "#28a745",
-            data: data.requested,
+            backgroundColor: "#ffc107",
+            borderColor: "#ffc107",
+            data: data.amount,
           },
           {
             label: "DANA USULAN",
-            backgroundColor: "#00a2e9",
-            borderColor: "#00a2e9",
+            backgroundColor: "#17a2b8",
+            borderColor: "#17a2b8",
+            data: data.requested,
+          },
+          {
+            label: "DANA REALISASI",
+            backgroundColor: "#28a745",
+            borderColor: "#28a745",
             data: data.approved,
+          },
+          {
+            label: "DANA ON PROCESS",
+            backgroundColor: "#ff851b",
+            borderColor: "#ff851b",
+            data: data.process,
           },
         ],
       },
@@ -150,12 +162,20 @@
       var row = $('<tr class="text-bold">');
       if(index == 'series') {
         var col = '<td width="5%">&nbsp;</td>';
+      } else if(index == 'amount') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#ffc107"></i> DANA RAB</td>';
       } else if(index == 'requested') {
-        var col = '<td width="10%"><i class="fas fa-square" style="color:#28a745"></i> DANA RAB</td>';
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#17a2b8"></i> DANA USULAN</td>';
       } else if(index == 'approved') {
-        var col = '<td width="10%"><i class="fas fa-square" style="color:#00a2e9"></i> DANA USULAN</td>';
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#28a745"></i> DANA REALISASI</td>';
+      } else if(index == 'process') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#ff851b"></i> DANA ON PROCESS</td>';
       } else if(index == 'percentage') {
         var col = '<td width="10%"><i class="fas fa-square" style="color:#6c757d"></i> PERSENTASE</td>';
+      } else if(index == 'finished') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#007bff"></i> STATUS SELESAI</td>';
+      } else if(index == 'unfinished') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#dc3545"></i> STATUS BELUM SELESAI</td>';
       } 
 
       $.each(value, function(key, val) {
@@ -163,6 +183,8 @@
           col += '<td width="10%" class="text-center">'+val+'</td>';
         } else if(index == 'percentage') {
           col += '<td width="10%" class="text-center">' + val + '%</td>';
+        } else if(index == 'finished' || index == 'unfinished') {
+          col += '<td width="10%" class="text-center">' + val + '</td>';
         } else {
           col += '<td width="10%" class="text-center">' + formatCurrency(val) + '</td>';
         }
