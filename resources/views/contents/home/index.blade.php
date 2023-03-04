@@ -86,7 +86,7 @@
         plugins: {
           title: {
             display: true,
-            text: 'SERAPAN RAB FTSP USULAN TA ' + data.year,
+            text: 'SERAPAN RAB FTSP TA ' + data.year,
             color: "#212529",
             font: {
               size: 20,
