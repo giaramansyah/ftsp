@@ -184,7 +184,10 @@ class NoteController extends Controller
                 $amount = $this->convertAmount($row->amount, true);
                 $amount_requested = $this->convertAmount($row->amount_requested, true);
 
-                $column = round(($amount_requested/$amount)*100, 2) . '%';
+                $column = '0%';
+                if($amount != null && $amount > 0) {
+                    $column = round(($amount_requested/$amount)*100, 2) . '%';
+                }
 
                 return $column;
             });
