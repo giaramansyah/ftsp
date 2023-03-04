@@ -156,6 +156,7 @@ class NoteController extends Controller
                 $data->whereIn('id', $map);
             }
             $data->orderBy('ma_id');
+            dd($data->get()->toArray());
             $table = DataTables::eloquent($data);
             $rawColumns = array('ma', 'approved', 'status_desc', 'percentage');
             $table->addIndexColumn();
