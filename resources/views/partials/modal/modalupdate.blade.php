@@ -1,12 +1,13 @@
 <div class="modal fade" id="modalUpdate">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form class="form-lazy-control" data-action="{{ $modal_action }}">
+      <form class="form-lazy-control" data-action="{{ $modal_action }}" data-validate="max_amount">
         <div class="modal-header p-2 justify-content-center">
           <h4 class="modal-title">Update Status Data Surat</h4>
         </div>
         <div class="modal-body p-2">
           <input type="hidden" name="ma_id" value="{{ $ma_id }}">
+          <input type="hidden" name="validate_max" id="validate_max" value="{{ $amount_requested }}">
           <input type="hidden" name="status" value="{{ config('global.status.code.finished') }}">
           <div class="form-group row">
             <label class="col-form-label col-sm-4">Realisasi Dana<code>*</code></label>

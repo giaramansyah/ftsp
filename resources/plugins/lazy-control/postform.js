@@ -46,6 +46,8 @@
         username: "username",
         password: "password",
         max_amount: "max_amount",
+        max_amount_request: "max_amount_request",
+        max_amount_approve: "max_amount_approve",
         file: "file",
         image: "image",
         post: "post",
@@ -445,6 +447,31 @@
                         return $('#validate_max').val().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
                     },
                 };
+
+                options.rules.amount_approved = {
+                    required: true,
+                    max_amount: function() {
+                        return $('#validate_max').val().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                    },
+                };
+            }
+
+            if (_this2._settings.validate.max_amount_request) {
+                options.rules.amount_requested = {
+                    required: true,
+                    max_amount_request: function() {
+                        return $('#validate_max_request').val().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                    },
+                };
+            }
+
+            if (_this2._settings.validate.max_amount_approve) {
+                options.rules.amount_approved = {
+                    required: true,
+                    max_amount_approve: function() {
+                        return $('#validate_max_approve').val().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                    },
+                };
             }
 
             if (_this2._settings.validate.image) {
@@ -462,7 +489,15 @@
         });
 
         $_default["default"].validator.addMethod("max_amount", function (value) {
-            return parseInt($("#validate_max").val()) >= parseInt(value.replace(/[^0-9\.]/g, ""));
+            return parseInt($("#validate_max").val().replace(/[^0-9\.]/g, "")) >= parseInt(value.replace(/[^0-9\.]/g, ""));
+        });
+
+        $_default["default"].validator.addMethod("max_amount_request", function (value) {
+            return parseInt($("#validate_max_request").val().replace(/[^0-9\.]/g, "")) >= parseInt(value.replace(/[^0-9\.]/g, ""));
+        });
+
+        $_default["default"].validator.addMethod("max_amount_approve", function (value) {
+            return parseInt($("#validate_max_approve").val().replace(/[^0-9\.]/g, "")) >= parseInt(value.replace(/[^0-9\.]/g, ""));
         });
 
         PostForm._jQueryInterface = function _jQueryInterface() {
@@ -508,6 +543,20 @@
                     -1
                 ) {
                     options.validate.max_amount = true;
+                }
+
+                if (
+                    $_default["default"].inArray(Static.max_amount_request, validate) >
+                    -1
+                ) {
+                    options.validate.max_amount_request = true;
+                }
+
+                if (
+                    $_default["default"].inArray(Static.max_amount_approve, validate) >
+                    -1
+                ) {
+                    options.validate.max_amount_approve = true;
                 }
             }
 
