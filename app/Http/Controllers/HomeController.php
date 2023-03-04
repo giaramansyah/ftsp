@@ -156,8 +156,8 @@ class HomeController extends Controller
             'year' => $yearsDesc[$year],
             'status' => array(
                 'finished' => array(
-                    'title' => 'Total Status',
-                    'label' => 'Surat Selesai ' . $yearsDesc[$year],
+                    'title' => 'Total Status Surat',
+                    'label' => 'Selesai ' . $yearsDesc[$year],
                     'value' => $note_finished,
                     'class' => 'bg-success',
                     'prefix' => 'Surat',
@@ -166,8 +166,8 @@ class HomeController extends Controller
                     'is_append' => true,
                 ),
                 'unfinished' => array(
-                    'title' => 'Total Status',
-                    'label' => 'Surat Belum Selesai ' . $yearsDesc[$year],
+                    'title' => 'Total Status Surat',
+                    'label' => 'Belum Selesai ' . $yearsDesc[$year],
                     'value' => $note_unfinished,
                     'class' => 'bg-danger',
                     'prefix' => 'Surat',
@@ -228,24 +228,29 @@ class HomeController extends Controller
 
         foreach($arrData as $key => $value) {
             $note = Note::select('id', 'amount', 'amount_requested', 'amount_approved', 'status')->where('is_trash', 0)->where('year', $year)->where('division_id', $value['division'])->whereRelation('staffs', 'staff_id', $value['pic']);
+            $data = Data::select('id', 'amount')->where('is_trash', 0)->where('year', $year)->where('division_id', $value['division'])->whereRelation('staffs', 'staff_id', $value['pic']);
 
             if($value['pic'] == config('global.staff.code.wd2')) {
                 $note->has('staffs', '=', 1);
+                $data->has('staffs', '=', 1);
             }
             
-            $data = $note->get()->toArray();
+            $note = $note->get()->toArray();
+            $data = $data->get()->toArray();
 
             $amount = 0;
             $request = 0;
             $approve = 0;
             $process = 0;
-            $percentage = 0;
+            $percentRequest = 0;
+            $percentApprove = 0;
+            $percentProgress = 0;
+            $percentProcess = 0;
             $finished = 0;
             $unfinished = 0;
 
-            if(!empty($data)) {
-                foreach ($data as $row) {
-                    $amount += $this->convertAmount($row['amount'], true);
+            if(!empty($note)) {
+                foreach ($note as $row) {
                     $request += $this->convertAmount($row['amount_requested'], true);
                     $approve += $this->convertAmount($row['amount_approved'], true);
 
@@ -254,14 +259,25 @@ class HomeController extends Controller
                     } else {
                         $unfinished += 1;
                     }
+                }
+            }
 
+            if(!empty($data)) {
+                foreach ($data as $row) {
+                    $amount += $this->convertAmount($row['amount'], true);
                 }
-                
-                if($request > 0) {
-                    $percentage = round($approve/$amount*100, 2);
-                }
-                $process = ($request - $approve);
-                
+            }
+            
+            $process = ($request - $approve);   
+            
+            if($amount > 0) {
+                $percentRequest = round($request/$amount*100, 2);
+                $percentApprove = round($approve/$amount*100, 2);
+                $percentProcess = round($process/$amount*100, 2);
+            }
+            
+            if($request > 0) {
+                $percentProgress = round($approve/$request*100, 2);
             }
 
             $result['series'][$key] = $value['unit'];
@@ -269,7 +285,10 @@ class HomeController extends Controller
             $result['requested'][$key] = $request;
             $result['approved'][$key] = $approve;
             $result['process'][$key] = $process;
-            $result['percentage'][$key] = $percentage;
+            $result['percent_request'][$key] = $percentRequest;
+            $result['percent_approve'][$key] = $percentApprove;
+            $result['percent_progress'][$key] = $percentProgress;
+            $result['percent_process'][$key] = $percentProcess;
             $result['finished'][$key] = $finished;
             $result['unfinished'][$key] = $unfinished;
         }

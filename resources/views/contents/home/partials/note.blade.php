@@ -19,7 +19,7 @@
   <div class="col-sm-12">
     <div class="card" id="note">
       <div class="card-header">
-        <div class="form-group row justify-content-center">
+        <div class="form-group row justify-content-center mb-0">
           <label class="col-sm-2 col-form-label">{{ __('Tahun Akademik') }}<code>*</code></label>
           <div class="col-sm-2">
             <select class="form-control form-control-sm select2" name="year">
@@ -37,10 +37,12 @@
           <div class="col-12 col-sm-12 p-2" id="canvas-container">
             <canvas class="chart-canvas" height="600px"></canvas>
           </div>
-          <table class="table table-bordered table-sm" width="100%">
-            <tbody>
-            </tbody>
-          </table>
+          <div class="col-12 col-sm-12 p-2 table-responsive">
+            <table class="table table-bordered table-sm" width="100%">
+              <tbody>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

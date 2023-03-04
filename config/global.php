@@ -146,10 +146,10 @@ return [
         'export' => [
             'admin' => '',
             'dekan' => 'Dekan',
-            'wd1' => 'Wadek I',
-            'wd2' => 'Wadek II',
-            'wd3' => 'Wadek III',
-            'wd4' => 'Wadek IV',
+            'wd1' => 'Wadek 1',
+            'wd2' => 'Wadek 2',
+            'wd3' => 'Wadek 3',
+            'wd4' => 'Wadek 4',
             'kaprodis1' => 'Kaprodi S1',
             'kaprodis2' => 'Kaprodi S2',
         ]

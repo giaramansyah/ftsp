@@ -116,7 +116,7 @@
               <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="amount"
                 onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)"
                 onblur="numberFormat(this, true);amountText(this.value, '#text_amount')"
-                value="{{ isset($amount) ? $amount : '' }}">
+                value="{{ isset($amount) ? $amount : '' }}" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
             </div>
           </div>
         </div>
@@ -172,7 +172,7 @@
               <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="amount_requested"
                 onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)"
                 onblur="numberFormat(this, true);amountText(this.value, '#text_amount_request')"
-                value="{{ isset($amount_requested) ? $amount_requested : '' }}">
+                value="{{ isset($amount_requested) ? $amount_requested : '' }}" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
             </div>
           </div>
         </div>
@@ -193,7 +193,7 @@
               <input type="text" class="form-control form-control-sm text-right" maxlength="20" name="amount_approved"
                 onkeypress="preventAlpha(event)" onkeyup="numberFormat(this, true)"
                 onblur="numberFormat(this, true);amountText(this.value, '#text_amount_approve')"
-                value="{{ isset($amount_approved) ? $amount_approved : '' }}">
+                value="{{ isset($amount_approved) ? $amount_approved : '' }}" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
             </div>
           </div>
         </div>

@@ -109,7 +109,10 @@
                 contexts.forEach(function(context) {
                   index = context.dataIndex;
                 });
-                return "Persentase : " + data.percentage[index] + "%";
+                return "Persentase Pengajuan : " + data.percent_request[index] + "%\n" +
+                      "Persentase Realisasi : " + data.percent_approve[index] + "%\n" +
+                      "Persentase On Progress : " + data.percent_progress[index] + "%\n" +
+                      "Persentase On Process : " + data.percent_process[index] + "%\n";
               }
             },
           },
@@ -159,7 +162,7 @@
         return;
       }
 
-      var row = $('<tr class="text-bold">');
+      var row = $('<tr>');
       if(index == 'series') {
         var col = '<td width="5%">&nbsp;</td>';
       } else if(index == 'amount') {
@@ -170,8 +173,14 @@
         var col = '<td width="10%"><i class="fas fa-square" style="color:#28a745"></i> DANA REALISASI</td>';
       } else if(index == 'process') {
         var col = '<td width="10%"><i class="fas fa-square" style="color:#ff851b"></i> DANA ON PROCESS</td>';
-      } else if(index == 'percentage') {
-        var col = '<td width="10%"><i class="fas fa-square" style="color:#6c757d"></i> PERSENTASE</td>';
+      } else if(index == 'percent_request') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#836200"></i> PERSENTASE PENGAJUAN</td>';
+      } else if(index == 'percent_approve') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#0b515c"></i> PERSENTASE REALISASI</td>';
+      } else if(index == 'percent_progress') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#145322"></i> PERSENTASE ON PROGRESS</td>';
+      } else if(index == 'percent_process') {
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#8d4100"></i> PERSENTASE ON PROCESS</td>';
       } else if(index == 'finished') {
         var col = '<td width="10%"><i class="fas fa-square" style="color:#007bff"></i> STATUS SELESAI</td>';
       } else if(index == 'unfinished') {
@@ -181,7 +190,7 @@
       $.each(value, function(key, val) {
         if(index == 'series') {
           col += '<td width="10%" class="text-center">'+val+'</td>';
-        } else if(index == 'percentage') {
+        } else if(index == 'percent_request' || index == 'percent_approve' || index == 'percent_progress' || index == 'percent_process') {
           col += '<td width="10%" class="text-center">' + val + '%</td>';
         } else if(index == 'finished' || index == 'unfinished') {
           col += '<td width="10%" class="text-center">' + val + '</td>';
