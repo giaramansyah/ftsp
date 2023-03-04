@@ -109,10 +109,10 @@
                 contexts.forEach(function(context) {
                   index = context.dataIndex;
                 });
-                return "Persentase Pengajuan : " + data.percent_request[index] + "%\n" +
-                      "Persentase Realisasi : " + data.percent_approve[index] + "%\n" +
-                      "Persentase On Progress : " + data.percent_progress[index] + "%\n" +
-                      "Persentase On Process : " + data.percent_process[index] + "%\n";
+                return "% Pengajuan : " + data.percent_request[index] + "%\n" +
+                      "% Realisasi : " + data.percent_approve[index] + "%\n" +
+                      "% On Progress : " + data.percent_progress[index] + "%\n" +
+                      "% On Process : " + data.percent_process[index] + "%\n";
               }
             },
           },
@@ -174,13 +174,13 @@
       } else if(index == 'process') {
         var col = '<td width="10%"><i class="fas fa-square" style="color:#ff851b"></i> DANA ON PROCESS</td>';
       } else if(index == 'percent_request') {
-        var col = '<td width="10%"><i class="fas fa-square" style="color:#836200"></i> PERSENTASE PENGAJUAN</td>';
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#836200"></i> % PENGAJUAN</td>';
       } else if(index == 'percent_approve') {
-        var col = '<td width="10%"><i class="fas fa-square" style="color:#0b515c"></i> PERSENTASE REALISASI</td>';
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#0b515c"></i> % REALISASI</td>';
       } else if(index == 'percent_progress') {
-        var col = '<td width="10%"><i class="fas fa-square" style="color:#145322"></i> PERSENTASE ON PROGRESS</td>';
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#145322"></i> % ON PROGRESS</td>';
       } else if(index == 'percent_process') {
-        var col = '<td width="10%"><i class="fas fa-square" style="color:#8d4100"></i> PERSENTASE ON PROCESS</td>';
+        var col = '<td width="10%"><i class="fas fa-square" style="color:#8d4100"></i> % ON PROCESS</td>';
       } else if(index == 'finished') {
         var col = '<td width="10%"><i class="fas fa-square" style="color:#007bff"></i> STATUS SELESAI</td>';
       } else if(index == 'unfinished') {
