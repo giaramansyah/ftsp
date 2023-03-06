@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
 
@@ -114,12 +115,12 @@ class PrivilegeGroupController extends Controller
 
                 if ($this->hasPrivilege($this->_update)) {
                     $param = array('class' => 'btn-xs', 'action' => route('settings.privigroup.edit', ['id' => SecureHelper::secure($row->id)]));
-                    $column .= view('partials.button.edit', $param)->render();
+                    $column .= View::render('partials.button.edit', $param);
                 }
 
                 if ($this->hasPrivilege($this->_delete)) {
                     $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.privigroup.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
-                    $column .= view('partials.button.delete', $param)->render();
+                    $column .= View::render('partials.button.delete', $param);
                 }
 
                 return $column;

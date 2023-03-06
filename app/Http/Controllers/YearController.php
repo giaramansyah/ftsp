@@ -7,6 +7,7 @@ use App\Library\SecureHelper;
 use App\Models\Year;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 
 class YearController extends Controller
@@ -44,7 +45,7 @@ class YearController extends Controller
 
                     if($this->hasPrivilege($this->_delete)) {
                         $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('master.years.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
-                        $column .= view('partials.button.delete', $param)->render();
+                        $column .= View::render('partials.button.delete', $param);
                     }
 
                     return $column;
