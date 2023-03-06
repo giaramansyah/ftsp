@@ -83,15 +83,16 @@ class PrivilegeGroupController extends Controller
                 continue;
             }
 
+            $items = array_map(function ($val) {
+                array();
+            }, $modules);
             $privilege = Privilege::select(['id', 'code', 'modules'])->where('menu_id', $value['id'])->orderBy('modules')->get()->toArray();
-            if (count($privilege) < count($modules)) {
-                $diff = count($privilege);
-                while ($diff < count($modules)) {
-                    $privilege[] = array();
-                    $diff++;
-                }
+
+            foreach ($privilege as $value) {
+                $items[$value['modules']] = $value;
             }
-            $menu[$key]['privileges'] = $privilege;
+
+            $menu[$key]['privileges'] = $items;
         }
 
         $privigroup = PrivilegeGroup::select(['name', 'description'])->where('id', $plainId)->first()->toArray();
@@ -162,6 +163,9 @@ class PrivilegeGroupController extends Controller
                         'updated_by' => Auth::user()->username,
                     ]);
                     if ($privigroup->id) {
+                        if(!is_array($param['privilege_id'])) {
+                            $param['privilege_id'] =  array($param['privilege_id']);
+                        }
                         foreach ($param['privilege_id'] as $value) {
                             MapPrivilege::create([
                                 'privilege_group_id' => $privigroup->id,
@@ -201,6 +205,9 @@ class PrivilegeGroupController extends Controller
                 if ($privigroup->save()) {
                     $map = MapPrivilege::where('privilege_group_id', $plainId);
                     $map->forceDelete();
+                    if(!is_array($param['privilege_id'])) {
+                        $param['privilege_id'] =  array($param['privilege_id']);
+                    }
                     foreach ($param['privilege_id'] as $value) {
                         MapPrivilege::create([
                             'privilege_group_id' => $privigroup->id,

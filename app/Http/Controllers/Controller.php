@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use hisorange\BrowserDetect\Parser as Browser;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
 
 class Controller extends BaseController
 {
@@ -225,7 +226,11 @@ class Controller extends BaseController
         $name = implode('_', $arrName);
         $descMonth = config('global.months');
 
-        return (object) array('name' => $name, 'path' => $path.'/'.$year.'/'.$descMonth[$month].'/'.$filename);
+        $fullPath = $path.'/'.$year.'/'.$descMonth[$month].'/'.$filename;
+        if(File::exists($fullPath)) {
+            return (object) array('status' => true, 'name' => $name, 'path' => $path.'/'.$year.'/'.$descMonth[$month].'/'.$filename);
+        }
+        return (object) array('status' => false);
     }
     
 }

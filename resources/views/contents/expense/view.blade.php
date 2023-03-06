@@ -59,8 +59,14 @@
             <li class="list-group-item">
               <b>Lap. Pertaggung Jawaban</b>
               <p class="float-right mb-0">
-                <a href="{{ $download }}" rel="noopener noreferrer nofollow" target="_blank"
-                  title="Download File LPJ">{{ $image }}</a>
+                @if($image_exist)
+                  <a href="{{ $download }}" rel="noopener noreferrer nofollow" target="_blank"
+                    title="Download File LPJ">{{ $image }}</a>
+                @else
+                  <i class="fas fa-exclamation-circle text-danger" title="File Not Found"></i><span class="text-muted">
+                    {{ $image }}
+                  </span>
+                @endif
               </p>
             </li>
             @endif

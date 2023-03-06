@@ -494,15 +494,19 @@ class ReceptionController extends Controller
 
         $file = $this->getFile($param['file'], $param['path']);
 
-        $headers = array(
-            'Content-Type: application/pdf',
-            'Content-Disposition: attachment;filename=' . $file->name,
-            'Cache-Control: max-age=0',
-            'Pragma: no-cache',
-            'Expires: 0'
-        );
-
-        return response()->download($file->path, $file->name, $headers);
+        if($file->status) {
+            $headers = array(
+                'Content-Type: application/pdf',
+                'Content-Disposition: attachment;filename=' . $file->name,
+                'Cache-Control: max-age=0',
+                'Pragma: no-cache',
+                'Expires: 0'
+            );
+    
+            return response()->download($file->path, $file->name, $headers); 
+        } else {
+            abort(404);
+        }
     }
 
     private function generate()

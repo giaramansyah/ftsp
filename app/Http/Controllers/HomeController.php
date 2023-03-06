@@ -69,7 +69,7 @@ class HomeController extends Controller
             $is_note = true;
             $is_general = true;
         } else {
-            if (Auth::user()->privilege == ['NTCR', 'NTUP', 'NTRM', 'NTRA', 'NTRD']) {
+            if (Auth::user()->privilege == ['NTCR', 'NTUP', 'NTRM', 'NTRA', 'NTRD'] || in_array(Auth::user()->staff_id, [config('global.staff.code.dekan'), config('global.staff.code.wd1'), config('global.staff.code.wd2')])) {
                 $is_note = true;
             } else {
                 $is_general = true;

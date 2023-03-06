@@ -139,9 +139,15 @@ class ExpenseController extends Controller
         if ($data['type'] == config('global.type.code.red')) {
             $is_red = true;
             $file = $this->getFile($data['image'], public_path('upload'));
-            $image = $data['image'];
-            $data['image'] = $file->name;
-            $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::pack(['file' => $image, 'path' => public_path('upload')])]);
+            if($file->status) {
+                $image = $data['image'];
+                $data['image_exist'] = true;
+                $data['image'] = $file->name;
+                $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::pack(['file' => $image, 'path' => public_path('upload')])]);
+            } else {
+                $data['image_exist'] = false;
+                $data['download'] = '#';
+            }
         }
 
         if (!$this->hasPrivilege($this->_readid)) {
@@ -357,9 +363,15 @@ class ExpenseController extends Controller
         if ($data['status'] == config('global.status.code.finished')) {
             $is_red = true;
             $file = $this->getFile($data['image'], public_path('upload'));
-            $image = $data['image'];
-            $data['image'] = $file->name;
-            $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::pack(['file' => $image, 'path' => public_path('upload')])]);
+            if($file->status) {
+                $image = $data['image'];
+                $data['image_exist'] = true;
+                $data['image'] = $file->name;
+                $data['download'] = route('transaction.expense.download', ['id' => SecureHelper::pack(['file' => $image, 'path' => public_path('upload')])]);
+            } else {
+                $data['image_exist'] = false;
+                $data['download'] = '#';
+            }
         }
 
         $employeeArr = $this->getEmployees();
@@ -805,16 +817,20 @@ class ExpenseController extends Controller
         }
 
         $file = $this->getFile($param['file'], $param['path']);
+        if($file->status) {
+            $headers = array(
+                'Content-Type: application/pdf',
+                'Content-Disposition: attachment;filename=' . $file->name,
+                'Cache-Control: max-age=0',
+                'Pragma: no-cache',
+                'Expires: 0'
+            );
+    
+            return response()->download($file->path, $file->name, $headers);
+        } else {
+            abort(404);
+        }
 
-        $headers = array(
-            'Content-Type: application/pdf',
-            'Content-Disposition: attachment;filename=' . $file->name,
-            'Cache-Control: max-age=0',
-            'Pragma: no-cache',
-            'Expires: 0'
-        );
-
-        return response()->download($file->path, $file->name, $headers);
     }
 
     public function generate(Request $request)
