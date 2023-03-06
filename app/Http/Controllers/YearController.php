@@ -45,7 +45,7 @@ class YearController extends Controller
 
                     if($this->hasPrivilege($this->_delete)) {
                         $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('master.years.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
-                        $column .= View::render('partials.button.delete', $param);
+                        $column .= View::make('partials.button.delete', $param);
                     }
 
                     return $column;

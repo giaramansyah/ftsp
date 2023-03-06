@@ -116,14 +116,14 @@ class UserController extends Controller
 
                 if ($this->hasPrivilege($this->_update)) {
                     $param = array('class' => 'btn-xs', 'action' => route('settings.user.edit', ['id' => SecureHelper::secure($row->id)]));
-                    $column .= View::render('partials.button.edit', $param);
+                    $column .= View::make('partials.button.edit', $param);
 
                     
                 }
 
                 if ($this->hasPrivilege($this->_delete)) {
                     $param = array('class' => 'btn-xs', 'source' => 'table', 'action' => route('settings.user.post', ['action' => config('global.action.form.delete'), 'id' => SecureHelper::secure($row->id)]));
-                    $column .= View::render('partials.button.delete', $param);
+                    $column .= View::make('partials.button.delete', $param);
                 }
 
                 return $column;
