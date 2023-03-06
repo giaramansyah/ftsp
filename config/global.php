@@ -73,42 +73,42 @@ return [
     'division' => [
         'code' => [
             'fakultas' => 1,
-            'arsitektur' => 2,
             'sipil' => 3,
-            'mta' => 4,
+            'arsitektur' => 2,
             'mts' => 5,
+            'mta' => 4,
         ],
         'desc' => [
             'fakultas' => 'Fakultas',
-            'arsitektur' => 'Arsitektur',
             'sipil' => 'Teknik Sipil',
-            'mta' => 'Magister Teknik Arsitektur',
+            'arsitektur' => 'Arsitektur',
             'mts' => 'Magister Teknik Sipil',
+            'mta' => 'Magister Teknik Arsitektur',
         ],
         'report' => [
             'fakultas' => 'FAKULTAS TEKNIK SIPIL DAN PERENCANAAN UNIVERSITAS TRISAKTI',
-            'arsitektur' => 'PROGRAM STUDI TEKNIK ARSITEKTUR UNIVERSITAS TRISAKTI',
             'sipil' => 'PROGRAM STUDI TEKNIK SIPIL UNIVERSITAS TRISAKTI',
-            'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
+            'arsitektur' => 'PROGRAM STUDI TEKNIK ARSITEKTUR UNIVERSITAS TRISAKTI',
             'mts' => 'PROGRAM STUDI MAGISTER TEKNIK SIPIL (S2 MTS) UNIVERSITAS TRISAKTI',
+            'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
         ]
     ],
 
     'compact_division' => [
         'code' => [
             'fakultas' => 99,
-            'mta' => 4,
             'mts' => 5,
+            'mta' => 4,
         ],
         'desc' => [
             'fakultas' => 'Fakultas S1',
-            'mta' => 'Magister Teknik Arsitektur',
             'mts' => 'Magister Teknik Sipil',
+            'mta' => 'Magister Teknik Arsitektur',
         ],
         'report' => [
             'fakultas' => 'FAKULTAS TEKNIK SIPIL DAN PERENCANAAN UNIVERSITAS TRISAKTI',
-            'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
             'mts' => 'PROGRAM STUDI MAGISTER TEKNIK SIPIL (S2 MTS) UNIVERSITAS TRISAKTI',
+            'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
         ]
     ],
 
