@@ -17,6 +17,7 @@
         "hisorange/browser-detect": "^4.5",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
+        "onecentlin/laravel-adminer": "^6.1",
         "phpoffice/phpspreadsheet": "^1.26",
         "phpseclib/phpseclib": "~3.0",
         "yajra/laravel-datatables": "^1.5"
