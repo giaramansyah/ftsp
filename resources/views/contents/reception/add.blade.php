@@ -9,7 +9,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
           <div class="col-sm-2">
-            <select class="form-control form-control-sm select2" name="year" onchange="getData()">
+            <select class="form-control form-control-sm select2" name="year" onchange="getData();getId();">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($yearArr as $key => $value)
               <option value="{{ Secure::secure($value['id']) }}">{{
@@ -21,7 +21,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">Unit<code>*</code></label>
           <div class="col-sm-2">
-            <select class="form-control form-control-sm select2" name="division_id" onchange="getData()">
+            <select class="form-control form-control-sm select2" name="division_id" onchange="getData();getId();">
               <option value="">-- Silakan Pilih --</option>
               @foreach ($divisionArr as $key => $value)
               <option value="{{ Secure::secure($value['id']) }}">{{
@@ -33,8 +33,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">No. Kas<code>*</code></label>
           <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" name="reception_id"
-              value="{{ isset($reception_id) ? $reception_id : '' }}" readonly {{ isset($mandatory) &&
+            <input type="text" class="form-control form-control-sm" name="reception_id" id="reception_id" readonly {{ isset($mandatory) &&
               $mandatory? 'required' : '' }}>
           </div>
           <label class="col-sm-2 offset-sm-1 col-form-label">Tgl. Penerimaan<code>*</code></label>
@@ -232,6 +231,34 @@
       $('.form-pic-select').hide()
       $('.form-pic-select').find('select').attr('required', false)
     }
+  }
+
+  function getId() {
+    var year = $('select[name="year"]').val();
+    var division_id = $('select[name="division_id"]').val();
+
+    if(year != '' && division_id != '') {
+      var data = {
+        year : year,
+        division_id : division_id
+      };
+
+      $.ajax({
+        method: 'get',
+        url: "{{ route('transaction.reception.generate') }}",
+        data: data,
+        dataType: 'json',
+        beforeSend: function() {
+          $('#reception_id').val('');
+        },
+        success: function(response) {
+          if(response.status) {
+            $('#reception_id').val(response.data);
+          }
+        }
+      });
+    }
+
   }
 
   function getPic(data_id, pic = null) {

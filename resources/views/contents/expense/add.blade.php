@@ -160,10 +160,9 @@
         </div>
         @if($is_red)
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Tgl. Penyerahan<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Tgl. Penyerahan</label>
           <div class="col-sm-2">
-            <input type="date" class="form-control form-control-sm" name="apply_date" {{ isset($mandatory) &&
-              $mandatory? 'required' : '' }}>
+            <input type="date" class="form-control form-control-sm" name="apply_date">
           </div>
         </div>
         <div class="form-group row">

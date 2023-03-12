@@ -412,7 +412,6 @@ class ExpenseController extends Controller
                         'staff_id' => 'required',
                         'amount' => 'required',
                         'text_amount' => 'required',
-                        'apply_date' => 'required',
                         'account' => 'required',
                         'is_multiple' => 'required',
                         'image' => 'required',
@@ -475,7 +474,7 @@ class ExpenseController extends Controller
 
                         if ($file->move($pathMonth, $filename)) {
                             $image = $filename;
-                            $apply_date = $param['apply_date'];
+                            $apply_date = isset($param['apply_date']) ? $param['apply_date'] : null;
                         } else {
                             $response = new Response(false, 'Gagal Mengunggah File Ke Server');
                             return response()->json($response->responseJson());

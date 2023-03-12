@@ -122,6 +122,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/reception/list', [ReceptionController::class, 'getList'])->name('transaction.reception.list');
     Route::get('/reception/data', [ReceptionController::class, 'getData'])->name('transaction.reception.data');
     Route::get('/reception/pic', [ReceptionController::class, 'getPic'])->name('transaction.reception.pic');
+    Route::get('/reception/generate', [ReceptionController::class, 'generate'])->name('transaction.reception.generate');
     Route::get('/reception/view/{id}', [ReceptionController::class, 'view'])->name('transaction.reception.view');
     Route::get('/reception/add', [ReceptionController::class, 'add'])->name('transaction.reception.add');
     Route::get('/reception/edit/{id}', [ReceptionController::class, 'edit'])->name('transaction.reception.edit');

@@ -60,9 +60,8 @@ class ReceptionController extends Controller
         $years = $this->getYears();
         $divisions = $this->getDivisions();
         $employees = $this->getEmployees();
-        $reception_id = $this->generate();
 
-        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'employeeArr' => $employees, 'reception_id' => $reception_id, 'action' => route('transaction.reception.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
+        $view = ['yearArr' => $years, 'divisionArr' => $divisions, 'employeeArr' => $employees, 'action' => route('transaction.reception.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
 
         return view('contents.reception.add', $view);
     }
@@ -509,10 +508,46 @@ class ReceptionController extends Controller
         }
     }
 
-    private function generate()
+    public function generate(Request $request)
     {
-        $prefix = 'I';
-        $year = date('y');
+        if (($request->input('year') == null && $request->input('year') == '') || ($request->input('division_id') == null && $request->input('division_id') == '')) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $year = SecureHelper::unsecure($request->input('year'));
+        if (!$year) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $division_id = SecureHelper::unsecure($request->input('division_id'));
+        if (!$division_id) {
+            $response = new Response();
+            return response()->json($response->responseJson());
+        }
+
+        $prefix = '';
+        $year = substr(strval($year), 2, 2);
+
+        switch ($division_id) {
+            case config('global.division.code.fakultas'):
+            case config('global.division.code.arsitektur'):
+            case config('global.division.code.sipil'):
+                $prefix = 'F';
+                break;
+            case config('global.division.code.mta'):
+                $prefix = 'MTA';
+                break;
+            case config('global.division.code.mts'):
+                $prefix = 'MTS';
+                break;
+            default:
+                $response = new Response();
+                return response()->json($response->responseJson());
+                break;
+        }
+
         $number = '0001';
 
         $reception = Reception::select('reception_id')->where('reception_id', 'like', '%' . $prefix . $year . '%')->orderBy('reception_id', 'desc')->first();
@@ -528,6 +563,8 @@ class ReceptionController extends Controller
             $number = $temp . $currentNumber;
         }
 
-        return $prefix . $year . $number;
+        $response = new Response(true, 'Success', 1);
+        $response->setData($prefix . $year . $number);
+        return response()->json($response->responseJson());
     }
 }
