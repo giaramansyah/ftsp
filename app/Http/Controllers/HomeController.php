@@ -27,7 +27,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        $data = $this->convertAmount(Data::where('year', $this->_year)->sum('amount'));
+        $data = $this->convertAmount(Data::where('year', $this->_year)->where('is_trash', 0)->sum('amount'));
         $balance = Balance::select('division_id', 'amount')->get();
 
         $years = $this->getYears();
