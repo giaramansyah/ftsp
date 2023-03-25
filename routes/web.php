@@ -44,6 +44,7 @@ Route::group(['middleware' => ['guest']], function() {
     });
 
     Route::get('/optimize', function(){
+        Artisan::call('optimize:clear');
         Artisan::call('optimize');
     });
 });
