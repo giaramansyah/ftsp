@@ -6,7 +6,7 @@
     <div class="card-header">
       @if($is_create)
       <div class="card-tools">
-        @include('partials.button.upload', ['action' => route('master.data.add')])
+        @include('partials.button.upload', ['action' => route('master.data.upload')])
         @include('partials.button.add', ['action' => route('master.data.add')])
       </div>
       @endif
