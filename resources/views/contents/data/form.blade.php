@@ -19,7 +19,7 @@
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">{{ __('No. M.A.') }}<code>*</code></label>
           <div class="col-sm-2">
-            <input type="text" class="form-control form-control-sm" maxlength="20" name="ma_id" value="{{ isset($ma_id) ? $ma_id : '' }}" readonly {{ isset($mandatory) && $mandatory? 'required' : '' }}>
+            <input type="text" class="form-control form-control-sm" maxlength="20" name="ma_id" value="{{ isset($ma_id) ? $ma_id : '' }}" {{ isset($id) ? 'readonly' : '' }} {{ isset($mandatory) && $mandatory? 'required' : '' }}>
           </div>
         </div>
         <div class="form-group row">
@@ -36,7 +36,7 @@
                 <span class="input-group-text text-bold">Rp</span>
               </div>
               <input type="text" class="form-control form-control-sm text-right text-bold" maxlength="20"
-                name="amount" value="{{ isset($amount) ? $amount : '' }}" readonly>
+                name="amount" value="{{ isset($amount) ? $amount : '' }}" {{ isset($id) ? 'readonly' : '' }}>
             </div>
           </div>
         </div>
@@ -61,7 +61,7 @@
                     <tr>
                       <td>
                         <div class="form-check">
-                          <input class="form-check-input" type="checkbox" name="staff_id" value="{{ $value['id'] }}" {{ in_array($value['id'], $staff_id) ? 'checked' : '' }} {{ isset($mandatory) && $mandatory && $key == 1 ? 'required' : '' }}>
+                          <input class="form-check-input" type="checkbox" name="staff_id" value="{{ $value['id'] }}" {{ isset($staff_id) && in_array($value['id'], $staff_id) ? 'checked' : '' }} {{ isset($mandatory) && $mandatory && $key == 1 ? 'required' : '' }}>
                           <label class="form-check-label">{{ $value['name'] }}</label>
                         </div>
                       </td>

@@ -49,7 +49,7 @@ class DataController extends Controller
         return view('contents.data.index', $view);
     }
 
-    public function add()
+    public function upload()
     {
         if (!$this->hasPrivilege($this->_create)) {
             return abort(404);
@@ -60,6 +60,22 @@ class DataController extends Controller
         $view = ['yearArr' => $year, 'action' => route('master.data.upload'), 'mandatory' => $this->hasPrivilege($this->_create)];
 
         return view('contents.data.upload', $view);
+    }
+
+    public function add()
+    {
+        if (!$this->hasPrivilege($this->_create)) {
+            return abort(404);
+        }
+
+        $year = $this->getYears();
+        $division = $this->getDivisions();
+        $staff = $this->getStaffs();
+        $staff = Arr::except($staff, 0);
+
+        $view = ['yearArr' => $year, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('master.data.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
+
+        return view('contents.data.form', $view);
     }
 
     public function edit($id)
@@ -227,7 +243,7 @@ class DataController extends Controller
         }
     }
 
-    public function upload(Request $request)
+    public function postUpload(Request $request)
     {
         $param = $request->all();
         $validator = Validator::make($param, [
@@ -292,17 +308,18 @@ class DataController extends Controller
                     $arrDivision = config('global.division.code');
                     $arrStaff = array_combine(config('global.staff.raw'), config('global.staff.code'));
 
-                    $data = Data::where('year', $param['year'])->get();
-                    foreach($data as $value) {
-                        $delete = Data::find($value->id);
-                        $delete->is_trash = 1;
-                        $delete->save();
+                    $data = Data::where('year', $param['year'])->orderBy('id')->get();
+                    foreach($data as $key => $value) {
+                        Data::find($value->id)->delete();
+                        MapData::where('data_id', $value->id)->delete();
+
+                        $collections[$key]['id'] = $value->id;
                     }
 
                     foreach ($collections as $collection) {
                         $staff = Str::lower(str_replace(" ", "", $collection['staff']));
                         $division = Str::lower(str_replace(" ", "", $collection['division']));
-                        $data = Data::create([
+                        $array = [
                             'ma_id' => $collection['ma_id'],
                             'description' => trim($collection['description']),
                             'year' => $param['year'],
@@ -311,7 +328,14 @@ class DataController extends Controller
                             'filename' => $filename,
                             'created_by' => Auth::user()->username,
                             'updated_by' => Auth::user()->username,
-                        ]);
+                        ];
+
+                        if(isset($collection['id'])) {
+                            $array['id'] = $collection['id'];
+                        }
+
+                        $data = Data::create($array);
+
                         if ($data->id) {
                             $arr = explode(',', $staff);
                             foreach ($arr as $value) {
@@ -343,7 +367,7 @@ class DataController extends Controller
             return response()->json($response->responseJson());
         }
 
-        if($action === config('global.action.form.edit')) {
+        if (in_array($action, Arr::only(config('global.action.form'), ['add', 'edit']))) {
             $param = SecureHelper::unpack($request->input('json'));
 
             if (!is_array($param)) {
@@ -351,72 +375,107 @@ class DataController extends Controller
                 return response()->json($response->responseJson());
             }
 
-            if(!$this->hasPrivilege($this->_update)) {
-                $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
-                return response()->json($response->responseJson());
-            }
+            if ($action === config('global.action.form.add')) {
+                if (!$this->hasPrivilege($this->_create)) {
+                    $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
+                    return response()->json($response->responseJson());
+                }
 
-            $plainId = SecureHelper::unsecure($id);
+                $data = Data::create([
+                    'year' => $param['year'],
+                    'ma_id' => $param['ma_id'],
+                    'description' => $param['description'],
+                    'division_id' => $param['division_id'],
+                    'filename' => 'Manual',
+                    'amount' => $param['amount'],
+                    'created_by' => Auth::user()->username,
+                    'updated_by' => Auth::user()->username,
+                ]);
 
-            if(!$plainId) {
-                $response = new Response();
-                return response()->json($response->responseJson());
-            }
-
-            if(!$this->hasPrivilege($this->_readid)) {
-                $data = Data::find($plainId);
-
-                if(isset($param['year']) && $param['year'] != '') $data->year = $param['year'];
-                if(isset($param['description']) && $param['description'] != '') $data->description = $param['description'];
-                if(isset($param['division_id']) && $param['division_id'] != '') $data->division_id = $param['division_id'];
-                if(!is_array($param['staff_id'])) $param['staff_id'] = array($param['staff_id']);
-                $data->updated_by = Auth::user()->username;
-
-                if($data->save()) {
-                    $map = MapData::where('data_id', $plainId);
-                    $map->forceDelete();
+                if ($data->id) {
+                    if(!is_array($param['staff_id'])) $param['staff_id'] = array($param['staff_id']);
                     foreach($param['staff_id'] as $value) {
                         MapData::create([
-                            'data_id' => $plainId,
+                            'data_id' => $data->id,
                             'staff_id' => $value
                         ]);
                     }
-
-                    $response = new Response(true, __('Data updated successfuly'), 1);
+                    $response = new Response(true, __('Data created successfuly'), 1);
                     $response->setRedirect(route('master.data.index'));
-
-                    $this->writeAppLog($this->_update, 'Data : '.$param['ma_id']);
+                    $this->writeAppLog($this->_create, 'Data : '.$param['ma_id']);
                 } else {
-                    $response = new Response(false, __('Data update failed. Please try again'));
-                }
-            } else {
-                $data = Data::find($plainId);
-                $data->year = $param['year'];
-                $data->description = $param['description'];
-                $data->division_id = $param['division_id'];
-                $data->updated_by = Auth::user()->username;
-
-                if(!is_array($param['staff_id'])) $param['staff_id'] = array($param['staff_id']);
-
-                if($data->save()) {
-                    $map = MapData::where('data_id', $plainId);
-                    $map->forceDelete();
-                    foreach($param['staff_id'] as $value) {
-                        MapData::create([
-                            'data_id' => $plainId,
-                            'staff_id' => $value
-                        ]);
-                    }
-                    
-                    $response = new Response(true, __('Data updated successfuly'), 1);
-                    $response->setRedirect(route('master.data.index'));
-
-                    $this->writeAppLog($this->_update, 'Data : '.$param['ma_id']);
-                } else {
-                    $response = new Response(false, __('Data update failed. Please try again'));
+                    $response = new Response(false, __('Data create failed. Please try again'));
                 }
             }
 
+            if($action === config('global.action.form.edit')) {
+                if(!$this->hasPrivilege($this->_update)) {
+                    $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
+                    return response()->json($response->responseJson());
+                }
+
+                $plainId = SecureHelper::unsecure($id);
+
+                if(!$plainId) {
+                    $response = new Response();
+                    return response()->json($response->responseJson());
+                }
+
+                if(!$this->hasPrivilege($this->_readid)) {
+                    $data = Data::find($plainId);
+
+                    if(isset($param['year']) && $param['year'] != '') $data->year = $param['year'];
+                    if(isset($param['description']) && $param['description'] != '') $data->description = $param['description'];
+                    if(isset($param['division_id']) && $param['division_id'] != '') $data->division_id = $param['division_id'];
+                    if(!is_array($param['staff_id'])) $param['staff_id'] = array($param['staff_id']);
+                    $data->updated_by = Auth::user()->username;
+
+                    if($data->save()) {
+                        $map = MapData::where('data_id', $plainId);
+                        $map->forceDelete();
+                        foreach($param['staff_id'] as $value) {
+                            MapData::create([
+                                'data_id' => $plainId,
+                                'staff_id' => $value
+                            ]);
+                        }
+
+                        $response = new Response(true, __('Data updated successfuly'), 1);
+                        $response->setRedirect(route('master.data.index'));
+
+                        $this->writeAppLog($this->_update, 'Data : '.$param['ma_id']);
+                    } else {
+                        $response = new Response(false, __('Data update failed. Please try again'));
+                    }
+                } else {
+                    $data = Data::find($plainId);
+                    $data->year = $param['year'];
+                    $data->description = $param['description'];
+                    $data->division_id = $param['division_id'];
+                    $data->updated_by = Auth::user()->username;
+
+                    if(!is_array($param['staff_id'])) $param['staff_id'] = array($param['staff_id']);
+
+                    if($data->save()) {
+                        $map = MapData::where('data_id', $plainId);
+                        $map->forceDelete();
+                        foreach($param['staff_id'] as $value) {
+                            MapData::create([
+                                'data_id' => $plainId,
+                                'staff_id' => $value
+                            ]);
+                        }
+                        
+                        $response = new Response(true, __('Data updated successfuly'), 1);
+                        $response->setRedirect(route('master.data.index'));
+
+                        $this->writeAppLog($this->_update, 'Data : '.$param['ma_id']);
+                    } else {
+                        $response = new Response(false, __('Data update failed. Please try again'));
+                    }
+                }
+
+            }
         }
 
         if($action === config('global.action.form.delete')) {

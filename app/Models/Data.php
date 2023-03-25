@@ -15,6 +15,7 @@ class Data extends Model
     protected $appends = ['staff', 'division', 'years', 'staff_id'];
     
     protected $fillable = [
+        'id',
         'ma_id',
         'description',
         'year',
