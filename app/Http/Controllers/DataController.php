@@ -57,7 +57,7 @@ class DataController extends Controller
 
         $year = $this->getYears();
 
-        $view = ['yearArr' => $year, 'action' => route('master.data.upload'), 'mandatory' => $this->hasPrivilege($this->_create)];
+        $view = ['yearArr' => $year, 'action' => route('master.data.postupload'), 'mandatory' => $this->hasPrivilege($this->_create)];
 
         return view('contents.data.upload', $view);
     }

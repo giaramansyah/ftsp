@@ -100,7 +100,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/data/add', [DataController::class, 'add'])->name('master.data.add');
     Route::get('/data/upload', [DataController::class, 'upload'])->name('master.data.upload');
     Route::get('/data/edit/{id}', [DataController::class, 'edit'])->name('master.data.edit');
-    Route::post('/data/upload', [DataController::class, 'postUpload'])->name('master.data.upload');
+    Route::post('/data/upload', [DataController::class, 'postUpload'])->name('master.data.postupload');
     Route::post('/data/post/{action}/{id}', [DataController::class, 'post'])->name('master.data.post');
 
     //balance
