@@ -85,6 +85,7 @@ class DataController extends Controller
         }
 
         $plainId = SecureHelper::unsecure($id);
+        
 
         if (!$plainId) {
             return abort(404);
