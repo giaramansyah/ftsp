@@ -317,7 +317,7 @@ class HomeController extends Controller
                 'value' => ($budget - $expense),
             ),
             'real' => array(
-                'color' => '#007bff',
+                'color' => '#dc3545',
                 'value' => $expense,
             ),
             'legend' => array(
@@ -360,7 +360,7 @@ class HomeController extends Controller
                 'value' => ($budget - $expense),
             ),
             'real' => array(
-                'color' => '#007bff',
+                'color' => '#dc3545',
                 'value' => $expense,
             ),
             'legend' => array(
@@ -403,7 +403,7 @@ class HomeController extends Controller
                 'value' => ($budget - $expense),
             ),
             'real' => array(
-                'color' => '#007bff',
+                'color' => '#dc3545',
                 'value' => $expense,
             ),
             'legend' => array(
