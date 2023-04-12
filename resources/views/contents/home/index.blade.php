@@ -285,8 +285,8 @@
           {
             data: [data.pagu.value, data.real.value],
             backgroundColor: [
-              data.real.color,
               data.pagu.color,
+              data.real.color,
             ],
             borderColor: "#e6e6e6",
             borderWidth: 1,
