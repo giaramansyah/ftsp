@@ -213,13 +213,15 @@
   function getData() {
     var year = $('select[name="year"]').val();
     var division_id = $('select[name="division_id"]').val();
+    var type = $('input[name="type"]').val();
 
     if(year != '' && division_id != '') {
       $('.table').dataTable().fnClearTable();
       $('.table').dataTable().fnDestroy();
       var data = {
         year : year,
-        division_id : division_id
+        division_id : division_id,
+        type : type
       };
       $('.table').DataTable(
         {

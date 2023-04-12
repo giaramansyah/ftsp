@@ -11,6 +11,7 @@ use App\Models\Expense;
 use App\Models\HistoryBalance;
 use App\Models\MapData;
 use App\Models\MapExpense;
+use App\Models\Reception;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -27,6 +28,8 @@ class ExpenseController extends Controller
     protected $_update = 'EXUP';
     protected $_readall = 'EXRA';
     protected $_readid = 'EXRD';
+
+    protected $_type;
 
     public function index($year = null)
     {
@@ -230,7 +233,9 @@ class ExpenseController extends Controller
     public function getData(Request $request)
     {
         if ($request->ajax()) {
-            if (($request->input('year') == null && $request->input('year') == '') || ($request->input('division_id') == null && $request->input('division_id') == '')) {
+            if (($request->input('year') == null && $request->input('year') == '') || 
+            ($request->input('division_id') == null && $request->input('division_id') == '') || 
+            ($request->input('type') == null && $request->input('type'))) {
                 $data = Expense::where('expense_id', 0);
                 $table = DataTables::eloquent($data);
                 return $table->toJson();
@@ -249,6 +254,10 @@ class ExpenseController extends Controller
                 $table = DataTables::eloquent($data);
                 return $table->toJson();
             }
+
+            $this->_type = $request->input('type');
+
+            // dd($request->all());
 
             $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
             $table = DataTables::eloquent($data);
@@ -269,10 +278,16 @@ class ExpenseController extends Controller
             });
 
             $table->addColumn('remain', function ($row) {
-                $expense =  MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
+                $expense = MapExpense::selectRaw('sum(amount) as amount')->where('data_id', $row->id)->first();
+                $expense_id = MapExpense::select('expense_id')->where('data_id', $row->id)->get()->toArray();
+                $expense_id = array_column($expense_id, 'expense_id');
                 $amount = $row->amount;
                 if ($expense) {
                     $amount = $this->convertAmount($row->amount, true) - $expense->amount;
+                    $reception = Reception::selectRaw('sum(amount) as rollback')->whereIn('expense_id', $expense_id)->first();
+                    if($reception && $this->_type == config('global.type.code.red')) {
+                        $amount = ($amount + $reception->rollback);
+                    }
                     $amount = $this->convertAmount($amount);
                 }
 
