@@ -283,7 +283,7 @@
         labels: data.series,
         datasets: [
           {
-            data: [data.real.value, data.pagu.value],
+            data: [data.pagu.value, data.real.value],
             backgroundColor: [
               data.real.color,
               data.pagu.color,
