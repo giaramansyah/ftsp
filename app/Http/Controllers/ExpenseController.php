@@ -142,7 +142,7 @@ class ExpenseController extends Controller
         if ($data['type'] == config('global.type.code.red')) {
             $is_red = true;
             $file = $this->getFile($data['image'], public_path('upload'));
-            if($file->status) {
+            if ($file->status) {
                 $image = $data['image'];
                 $data['image_exist'] = true;
                 $data['image'] = $file->name;
@@ -233,9 +233,10 @@ class ExpenseController extends Controller
     public function getData(Request $request)
     {
         if ($request->ajax()) {
-            if (($request->input('year') == null && $request->input('year') == '') || 
-            ($request->input('division_id') == null && $request->input('division_id') == '') || 
-            ($request->input('type') == null && $request->input('type'))) {
+            if (($request->input('year') == null && $request->input('year') == '') ||
+                ($request->input('division_id') == null && $request->input('division_id') == '') ||
+                ($request->input('type') == null && $request->input('type'))
+            ) {
                 $data = Expense::where('expense_id', 0);
                 $table = DataTables::eloquent($data);
                 return $table->toJson();
@@ -285,7 +286,7 @@ class ExpenseController extends Controller
                 if ($expense) {
                     $amount = $this->convertAmount($row->amount, true) - $expense->amount;
                     $reception = Reception::selectRaw('sum(amount) as rollback')->whereIn('expense_id', $expense_id)->first();
-                    if($reception && $this->_type == config('global.type.code.red')) {
+                    if ($reception && $this->_type == config('global.type.code.red')) {
                         $amount = ($amount + $reception->rollback);
                     }
                     $amount = $this->convertAmount($amount);
@@ -378,7 +379,7 @@ class ExpenseController extends Controller
         if ($data['status'] == config('global.status.code.finished')) {
             $is_red = true;
             $file = $this->getFile($data['image'], public_path('upload'));
-            if($file->status) {
+            if ($file->status) {
                 $image = $data['image'];
                 $data['image_exist'] = true;
                 $data['image'] = $file->name;
@@ -674,64 +675,181 @@ class ExpenseController extends Controller
                             }
                         }
 
-                        $expense = Expense::find($plainId);
-                        $expense->expense_date = $param['expense_date'];
-                        $expense->reff_no = $param['reff_no'];
-                        $expense->reff_date = $param['reff_date'];
-                        $expense->description = $param['description'];
-                        $expense->sub_description = $param['sub_description'];
-                        $expense->ma_id = $param['ma_id'];
-                        $expense->name = $param['name'];
-                        $expense->staff_id = $param['staff_id'];
-                        $expense->amount = $param['amount'];
-                        $expense->text_amount = $param['text_amount'];
-                        $expense->account = $param['account'];
-                        if ($apply_date) $expense->apply_date = $apply_date;
-                        if ($image) $expense->image = $image;
-                        if ($status) $expense->status = $status;
-                        $expense->updated_by = Auth::user()->username;
-
-                        if ($expense->save()) {
-                            $totalAmount = $this->convertAmount($param['amount'], true);
-
-                            $map = MapExpense::where('expense_id', $plainId)->get();
-                            foreach ($map as $value) {
-                                if ($expense->is_multiple == 1) {
-                                    $data = Data::find($value->data_id);
-                                    if ($data) {
-                                        $amount = $this->convertAmount($data->amount, true);
-                                        if ($amount < $totalAmount) {
-                                            $value->amount = $amount;
-                                            $totalAmount -= $amount;
-                                        } else {
-                                            $value->amount = $totalAmount;
-                                        }
-                                    }
-                                } else {
-                                    $value->amount = $totalAmount;
-                                }
-
-                                MapExpense::where('expense_id', $value->expense_id)->where('data_id', $value->data_id)->update(['amount' => $value->amount]);
-                            }
-
+                        if ($param['type'] == config('global.type.code.white') && $status == config('global.status.code.finished')) {
+                            $prefix = '';
+                            $year = $param['year'];
+                            $year = substr(strval($year), 2, 2);
                             $division_id = $param['division_id'];
-                            $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
-                            if ($balance) {
-                                $history = HistoryBalance::where('balance_id', $balance->id)->where('data_id', $expense->id)->where('transaction_id', config('global.transaction.code.debet'))->first();
-                                $balance->amount = ($this->convertAmount($balance->amount, true) + $this->convertAmount($history->amount, true) - $this->convertAmount($param['amount'], true));
-                                $balance->updated_by = Auth::user()->username;
-                                if ($balance->save()) {
-                                    $history->amount = $param['amount'];
-                                    $history->save();
-                                }
+
+                            switch ($division_id) {
+                                case config('global.division.code.fakultas'):
+                                case config('global.division.code.arsitektur'):
+                                case config('global.division.code.sipil'):
+                                    $prefix = 'F';
+                                    break;
+                                case config('global.division.code.mta'):
+                                    $prefix = 'MTA';
+                                    break;
+                                case config('global.division.code.mts'):
+                                    $prefix = 'MTS';
+                                    break;
+                                default:
+                                    $response = new Response();
+                                    return response()->json($response->responseJson());
+                                    break;
                             }
 
-                            $response = new Response(true, __('Expense updated successfuly'), 1);
-                            $response->setRedirect(route('transaction.expense.view', ['id' => SecureHelper::secure($expense->id)]));
+                            $number = '0001';
 
-                            $this->writeAppLog($this->_create, 'Expense : ' . $param['expense_id']);
+                            $expense = Expense::select('expense_id')->where('expense_id', 'like', '%' . $prefix . $year . '%')->orderBy('expense_id', 'desc')->first();
+                            if ($expense) {
+                                $currentNumber = Str::after($expense->expense_id, $prefix . $year);
+                                $currentNumber++;
+                                $currentNumber = strval($currentNumber);
+                                $temp = '';
+                                for ($i = 0; $i < 4 - strlen($currentNumber); $i++) {
+                                    $temp .= '0';
+                                }
+
+                                $number = $temp . $currentNumber;
+                            }
+
+                            $expense = Expense::create([
+                                'type' => config('global.type.code.red'),
+                                'status' => $status,
+                                'expense_id' => $prefix . $year . $number,
+                                'expense_date' => $param['expense_date'],
+                                'reff_no' => $param['reff_no'],
+                                'reff_date' => $param['reff_date'],
+                                'description' => $param['description'],
+                                'sub_description' => $param['sub_description'],
+                                'ma_id' => $param['ma_id'],
+                                'name' => $param['name'],
+                                'staff_id' => $param['staff_id'],
+                                'amount' => $param['amount'],
+                                'text_amount' => $param['text_amount'],
+                                'account' => $param['account'],
+                                'is_multiple' => $param['is_multiple'],
+                                'apply_date' => $apply_date,
+                                'image' => $image,
+                                'created_by' => Auth::user()->username,
+                                'updated_by' => Auth::user()->username,
+                            ]);
+
+                            if ($expense->id) {
+                                $totalAmount = $this->convertAmount($param['amount'], true);
+
+                                $map = MapExpense::where('expense_id', $plainId)->get();
+                                foreach ($map as $value) {
+                                    $map = [
+                                        'expense_id' => $expense->id,
+                                        'data_id' => $value->data_id,
+                                        'amount' => 0
+                                    ];
+
+                                    if ($param['is_multiple'] == 1) {
+                                        $data = Data::find($value->data_id);
+                                        if ($data) {
+                                            $amount = $this->convertAmount($data->amount, true);
+                                            if ($amount < $totalAmount) {
+                                                $map['amount'] = $amount;
+                                                $totalAmount -= $amount;
+                                            } else {
+                                                $map['amount'] = $totalAmount;
+                                            }
+                                        }
+                                    } else {
+                                        $map['amount'] = $totalAmount;
+                                    }
+
+                                    MapExpense::create($map);
+                                }
+
+                                $division_id = $param['division_id'];
+                                $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
+                                if ($balance) {
+                                    $history = HistoryBalance::where('balance_id', $balance->id)->where('data_id', $expense->id)->where('transaction_id', config('global.transaction.code.debet'))->first();
+                                    $balance->amount = ($this->convertAmount($balance->amount, true) + $this->convertAmount($history->amount, true) - $this->convertAmount($param['amount'], true));
+                                    $balance->updated_by = Auth::user()->username;
+                                    if ($balance->save()) {
+                                        $history->amount = $param['amount'];
+                                        $history->save();
+                                    }
+                                }
+
+                                $response = new Response(true, __('Expense updated successfuly'), 1);
+                                $response->setRedirect(route('transaction.expense.view', ['id' => SecureHelper::secure($expense->id)]));
+
+                                $this->writeAppLog($this->_create, 'Expense : ' . $param['expense_id']);
+                            } else {
+                                $response = new Response(false, __('Expense updated failed. Please try again'));
+                            }
                         } else {
-                            $response = new Response(false, __('Expense updated failed. Please try again'));
+                            $expense = Expense::find($plainId);
+                            $expense->expense_date = $param['expense_date'];
+                            $expense->reff_no = $param['reff_no'];
+                            $expense->reff_date = $param['reff_date'];
+                            $expense->description = $param['description'];
+                            $expense->sub_description = $param['sub_description'];
+                            $expense->ma_id = $param['ma_id'];
+                            $expense->name = $param['name'];
+                            $expense->staff_id = $param['staff_id'];
+                            $expense->amount = $param['amount'];
+                            $expense->text_amount = $param['text_amount'];
+                            $expense->account = $param['account'];
+                            if ($apply_date) {
+                                $expense->apply_date = $apply_date;
+                            }
+                            if ($image) {
+                                $expense->image = $image;
+                            }
+                            if ($status) {
+                                $expense->status = $status;
+                            }
+                            $expense->updated_by = Auth::user()->username;
+
+                            if ($expense->save()) {
+                                $totalAmount = $this->convertAmount($param['amount'], true);
+
+                                $map = MapExpense::where('expense_id', $plainId)->get();
+                                foreach ($map as $value) {
+                                    if ($expense->is_multiple == 1) {
+                                        $data = Data::find($value->data_id);
+                                        if ($data) {
+                                            $amount = $this->convertAmount($data->amount, true);
+                                            if ($amount < $totalAmount) {
+                                                $value->amount = $amount;
+                                                $totalAmount -= $amount;
+                                            } else {
+                                                $value->amount = $totalAmount;
+                                            }
+                                        }
+                                    } else {
+                                        $value->amount = $totalAmount;
+                                    }
+
+                                    MapExpense::where('expense_id', $value->expense_id)->where('data_id', $value->data_id)->update(['amount' => $value->amount]);
+                                }
+
+                                $division_id = $param['division_id'];
+                                $balance = Balance::where('division_id', $division_id)->where('is_trash', 0)->first();
+                                if ($balance) {
+                                    $history = HistoryBalance::where('balance_id', $balance->id)->where('data_id', $expense->id)->where('transaction_id', config('global.transaction.code.debet'))->first();
+                                    $balance->amount = ($this->convertAmount($balance->amount, true) + $this->convertAmount($history->amount, true) - $this->convertAmount($param['amount'], true));
+                                    $balance->updated_by = Auth::user()->username;
+                                    if ($balance->save()) {
+                                        $history->amount = $param['amount'];
+                                        $history->save();
+                                    }
+                                }
+
+                                $response = new Response(true, __('Expense updated successfuly'), 1);
+                                $response->setRedirect(route('transaction.expense.view', ['id' => SecureHelper::secure($expense->id)]));
+
+                                $this->writeAppLog($this->_create, 'Expense : ' . $param['expense_id']);
+                            } else {
+                                $response = new Response(false, __('Expense updated failed. Please try again'));
+                            }
                         }
                     }
                 }
@@ -754,9 +872,9 @@ class ExpenseController extends Controller
             $response = new Response();
             return response()->json($response->responseJson());
         }
-        
+
         $plainId = SecureHelper::unsecure($id);
-        
+
         if (!$plainId) {
             $response = new Response();
             return response()->json($response->responseJson());
@@ -764,7 +882,7 @@ class ExpenseController extends Controller
 
         $type = $param['type'];
 
-        if(!in_array($type, [config('global.type.code.red'), config('global.type.code.white')])) {
+        if (!in_array($type, [config('global.type.code.red'), config('global.type.code.white')])) {
             $response = new Response();
             return response()->json($response->responseJson());
         }
@@ -774,7 +892,7 @@ class ExpenseController extends Controller
         $types = array_combine(config('global.type.code'), config('global.type.desc'));
         $filename = date('d_M_Y_H_i_s') . '_' . $types[$data['type']] . ' ' . $data['ma_id'] . '.pdf';
 
-        if($type == config('global.type.code.red')) {
+        if ($type == config('global.type.code.red')) {
             $data['knowing'] = Employee::find($param['knowing'])->name;
             $data['approver'] = Employee::find($param['approver'])->name;
             $data['sender'] = Employee::find($param['sender'])->name;
@@ -782,7 +900,7 @@ class ExpenseController extends Controller
             $pdf = Pdf::loadView('partials.print.red', $data);
         }
 
-        if($type == config('global.type.code.white')) {
+        if ($type == config('global.type.code.white')) {
             $data['knowing'] = Employee::find($param['knowing'])->name;
             $data['approver'] = Employee::find($param['approver'])->name;
             $data['reciever'] = Employee::find($param['reciever'])->name;
@@ -831,7 +949,7 @@ class ExpenseController extends Controller
         }
 
         $file = $this->getFile($param['file'], $param['path']);
-        if($file->status) {
+        if ($file->status) {
             $headers = array(
                 'Content-Type: application/pdf',
                 'Content-Disposition: attachment;filename=' . $file->name,
@@ -839,12 +957,11 @@ class ExpenseController extends Controller
                 'Pragma: no-cache',
                 'Expires: 0'
             );
-    
+
             return response()->download($file->path, $file->name, $headers);
         } else {
             abort(404);
         }
-
     }
 
     public function generate(Request $request)

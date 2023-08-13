@@ -8,9 +8,12 @@
                 <div class="card-body">
                     <input type="hidden" name="type" value="{{ isset($type) ? $type : '' }}">
                     <input type="hidden" name="status" value="{{ isset($status) ? $status : '' }}">
+                    <input type="hidden" name="is_multiple" value="{{ isset($is_multiple) ? $is_multiple : '' }}">
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Tahun Akademik<code>*</code></label>
                         <div class="col-sm-2">
+                            <input type="hidden" name="year"
+                                value="{{ isset($data['year']) && $data['year'] ? $data['year'] : '' }}">
                             <input type="text" class="form-control form-control-sm"
                                 value="{{ isset($data['years']) && $data['years'] ? $data['years'] : '' }}" readonly>
                         </div>
