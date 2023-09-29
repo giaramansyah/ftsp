@@ -4,7 +4,7 @@
     <select class="form-control form-control-sm select2" name="year2">
       <option value="">-- Silakan Pilih --</option>
       @foreach ($yearArr as $key => $value)
-      <option value="{{ Secure::secure($value['id']) }}" {{ date('Y') == $value['id'] ? 'selected' : ''
+      <option value="{{ Secure::secure($value['id']) }}" {{ $thisYear == $value['id'] ? 'selected' : ''
         }}>{{ $value['name'] }}</option>
       @endforeach
     </select>

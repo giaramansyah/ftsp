@@ -91,13 +91,25 @@ class HomeController extends Controller
 
         $years = $this->getYears();
 
-        $view = ['result' => $result, 'is_general' => $is_general, 'is_note' => $is_note, 'yearArr' =>  $years];
+        $view = ['result' => $result, 'is_general' => $is_general, 'is_note' => $is_note, 'yearArr' =>  $years, 'thisYear' => $this->_year];
 
         return view('contents.home.index', $view);
     }
 
-    public function getRealization()
+    public function getRealization($year = null)
     {
+        if (!isset($year)) {
+            $this->_year = date('Y');
+        } else {
+            $year = SecureHelper::unsecure($year);
+
+            if (!$year) {
+                $this->_year = date('Y');
+            } else {
+                $this->_year = $year;
+            }
+        }
+
         $result = array();
         $result['fakultas'] = $this->fakultas();
         $result['mta'] = $this->mta();
@@ -109,9 +121,21 @@ class HomeController extends Controller
         return response()->json($response->responseJson());
     }
 
-    public function getPending(Request $request)
+    public function getPending(Request $request, $year = null)
     {
         if ($request->ajax()) {
+            if (!isset($year)) {
+                $this->_year = date('Y');
+            } else {
+                $year = SecureHelper::unsecure($year);
+    
+                if (!$year) {
+                    $this->_year = date('Y');
+                } else {
+                    $this->_year = $year;
+                }
+            }
+            
             $data = Data::select(['id'])->where('is_trash', 0)->where('year', $this->_year)->orderBy('id')->get()->toArray();
             $data = array_column($data, 'id');
 
