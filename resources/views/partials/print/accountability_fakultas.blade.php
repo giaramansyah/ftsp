@@ -223,28 +223,34 @@
     </table>
     <table width="100%">
       <tr>
-        <td width="50%" style="text-align: center">Mengetahui,</td>
-        <td width="50%" style="text-align: center">Jakarta, {{ $report_date }}</td>
+        <td width="33%" style="text-align: center">Mengetahui,</td>
+        <td width="33%" style="text-align: center"></td>
+        <td width="33%" style="text-align: center">Jakarta, {{ $report_date }}</td>
       </tr>
       <tr>
-        <td width="50%" style="text-align: center">Wakil Dekan II</td>
-        <td width="50%" style="text-align: center">Kasir FTSP</td>
+        <td width="33%" style="text-align: center">Wakil Dekan II</td>
+        <td width="33%" style="text-align: center">Kasubag Umum Keuangan</td>
+        <td width="33%" style="text-align: center">Kasir FTSP</td>
       </tr>
       <tr>
-        <td width="50%" style="text-align: center">&nbsp;</td>
-        <td width="50%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
       </tr>
       <tr>
-        <td width="50%" style="text-align: center">&nbsp;</td>
-        <td width="50%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
       </tr>
       <tr>
-        <td width="50%" style="text-align: center">&nbsp;</td>
-        <td width="50%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
+        <td width="33%" style="text-align: center">&nbsp;</td>
       </tr>
       <tr>
-        <td width="50%" style="text-align: center; font-weight: 600">{{ $knowing }}</td>
-        <td width="50%" style="text-align: center; font-weight: 600">{{ $user }}</td>
+        <td width="33%" style="text-align: center; font-weight: 600">{{ $knowing }}</td>
+        <td width="33%" style="text-align: center; font-weight: 600">{{ $knowing2 }}</td>
+        <td width="33%" style="text-align: center; font-weight: 600">{{ $user }}</td>
       </tr>
     </table>
   </body>

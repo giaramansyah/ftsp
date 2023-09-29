@@ -197,36 +197,50 @@ class ExcelWriter
         $row++;
         $row++;
         $sheet->setCellValue($this->_columns[0] . $row, 'Mengetahui,');
-        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[3] . $row);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
 
-        $sheet->setCellValue($this->_columns[5] . $row, 'Jakarta, ' . $this->_data['report_date']);
-        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->setCellValue($this->_columns[3] . $row, '');
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[5] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[6] . $row, 'Jakarta, ' . $this->_data['report_date']);
+        $sheet->mergeCells($this->_columns[6] . $row . ':' . $this->_columns[9] . $row);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
 
         $row++;
         $sheet->setCellValue($this->_columns[0] . $row, 'Wakil Dekan II');
-        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[3] . $row);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
 
-        $sheet->setCellValue($this->_columns[5] . $row, 'Kasir FTSP');
-        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->setCellValue($this->_columns[3] . $row, 'Kasubag Umum Keuangan');
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[5] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[6] . $row, 'Kasir FTSP');
+        $sheet->mergeCells($this->_columns[6] . $row . ':' . $this->_columns[9] . $row);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
 
         $row++;
         $row++;
         $row++;
         $sheet->setCellValue($this->_columns[0] . $row, $this->_data['knowing']);
-        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[3] . $row);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->getFont()->setBold(true);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->getFont()->setBaseLine(true);
+        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->getFont()->setBaseLine(true);
 
-        $sheet->setCellValue($this->_columns[5] . $row, $this->_data['user']);
-        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->getFont()->setBold(true);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->getFont()->setBaseLine(true);
+        $sheet->setCellValue($this->_columns[3] . $row, $this->_data['knowing2']);
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[5] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->getFont()->setBaseLine(true);
+
+        $sheet->setCellValue($this->_columns[6] . $row, $this->_data['user']);
+        $sheet->mergeCells($this->_columns[6] . $row . ':' . $this->_columns[9] . $row);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->getFont()->setBaseLine(true);
     }
 
     private function accountability_fakultas(Worksheet $sheet)
@@ -475,36 +489,50 @@ class ExcelWriter
         $row++;
         $row++;
         $sheet->setCellValue($this->_columns[0] . $row, 'Mengetahui,');
-        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[3] . $row);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
 
-        $sheet->setCellValue($this->_columns[5] . $row, 'Jakarta, ' . $this->_data['report_date']);
-        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->setCellValue($this->_columns[3] . $row, '');
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[5] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[6] . $row, 'Jakarta, ' . $this->_data['report_date']);
+        $sheet->mergeCells($this->_columns[6] . $row . ':' . $this->_columns[9] . $row);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
 
         $row++;
         $sheet->setCellValue($this->_columns[0] . $row, 'Wakil Dekan II');
-        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[3] . $row);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
 
-        $sheet->setCellValue($this->_columns[5] . $row, 'Kasir FTSP');
-        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->setCellValue($this->_columns[3] . $row, 'Kasubag Umum Keuangan');
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[5] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->applyFromArray($this->_style['footer']);
+
+        $sheet->setCellValue($this->_columns[6] . $row, 'Kasir FTSP');
+        $sheet->mergeCells($this->_columns[6] . $row . ':' . $this->_columns[9] . $row);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
 
         $row++;
         $row++;
         $row++;
         $sheet->setCellValue($this->_columns[0] . $row, $this->_data['knowing']);
-        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[3] . $row);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->applyFromArray($this->_style['footer']);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->getFont()->setBold(true);
-        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[3] . $row)->getFont()->setBaseLine(true);
+        $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[2] . $row);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->getFont()->setBaseLine(true);
 
-        $sheet->setCellValue($this->_columns[5] . $row, $this->_data['user']);
-        $sheet->mergeCells($this->_columns[5] . $row . ':' . $this->_columns[9] . $row);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->getFont()->setBold(true);
-        $sheet->getStyle($this->_columns[5] . $row . ':' . $this->_columns[9] . $row)->getFont()->setBaseLine(true);
+        $sheet->setCellValue($this->_columns[3] . $row, $this->_data['knowing2']);
+        $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[5] . $row);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->getFont()->setBaseLine(true);
+
+        $sheet->setCellValue($this->_columns[6] . $row, $this->_data['user']);
+        $sheet->mergeCells($this->_columns[6] . $row . ':' . $this->_columns[9] . $row);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->applyFromArray($this->_style['footer']);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->getFont()->setBold(true);
+        $sheet->getStyle($this->_columns[6] . $row . ':' . $this->_columns[9] . $row)->getFont()->setBaseLine(true);
     }
 
     private function accountability_umd(Worksheet $sheet)

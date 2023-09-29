@@ -243,6 +243,7 @@ class AccountabilityController extends Controller
             $reports = array_combine(config('global.report.code'), config('global.report.desc'));
             $divisions = array_combine(config('global.compact_division.code'), config('global.compact_division.report'));
             $employee = Employee::find($param['knowing']);
+            $employee2 = Employee::find($param['knowing2']);
             $date = Carbon::createFromFormat('Y-m-d', $param['accountability_date']);
 
 
@@ -259,6 +260,7 @@ class AccountabilityController extends Controller
                     'total_reception' => 0,
                     'total_expense' => 0,
                     'knowing' => isset($employee->name) ? $employee->name : Auth::user()->full_name,
+                    'knowing2' => isset($employee2->name) ? $employee2->name : Auth::user()->full_name,
                     'user' => Auth::user()->full_name
                 ];
 
@@ -355,6 +357,7 @@ class AccountabilityController extends Controller
                     'expense' => array(),
                     'total_expense' => 0,
                     'knowing' => isset($employee->name) ? $employee->name : Auth::user()->full_name,
+                    'knowing2' => isset($employee2->name) ? $employee2->name : Auth::user()->full_name,
                     'user' => Auth::user()->full_name
                 ];
 
