@@ -239,10 +239,7 @@
           processing: true,
           ajax: {
             method: 'GET',
-            url: "{{ route('home.pending') }}",
-            data: {
-              year: $('select[name=year2]').val()
-            }
+            url: "{{ route('home.pending') }}/" + $('select[name=year2]').val()
           },
           order: [],
           columns: [{
@@ -307,10 +304,7 @@
 
         $.ajax({
           type: "GET",
-          url: "{{ route('home.realization') }}",
-          data: {
-            year: $('select[name=year2]').val()
-          },
+          url: "{{ route('home.realization') }}/" + $('select[name=year2]').val(),
           dataType: 'json',
           tryCount: 0,
           retryLimit: 3,
