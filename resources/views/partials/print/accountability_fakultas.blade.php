@@ -229,7 +229,7 @@
       </tr>
       <tr>
         <td width="33%" style="text-align: center">Wakil Dekan II</td>
-        <td width="33%" style="text-align: center">Kasubag Umum Keuangan</td>
+        <td width="33%" style="text-align: center">Kasubag Umum & Keuangan</td>
         <td width="33%" style="text-align: center">Kasir FTSP</td>
       </tr>
       <tr>

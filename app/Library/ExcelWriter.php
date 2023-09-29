@@ -213,7 +213,7 @@ class ExcelWriter
         $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[2] . $row);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
 
-        $sheet->setCellValue($this->_columns[3] . $row, 'Kasubag Umum Keuangan');
+        $sheet->setCellValue($this->_columns[3] . $row, 'Kasubag Umum & Keuangan');
         $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[5] . $row);
         $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->applyFromArray($this->_style['footer']);
 
@@ -505,7 +505,7 @@ class ExcelWriter
         $sheet->mergeCells($this->_columns[0] . $row . ':' . $this->_columns[2] . $row);
         $sheet->getStyle($this->_columns[0] . $row . ':' . $this->_columns[2] . $row)->applyFromArray($this->_style['footer']);
 
-        $sheet->setCellValue($this->_columns[3] . $row, 'Kasubag Umum Keuangan');
+        $sheet->setCellValue($this->_columns[3] . $row, 'Kasubag Umum & Keuangan');
         $sheet->mergeCells($this->_columns[3] . $row . ':' . $this->_columns[5] . $row);
         $sheet->getStyle($this->_columns[3] . $row . ':' . $this->_columns[5] . $row)->applyFromArray($this->_style['footer']);
 
