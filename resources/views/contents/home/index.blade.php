@@ -310,7 +310,7 @@
           url: "{{ route('home.realization') }}",
           data: {
             year: $('select[name=year2]').val()
-          }
+          },
           dataType: 'json',
           tryCount: 0,
           retryLimit: 3,
