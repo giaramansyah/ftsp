@@ -224,6 +224,11 @@
   @endif
   @if ($is_general)
     <script type="text/javascript">
+      $('select[name=year2]').on('change', function() {
+        var id = $(this).val();
+        location.href = "route('home')" + "/" + id;
+      })
+
       getPieChart();
       getPending();
 
@@ -234,7 +239,7 @@
           processing: true,
           ajax: {
             method: 'GET',
-            url: "{{ route('home.pending') }}",
+            url: "{{ route('home.pending') }}"
           },
           order: [],
           columns: [{

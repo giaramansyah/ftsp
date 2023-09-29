@@ -22,11 +22,24 @@ class HomeController extends Controller
     function __construct()
     {
         // $this->_year = 2022;
-        $this->_year = date('Y');
+        //$this->_year = date('Y');
     }
 
-    public function index()
+    public function index($year = null)
     {
+
+        if (!isset($year)) {
+            $this->_year = date('Y');
+        } else {
+            $year = SecureHelper::unsecure($year);
+
+            if (!$year) {
+                $this->_year = date('Y');
+            } else {
+                $this->_year = $year;
+            }
+        }
+
         $data = $this->convertAmount(Data::where('year', $this->_year)->where('is_trash', 0)->sum('amount'));
         $balance = Balance::select('division_id', 'amount')->get();
 
