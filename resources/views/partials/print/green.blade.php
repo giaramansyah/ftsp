@@ -132,7 +132,7 @@
       <b>{{ $ma_id ? $ma_id : '' }}</b>
     </div>
     <div class="desc">
-      <b>{{ $description }}<br>a/n. {{ $name }}</b>
+      <b>{{ $description }}<br>a/n. {{ $name_desc }}</b>
     </div>
     <div class="note">
       <b>Sebesar :</b>
