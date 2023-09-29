@@ -1,13 +1,21 @@
-<div class="form-group row justify-content-center mb-0">
-  <label class="col-sm-2 col-form-label">{{ __('Tahun Akademik') }}<code>*</code></label>
-  <div class="col-sm-2">
-    <select class="form-control form-control-sm select2" name="year2">
-      <option value="">-- Silakan Pilih --</option>
-      @foreach ($yearArr as $key => $value)
-      <option value="{{ Secure::secure($value['id']) }}" {{ $thisYear == $value['id'] ? 'selected' : ''
-        }}>{{ $value['name'] }}</option>
-      @endforeach
-    </select>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card" id="note">
+      <div class="card-header">
+        <div class="form-group row justify-content-center mb-0">
+          <label class="col-sm-2 col-form-label">{{ __('Tahun Akademik') }}<code>*</code></label>
+          <div class="col-sm-2">
+            <select class="form-control form-control-sm select2" name="year2">
+              <option value="">-- Silakan Pilih --</option>
+              @foreach ($yearArr as $key => $value)
+              <option value="{{ Secure::secure($value['id']) }}" {{ $thisYear == $value['id'] ? 'selected' : ''
+                }}>{{ $value['name'] }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="row justify-content-center">
