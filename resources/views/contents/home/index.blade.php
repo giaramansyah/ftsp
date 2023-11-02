@@ -226,7 +226,7 @@
     <script type="text/javascript">
       $('select[name=year2]').on('change', function() {
         var id = $(this).val();
-        location.href = "{{ route('home') }}" + "/" + id;
+        location.href = "{{ route('home') }}" + "?years=" + id;
       })
 
       getPieChart();

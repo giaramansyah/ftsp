@@ -25,8 +25,9 @@ class HomeController extends Controller
         //$this->_year = date('Y');
     }
 
-    public function index($year = null)
+    public function index(Request $request)
     {
+        $year = $request->input('years');
 
         if (!isset($year)) {
             $this->_year = date('Y');
