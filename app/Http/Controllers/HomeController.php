@@ -79,14 +79,16 @@ class HomeController extends Controller
 
         $is_note = false;
         $is_general = false;
-        $bod = Arr::except(config('global.staff.code'), 'admin');
+        $bod = [config('global.staff.code.dekan'), config('global.staff.code.wd2')];
         if (Auth::user()->id == 1) {
             $is_note = true;
             $is_general = true;
         } else {
             if (Auth::user()->privilege == ['NTCR', 'NTUP', 'NTRM', 'NTRA', 'NTRD'] || in_array(Auth::user()->staff_id, $bod)) {
                 $is_note = true;
-            } else {
+            } 
+            
+            if(config('global.staff.code.admin')) {
                 $is_general = true;
             }
         }
