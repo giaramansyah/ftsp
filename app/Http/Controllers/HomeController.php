@@ -88,7 +88,7 @@ class HomeController extends Controller
                 $is_note = true;
             } 
             
-            if(config('global.staff.code.admin')) {
+            if(Auth::user()->staff_id == config('global.staff.code.admin')) {
                 $is_general = true;
             }
         }
