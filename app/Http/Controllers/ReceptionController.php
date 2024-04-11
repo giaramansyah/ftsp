@@ -444,10 +444,10 @@ class ReceptionController extends Controller
 
         $filename = date('d_M_Y_H_i_s') . '_' . config('global.type.desc.green') . '_' . $data['reception_id'] . '.pdf';
 
-        $data['knowing'] = Employee::find($param['knowing'])->name;
-        $data['approver'] = Employee::find($param['approver'])->name;
-        $data['sender'] = Employee::find($param['sender'])->name;
-        $data['reciever'] = Employee::find($param['reciever'])->name;
+        $data['knowing'] = Employee::find($param['knowing']) ? Employee::find($param['knowing'])->name : '';
+        $data['approver'] = Employee::find($param['approver']) ? Employee::find($param['approver'])->name : '';
+        $data['sender'] = Employee::find($param['sender']) ? Employee::find($param['sender'])->name : '';
+        $data['reciever'] = Employee::find($param['reciever']) ? Employee::find($param['reciever'])->name : '';
         $pdf = Pdf::loadView('partials.print.green', $data);
 
         $descMonth = config('global.months');

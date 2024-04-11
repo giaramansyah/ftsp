@@ -10,7 +10,7 @@
           <div class="form-group row">
             <label class="col-form-label col-sm-4">Dibayar Oleh</label>
             <div class="col-sm-8">
-              <select class="form-control form-control-sm select2" name="knowing" required>
+              <select class="form-control form-control-sm select2" name="knowing">
                 <option value="">-- Silakan Pilih --</option>
                 @foreach ($employeeArr as $key => $value)
                 <option value="{{ $value['id'] }}">{{
@@ -22,7 +22,7 @@
           <div class="form-group row">
             <label class="col-form-label col-sm-4">Menyetujui</label>
             <div class="col-sm-8">
-              <select class="form-control form-control-sm select2" name="approver" required>
+              <select class="form-control form-control-sm select2" name="approver">
                 <option value="">-- Silakan Pilih --</option>
                 @foreach ($employeeArr as $key => $value)
                 <option value="{{ $value['id'] }}">{{
@@ -34,7 +34,7 @@
           <div class="form-group row">
             <label class="col-form-label col-sm-4">Yang Menerima</label>
             <div class="col-sm-8">
-              <select class="form-control form-control-sm select2" name="reciever" required>
+              <select class="form-control form-control-sm select2" name="reciever">
                 <option value="">-- Silakan Pilih --</option>
                 @foreach ($employeeArr as $key => $value)
                 <option value="{{ $value['id'] }}">{{

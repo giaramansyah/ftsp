@@ -102,11 +102,30 @@ class UserController extends Controller
             $group[$key]['id'] = $encId;
         }
 
-        $division = $this->getDivisions();
-        $division = Arr::except($division, 0);
+        // $division = $this->getDivisions();
+        // $division = Arr::except($division, 0);
+        $divisions = $division = array_combine(config('global.division.code'), config('global.division.desc'));
+        $division = Arr::only($divisions, [config('global.division.code.sipil'), config('global.division.code.arsitektur')]);
+        $divisions1 = array();
+        foreach($division as $key => $value) {
+            $divisions1[] = array(
+                'id' => $key,
+                'name' => $value,
+            );
+        }
+
+        $division = Arr::only($divisions, [config('global.division.code.mts'), config('global.division.code.mta')]);
+        $divisions2 = array();
+        foreach($division as $key => $value) {
+            $divisions2[] = array(
+                'id' => $key,
+                'name' => $value,
+            );
+        }
+
         $staff = $this->getStaffs();
 
-        $view = ['groupArr' => $group, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('settings.user.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'mandatory' => $this->hasPrivilege($this->_readid)];
+        $view = ['groupArr' => $group, 'divisionArrS1' => $divisions1, 'divisionArrS2' => $divisions2, 'staffArr' => $staff, 'action' => route('settings.user.post', ['action' => config('global.action.form.edit'), 'id' => $id]), 'mandatory' => $this->hasPrivilege($this->_readid)];
 
         return view('contents.user.form', array_merge($user, $view));
     }

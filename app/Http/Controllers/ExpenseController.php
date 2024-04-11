@@ -893,17 +893,17 @@ class ExpenseController extends Controller
         $filename = date('d_M_Y_H_i_s') . '_' . $types[$data['type']] . ' ' . $data['ma_id'] . '.pdf';
 
         if ($type == config('global.type.code.red')) {
-            $data['knowing'] = Employee::find($param['knowing'])->name;
-            $data['approver'] = Employee::find($param['approver'])->name;
-            $data['sender'] = Employee::find($param['sender'])->name;
-            $data['reciever'] = Employee::find($param['reciever'])->name;
+            $data['knowing'] = Employee::find($param['knowing']) ? Employee::find($param['knowing'])->name : '';
+            $data['approver'] = Employee::find($param['approver']) ? Employee::find($param['approver'])->name : '';
+            $data['sender'] = Employee::find($param['sender']) ? Employee::find($param['sender'])->name : '';
+            $data['reciever'] = Employee::find($param['reciever']) ? Employee::find($param['reciever'])->name : '';
             $pdf = Pdf::loadView('partials.print.red', $data);
         }
 
         if ($type == config('global.type.code.white')) {
-            $data['knowing'] = Employee::find($param['knowing'])->name;
-            $data['approver'] = Employee::find($param['approver'])->name;
-            $data['reciever'] = Employee::find($param['reciever'])->name;
+            $data['knowing'] = Employee::find($param['knowing']) ? Employee::find($param['knowing'])->name : '';
+            $data['approver'] = Employee::find($param['approver']) ? Employee::find($param['approver'])->name : '';
+            $data['reciever'] = Employee::find($param['reciever']) ? Employee::find($param['reciever'])->name : '';
             $pdf = Pdf::loadView('partials.print.white', $data);
         }
 

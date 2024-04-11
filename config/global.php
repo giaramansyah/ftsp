@@ -85,7 +85,7 @@ return [
             'arsitektur' => 'Arsitektur',
             'mts' => 'Magister Teknik Sipil',
             'mta' => 'Magister Teknik Arsitektur',
-            'dta' => 'Doktor Teknik Arsitektur',
+            'dta' => 'Doktor Arsitektur',
         ],
         'report' => [
             'fakultas' => 'FAKULTAS TEKNIK SIPIL DAN PERENCANAAN UNIVERSITAS TRISAKTI',
@@ -93,7 +93,7 @@ return [
             'arsitektur' => 'PROGRAM STUDI TEKNIK ARSITEKTUR UNIVERSITAS TRISAKTI',
             'mts' => 'PROGRAM STUDI MAGISTER TEKNIK SIPIL (S2 MTS) UNIVERSITAS TRISAKTI',
             'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
-            'dta' => 'PROGRAM STUDI DOKTOR TEKNIK ARSITEKTUR (S3 DTA) UNIVERSITAS TRISAKTI',
+            'dta' => 'PROGRAM STUDI DOKTOR ARSITEKTUR (S3 DTA) UNIVERSITAS TRISAKTI',
         ]
     ],
 
@@ -108,13 +108,13 @@ return [
             'fakultas' => 'Fakultas S1',
             'mts' => 'Magister Teknik Sipil',
             'mta' => 'Magister Teknik Arsitektur',
-            'dta' => 'Doktor Teknik Arsitektur',
+            'dta' => 'Doktor Arsitektur',
         ],
         'report' => [
             'fakultas' => 'FAKULTAS TEKNIK SIPIL DAN PERENCANAAN UNIVERSITAS TRISAKTI',
             'mts' => 'PROGRAM STUDI MAGISTER TEKNIK SIPIL (S2 MTS) UNIVERSITAS TRISAKTI',
             'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
-            'dta' => 'PROGRAM STUDI DOKTOR TEKNIK ARSITEKTUR (S3 DTA) UNIVERSITAS TRISAKTI',
+            'dta' => 'PROGRAM STUDI DOKTOR ARSITEKTUR (S3 DTA) UNIVERSITAS TRISAKTI',
         ]
     ],
 
