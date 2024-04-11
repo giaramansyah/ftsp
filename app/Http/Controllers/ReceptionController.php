@@ -542,6 +542,9 @@ class ReceptionController extends Controller
             case config('global.division.code.mts'):
                 $prefix = 'MTS';
                 break;
+            case config('global.division.code.dta'):
+                $prefix = 'DTA';
+                break;
             default:
                 $response = new Response();
                 return response()->json($response->responseJson());

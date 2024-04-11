@@ -36,7 +36,7 @@
         </div>
         @endif
         <div class="form-group row">
-          <label class="col-sm-2 col-form-label">Nama Lengkap<code>*</code></label>
+          <label class="col-sm-2 col-form-label">Nominal Saldo<code>*</code></label>
           <div class="col-sm-2">
             <div class="input-group input-group-sm">
               <div class="input-group-prepend">

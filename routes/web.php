@@ -58,6 +58,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/home/realization/{year?}', [HomeController::class, 'getRealization'])->name('home.realization');
     Route::get('/home/pending/{year?}', [HomeController::class, 'getPending'])->name('home.pending');
     Route::get('/home/note', [HomeController::class, 'getNote'])->name('home.note');
+    Route::get('/home/pic', [HomeController::class, 'getPic'])->name('home.pic');
 
     //myaccount
     Route::get('/myaccount', [AccountController::class, 'index'])->name('myaccount');

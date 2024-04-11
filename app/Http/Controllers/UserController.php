@@ -44,10 +44,29 @@ class UserController extends Controller
             $group[$key]['id'] = SecureHelper::secure($value['id']);
         }
 
-        $division = $this->getDivisions();
+        $divisions = $division = array_combine(config('global.division.code'), config('global.division.desc'));
+        $division = Arr::only($divisions, [config('global.division.code.sipil'), config('global.division.code.arsitektur')]);
+        $divisions1 = array();
+        foreach($division as $key => $value) {
+            $divisions1[] = array(
+                'id' => $key,
+                'name' => $value,
+            );
+        }
+
+        $division = Arr::only($divisions, [config('global.division.code.mts'), config('global.division.code.mta')]);
+        $divisions2 = array();
+        foreach($division as $key => $value) {
+            $divisions2[] = array(
+                'id' => $key,
+                'name' => $value,
+            );
+        }
+
+        // $division = $this->getDivisions();
         $staff = $this->getStaffs();
 
-        $view = ['groupArr' => $group, 'divisionArr' => $division, 'staffArr' => $staff, 'action' => route('settings.user.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
+        $view = ['groupArr' => $group, 'divisionArrS1' => $divisions1, 'divisionArrS2' => $divisions2, 'staffArr' => $staff, 'action' => route('settings.user.post', ['action' => config('global.action.form.add'), 'id' => 0]), 'mandatory' => $this->hasPrivilege($this->_create)];
 
         return view('contents.user.form', $view);
     }

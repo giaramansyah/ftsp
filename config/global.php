@@ -77,6 +77,7 @@ return [
             'arsitektur' => 2,
             'mts' => 5,
             'mta' => 4,
+            'dta' => 6,
         ],
         'desc' => [
             'fakultas' => 'Fakultas',
@@ -84,6 +85,7 @@ return [
             'arsitektur' => 'Arsitektur',
             'mts' => 'Magister Teknik Sipil',
             'mta' => 'Magister Teknik Arsitektur',
+            'dta' => 'Doktor Teknik Arsitektur',
         ],
         'report' => [
             'fakultas' => 'FAKULTAS TEKNIK SIPIL DAN PERENCANAAN UNIVERSITAS TRISAKTI',
@@ -91,6 +93,7 @@ return [
             'arsitektur' => 'PROGRAM STUDI TEKNIK ARSITEKTUR UNIVERSITAS TRISAKTI',
             'mts' => 'PROGRAM STUDI MAGISTER TEKNIK SIPIL (S2 MTS) UNIVERSITAS TRISAKTI',
             'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
+            'dta' => 'PROGRAM STUDI DOKTOR TEKNIK ARSITEKTUR (S3 DTA) UNIVERSITAS TRISAKTI',
         ]
     ],
 
@@ -99,16 +102,19 @@ return [
             'fakultas' => 99,
             'mts' => 5,
             'mta' => 4,
+            'dta' => 6,
         ],
         'desc' => [
             'fakultas' => 'Fakultas S1',
             'mts' => 'Magister Teknik Sipil',
             'mta' => 'Magister Teknik Arsitektur',
+            'dta' => 'Doktor Teknik Arsitektur',
         ],
         'report' => [
             'fakultas' => 'FAKULTAS TEKNIK SIPIL DAN PERENCANAAN UNIVERSITAS TRISAKTI',
             'mts' => 'PROGRAM STUDI MAGISTER TEKNIK SIPIL (S2 MTS) UNIVERSITAS TRISAKTI',
             'mta' => 'PROGRAM STUDI MAGISTER TEKNIK ARSITEKTUR (S2 MTA) UNIVERSITAS TRISAKTI',
+            'dta' => 'PROGRAM STUDI DOKTOR TEKNIK ARSITEKTUR (S3 DTA) UNIVERSITAS TRISAKTI',
         ]
     ],
 
@@ -122,6 +128,7 @@ return [
             'wd4' => 6,
             'kaprodis1' => 7,
             'kaprodis2' => 8,
+            'kaprodis3' => 9,
         ],
         'desc' => [
             'admin' => 'Admin',
@@ -132,6 +139,7 @@ return [
             'wd4' => 'Wakil Dekan 4',
             'kaprodis1' => 'Kepala Program Studi S1',
             'kaprodis2' => 'Kepala Program Studi S2',
+            'kaprodis3' => 'Kepala Program Studi S3',
         ],
         'raw' => [
             'admin' => '',
@@ -142,6 +150,7 @@ return [
             'wd4' => 'wadekiv',
             'kaprodis1' => 'kaprodis1',
             'kaprodis2' => 'kaprodis2',
+            'kaprodis3' => 'kaprodis3',
         ],
         'export' => [
             'admin' => '',
@@ -152,6 +161,7 @@ return [
             'wd4' => 'Wadek 4',
             'kaprodis1' => 'Kaprodi S1',
             'kaprodis2' => 'Kaprodi S2',
+            'kaprodis3' => 'Kaprodi S3',
         ]
     ],
 

@@ -147,7 +147,7 @@ class RecapitulationController extends Controller
         });
 
         $table->addColumn('used', function ($row) {
-            $ma = Data::select('id')->where('is_trash', 0)->where('division_id', $row->division_id)->get()->toArray();
+            $ma = Data::select('id')->where('is_trash', 0)->where('year', $row->year)->where('division_id', $row->division_id)->get()->toArray();
             $data_id = array_column($ma, 'id');
             $expense =  MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
             if ($expense) {
@@ -155,12 +155,12 @@ class RecapitulationController extends Controller
             } else {
                 $column = '0';
             }
-
+            
             return $column;
         });
-
+        
         $table->addColumn('remain', function ($row) {
-            $ma = Data::select('id')->where('is_trash', 0)->where('division_id', $row->division_id)->get()->toArray();
+            $ma = Data::select('id')->where('is_trash', 0)->where('year', $row->year)->where('division_id', $row->division_id)->get()->toArray();
             $data_id = array_column($ma, 'id');
             $expense =  MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
             if ($expense) {
@@ -175,7 +175,7 @@ class RecapitulationController extends Controller
         });
 
         $table->addColumn('percent', function ($row) {
-            $ma = Data::select('id')->where('is_trash', 0)->where('division_id', $row->division_id)->get()->toArray();
+            $ma = Data::select('id')->where('is_trash', 0)->where('year', $row->year)->where('division_id', $row->division_id)->get()->toArray();
             $data_id = array_column($ma, 'id');
             $expense =  MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
             if ($expense) {

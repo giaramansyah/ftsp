@@ -19,8 +19,8 @@
   </div>
 </div>
 <div class="row justify-content-center">
-  @foreach ($result as $value)
-  <div class="col-sm-3">
+  @foreach ($result as $key => $value)
+  <div class="{{ $key == 0 ? 'col-sm-12' : 'col-sm-3' }}">
     <div class="info-box">
       <span class="info-box-icon {{ $value['class'] }} elevation-1">
         <i class="{{ $value['icon'] }}"></i>
@@ -42,9 +42,9 @@
   </div>
   @endforeach
 </div>
-<div class="row">
-  @foreach (['fakultas', 'mta', 'mts'] as $value)
-  <div class="col-sm-4">
+<div class="row justify-content-center">
+  @foreach (['fakultas', 'mta', 'mts', 'dta'] as $value)
+  <div class="col-sm-6">
     <div class="card" id="{{ $value }}">
       <div class="card-body p-2">
         <div class="row px-2">

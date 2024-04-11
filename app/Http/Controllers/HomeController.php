@@ -12,6 +12,7 @@ use App\Models\MapExpense;
 use App\Models\Note;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -79,23 +80,29 @@ class HomeController extends Controller
 
         $is_note = false;
         $is_general = false;
+        $is_pic = false;
         $bod = [config('global.staff.code.dekan'), config('global.staff.code.wd2')];
+        $staffs = Arr::except(config('global.staff.code'), ['admin', 'dekan', 'wd2']);
         if (Auth::user()->id == 1) {
             $is_note = true;
             $is_general = true;
         } else {
             if (Auth::user()->privilege == ['NTCR', 'NTUP', 'NTRM', 'NTRA', 'NTRD'] || in_array(Auth::user()->staff_id, $bod)) {
                 $is_note = true;
-            } 
-            
-            if(Auth::user()->staff_id == config('global.staff.code.admin')) {
+            }
+
+            if (in_array(Auth::user()->staff_id, $staffs)) {
+                $is_pic = true;
+            }
+
+            if (Auth::user()->staff_id == config('global.staff.code.admin')) {
                 $is_general = true;
             }
         }
 
         $years = $this->getYears();
 
-        $view = ['result' => $result, 'is_general' => $is_general, 'is_note' => $is_note, 'yearArr' =>  $years, 'thisYear' => $this->_year];
+        $view = ['result' => $result, 'is_general' => $is_general, 'is_note' => $is_note, 'is_pic' => $is_pic, 'yearArr' =>  $years, 'thisYear' => $this->_year];
 
         return view('contents.home.index', $view);
     }
@@ -118,6 +125,7 @@ class HomeController extends Controller
         $result['fakultas'] = $this->fakultas();
         $result['mta'] = $this->mta();
         $result['mts'] = $this->mts();
+        $result['dta'] = $this->dta();
 
         $response = new Response(true, 'Success', 1);
         $response->setData($result);
@@ -132,14 +140,14 @@ class HomeController extends Controller
                 $this->_year = date('Y');
             } else {
                 $year = SecureHelper::unsecure($year);
-    
+
                 if (!$year) {
                     $this->_year = date('Y');
                 } else {
                     $this->_year = $year;
                 }
             }
-            
+
             $data = Data::select(['id'])->where('is_trash', 0)->where('year', $this->_year)->orderBy('id')->get()->toArray();
             $data = array_column($data, 'id');
 
@@ -265,17 +273,22 @@ class HomeController extends Controller
                 'pic' => config('global.staff.code.kaprodis2'),
                 'division' => config('global.division.code.mta'),
             ),
+            array(
+                'unit' => 'DTA',
+                'pic' => config('global.staff.code.kaprodis3'),
+                'division' => config('global.division.code.dta'),
+            ),
         );
 
-        foreach($arrData as $key => $value) {
+        foreach ($arrData as $key => $value) {
             $note = Note::select('id', 'amount', 'amount_requested', 'amount_approved', 'status')->where('is_trash', 0)->where('year', $year)->where('division_id', $value['division'])->whereRelation('staffs', 'staff_id', $value['pic']);
             $data = Data::select('id', 'amount')->where('is_trash', 0)->where('year', $year)->where('division_id', $value['division'])->whereRelation('staffs', 'staff_id', $value['pic']);
 
-            if($value['pic'] == config('global.staff.code.wd2')) {
+            if ($value['pic'] == config('global.staff.code.wd2')) {
                 $note->has('staffs', '=', 1);
                 $data->has('staffs', '=', 1);
             }
-            
+
             $note = $note->get()->toArray();
             $data = $data->get()->toArray();
 
@@ -290,12 +303,12 @@ class HomeController extends Controller
             $finished = 0;
             $unfinished = 0;
 
-            if(!empty($note)) {
+            if (!empty($note)) {
                 foreach ($note as $row) {
                     $request += $this->convertAmount($row['amount_requested'], true);
                     $approve += $this->convertAmount($row['amount_approved'], true);
 
-                    if($row['status'] == config('global.status.code.finished')) {
+                    if ($row['status'] == config('global.status.code.finished')) {
                         $finished += 1;
                     } else {
                         $unfinished += 1;
@@ -303,22 +316,22 @@ class HomeController extends Controller
                 }
             }
 
-            if(!empty($data)) {
+            if (!empty($data)) {
                 foreach ($data as $row) {
                     $amount += $this->convertAmount($row['amount'], true);
                 }
             }
-            
-            $process = ($request - $approve);   
-            
-            if($amount > 0) {
-                $percentRequest = round($request/$amount*100, 2);
-                $percentApprove = round($approve/$amount*100, 2);
-                $percentProcess = round($process/$amount*100, 2);
+
+            $process = ($request - $approve);
+
+            if ($amount > 0) {
+                $percentRequest = round($request / $amount * 100, 2);
+                $percentApprove = round($approve / $amount * 100, 2);
+                $percentProcess = round($process / $amount * 100, 2);
             }
-            
-            if($request > 0) {
-                $percentProgress = round($approve/$request*100, 2);
+
+            if ($request > 0) {
+                $percentProgress = round($approve / $request * 100, 2);
             }
 
             $result['series'][$key] = $value['unit'];
@@ -333,7 +346,108 @@ class HomeController extends Controller
             $result['finished'][$key] = $finished;
             $result['unfinished'][$key] = $unfinished;
         }
-        
+
+        $response = new Response(true, 'Success', 1);
+        $response->setData($result);
+
+        return response()->json($response->responseJson());
+    }
+
+    public function getPic(Request $request)
+    {
+        if ($request->ajax()) {
+            $param = $request->input('id');
+
+            if (!isset($param)) {
+                $year = 0;
+            } else {
+                $param = SecureHelper::unsecure($param);
+
+                if (!$param) {
+                    $year = 0;
+                } else {
+                    $year = $param;
+                }
+            }
+        } else {
+            abort(404);
+        }
+
+        $note = Note::select('id', 'amount', 'amount_requested', 'amount_approved', 'status')->where('is_trash', 0)->where('year', $year)->where('division_id', Auth::user()->division_id)->whereRelation('staffs', 'staff_id', Auth::user()->staff_id);
+        $data = Data::select('id', 'amount')->where('is_trash', 0)->where('year', $year)->where('division_id', Auth::user()->division_id)->whereRelation('staffs', 'staff_id', Auth::user()->staff_id);
+
+        $note = $note->get()->toArray();
+        $data = $data->get()->toArray();
+
+        $amount = 0;
+        $request = 0;
+        $approve = 0;
+        $process = 0;
+        $percentRequest = 0;
+        $percentApprove = 0;
+        $percentProgress = 0;
+        $percentProcess = 0;
+        $finished = 0;
+        $unfinished = 0;
+
+        if (!empty($note)) {
+            foreach ($note as $row) {
+                $request += $this->convertAmount($row['amount_requested'], true);
+                $approve += $this->convertAmount($row['amount_approved'], true);
+
+                if ($row['status'] == config('global.status.code.finished')) {
+                    $finished += 1;
+                } else {
+                    $unfinished += 1;
+                }
+            }
+        }
+
+        if (!empty($data)) {
+            foreach ($data as $row) {
+                $amount += $this->convertAmount($row['amount'], true);
+            }
+        }
+
+        $process = ($request - $approve);
+
+        if ($amount > 0) {
+            $percentRequest = round($request / $amount * 100, 2);
+            $percentApprove = round($approve / $amount * 100, 2);
+            $percentProcess = round($process / $amount * 100, 2);
+        }
+
+        if ($request > 0) {
+            $percentProgress = round($approve / $request * 100, 2);
+        }
+
+        $divisions = array_combine(config('global.division.code'), config('global.division.desc'));
+        $staffs = array_combine(config('global.staff.code'), config('global.staff.desc'));
+        $years = $this->getYears();
+        $yearsDesc = array_combine(array_column($years, 'id'), array_column($years, 'name'));
+
+        $result = array(
+            'year' => $yearsDesc[$year],
+        );
+
+        if (in_array(Auth::user()->staff_id, [config('global.staff.code.wd1'), config('global.staff.code.wd3'), config('global.staff.code.wd4')])) {
+            $result['title'] = Str::upper($staffs[Auth::user()->staff_id]);
+        } else {
+            $result['title'] = Str::upper($staffs[Auth::user()->staff_id]) . ' ' . Str::upper($divisions[Auth::user()->division_id]);
+        }
+
+        $result['series'][0] = $result['title'];
+        $result['amount'][0] = $amount;
+        $result['requested'][0] = $request;
+        $result['approved'][0] = $approve;
+        $result['process'][0] = $process;
+        $result['percent_request'][0] = $percentRequest;
+        $result['percent_approve'][0] = $percentApprove;
+        $result['percent_progress'][0] = $percentProgress;
+        $result['percent_process'][0] = $percentProcess;
+        $result['finished'][0] = $finished;
+        $result['unfinished'][0] = $unfinished;
+
         $response = new Response(true, 'Success', 1);
         $response->setData($result);
 
@@ -352,7 +466,7 @@ class HomeController extends Controller
 
         return array(
             'title' => 'REALISASI ANGGARAN ' . config('global.division.report.fakultas'),
-            'series' => array('Mata Anggaran', 'Realisasi'),
+            'series' => array('Sisa Mata Anggaran', 'Realisasi'),
             'pagu' => array(
                 'color' => '#007bff',
                 'value' => ($budget - $expense),
@@ -395,7 +509,7 @@ class HomeController extends Controller
 
         return array(
             'title' => 'REALISASI ANGGARAN ' . config('global.division.report.mta'),
-            'series' => array('Mata Anggaran', 'Realisasi'),
+            'series' => array('Sisa Mata Anggaran', 'Realisasi'),
             'pagu' => array(
                 'color' => '#007bff',
                 'value' => ($budget - $expense),
@@ -438,7 +552,50 @@ class HomeController extends Controller
 
         return array(
             'title' => 'REALISASI ANGGARAN ' . config('global.division.report.mts'),
-            'series' => array('Mata Anggaran', 'Realisasi'),
+            'series' => array('Sisa Mata Anggaran', 'Realisasi'),
+            'pagu' => array(
+                'color' => '#007bff',
+                'value' => ($budget - $expense),
+            ),
+            'real' => array(
+                'color' => '#dc3545',
+                'value' => $expense,
+            ),
+            'legend' => array(
+                array(
+                    'text' => 'Mata Anggaran',
+                    'value' => $this->convertAmount($budget),
+                    'color' => 'text-primary'
+                ),
+                array(
+                    'text' => 'Realisasi',
+                    'value' => $this->convertAmount($expense),
+                    'percent' => $budget > 0 ? round(($expense / $budget * 100), 2) : 0.00,
+                    'color' => 'text-danger'
+                ),
+                array(
+                    'text' => 'Sisa',
+                    'value' => $this->convertAmount($budget - $expense),
+                    'percent' => $budget > 0 ? round((($budget - $expense) / $budget * 100), 2) : 0.00,
+                    'color' => 'text-gray'
+                ),
+            ),
+        );
+    }
+
+    private function dta()
+    {
+        $budget = Data::where('division_id', config('global.division.code.dta'))->where('is_trash', 0)->where('year', $this->_year)->sum('amount');
+
+        $data = Data::select('id')->where('is_trash', 0)->where('division_id', config('global.division.code.dta'))->where('year', $this->_year)->get()->toArray();
+        $data_id = array_column($data, 'id');
+
+        $expense = MapExpense::selectRaw('ifnull(sum(amount), 0) as used')->whereIn('data_id', $data_id)->first();
+        $expense = $this->convertAmount($expense->used, true);
+
+        return array(
+            'title' => 'REALISASI ANGGARAN ' . config('global.division.report.dta'),
+            'series' => array('Sisa Mata Anggaran', 'Realisasi'),
             'pagu' => array(
                 'color' => '#007bff',
                 'value' => ($budget - $expense),

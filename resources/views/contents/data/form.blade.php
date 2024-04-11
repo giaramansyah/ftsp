@@ -42,7 +42,7 @@
         </div>
         <div class="form-group row">
           <label class="col-sm-2 col-form-label">{{ __('Unit') }}<code>*</code></label>
-          <div class="col-sm-2">
+          <div class="col-sm-3">
             <select class="form-control form-control-sm select2" name="division_id" {{ isset($mandatory) && $mandatory? 'required' : '' }}>
               <option value="">-- Silakan Pilih --</option>
               @foreach ($divisionArr as $key => $value)
@@ -74,16 +74,23 @@
         </div>
         <div class="form-group row form-staff-input-1">
           <label class="col-sm-2 col-form-label">{{ __('PIC') }}<code>*</code></label>
-          <div class="col-sm-2">
+          <div class="col-sm-3">
             <input type="hidden" name="staff_id" value="{{ config('global.staff.code.kaprodis1') }}">
             <input type="text" class="form-control form-control-sm" name="staff" value="{{ config('global.staff.desc.kaprodis1') }}" readonly {{ isset($mandatory) && $mandatory && $key == 0 ? 'required' : '' }}>
           </div>
         </div>
         <div class="form-group row form-staff-input-2">
           <label class="col-sm-2 col-form-label">{{ __('PIC') }}<code>*</code></label>
-          <div class="col-sm-2">
+          <div class="col-sm-3">
             <input type="hidden" name="staff_id" value="{{ config('global.staff.code.kaprodis2') }}">
             <input type="text" class="form-control form-control-sm" name="staff" value="{{ config('global.staff.desc.kaprodis2') }}" readonly {{ isset($mandatory) && $mandatory && $key == 0 ? 'required' : '' }}>
+          </div>
+        </div>
+        <div class="form-group row form-staff-input-3">
+          <label class="col-sm-2 col-form-label">{{ __('PIC') }}<code>*</code></label>
+          <div class="col-sm-3">
+            <input type="hidden" name="staff_id" value="{{ config('global.staff.code.kaprodis3') }}">
+            <input type="text" class="form-control form-control-sm" name="staff" value="{{ config('global.staff.desc.kaprodis3') }}" readonly {{ isset($mandatory) && $mandatory && $key == 0 ? 'required' : '' }}>
           </div>
         </div>
       </div>
@@ -116,30 +123,47 @@
         $('.form-staff-select').removeClass('d-none');
         $('.form-staff-input-1').addClass('d-none');
         $('.form-staff-input-2').addClass('d-none');
+        $('.form-staff-input-3').addClass('d-none');
         $('.form-staff-select').find('input').attr('disabled', false);
         $('.form-staff-input-1').find('input').attr('disabled', true);
         $('.form-staff-input-2').find('input').attr('disabled', true);
+        $('.form-staff-input-3').find('input').attr('disabled', true);
       } else if($(this).val() == "{{ config('global.division.code.arsitektur') }}" || $(this).val() == "{{ config('global.division.code.sipil') }}") {
         $('.form-staff-select').addClass('d-none');
         $('.form-staff-input-1').removeClass('d-none');
         $('.form-staff-input-2').addClass('d-none');
+        $('.form-staff-input-3').addClass('d-none');
         $('.form-staff-select').find('input').attr('disabled', true);
         $('.form-staff-input-1').find('input').attr('disabled', false);
         $('.form-staff-input-2').find('input').attr('disabled', true);
+        $('.form-staff-input-3').find('input').attr('disabled', true);
       } else if($(this).val() == "{{ config('global.division.code.mta') }}" || $(this).val() == "{{ config('global.division.code.mts') }}") {
         $('.form-staff-select').addClass('d-none');
         $('.form-staff-input-1').addClass('d-none');
         $('.form-staff-input-2').removeClass('d-none');
+        $('.form-staff-input-3').addClass('d-none');
         $('.form-staff-select').find('input').attr('disabled', true);
         $('.form-staff-input-1').find('input').attr('disabled', true);
         $('.form-staff-input-2').find('input').attr('disabled', false);
+        $('.form-staff-input-3').find('input').attr('disabled', true);
+      } else if($(this).val() == "{{ config('global.division.code.dta') }}") {
+        $('.form-staff-select').addClass('d-none');
+        $('.form-staff-input-1').addClass('d-none');
+        $('.form-staff-input-2').addClass('d-none');
+        $('.form-staff-input-3').removeClass('d-none');
+        $('.form-staff-select').find('input').attr('disabled', true);
+        $('.form-staff-input-1').find('input').attr('disabled', true);
+        $('.form-staff-input-2').find('input').attr('disabled', true);
+        $('.form-staff-input-3').find('input').attr('disabled', false);
       } else {
         $('.form-staff-select').addClass('d-none');
         $('.form-staff-input-1').addClass('d-none');
         $('.form-staff-input-2').addClass('d-none');
+        $('.form-staff-input-3').addClass('d-none');
         $('.form-staff-select').find('input').attr('disabled', true);
         $('.form-staff-input-1').find('input').attr('disabled', true);
         $('.form-staff-input-2').find('input').attr('disabled', true);
+        $('.form-staff-input-3').find('input').attr('disabled', true);
       }
     })
 
