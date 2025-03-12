@@ -45,7 +45,7 @@
                 <th>No</th>
                 <th>PIC</th>
                 <th>No. MA</th>
-                <th>Program</th>
+                <th>Perihal</th>
                 <th>Dana RAB</th>
                 <th>No. Surat</th>
                 <th>Tgl. Surat</th>
@@ -95,10 +95,10 @@
           {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
           {data: 'staff_export', name: 'staff_export', orderable: true, searchable: true},
           {data: 'ma', name: 'ma', orderable: true, searchable: true},
-          {data: 'program', name: 'program', orderable: true, searchable: true, class: 'text-wrap'},
+          {data: 'regarding', name: 'regarding', orderable: true, searchable: true, class: 'text-wrap'},
           {data: 'amount', name: 'amount', orderable: true, searchable: true, class: 'text-right text-bold'},
-          {data: 'note_reff', name: 'program', orderable: true, searchable: true},
-          {data: 'note_date', name: 'program', orderable: true, searchable: true},
+          {data: 'note_reff', name: 'note_reff', orderable: true, searchable: true},
+          {data: 'note_date', name: 'note_date', orderable: true, searchable: true},
           {data: 'amount_requested', name: 'amount_requested', orderable: true, searchable: true, class: 'text-right text-bold'},
           {data: 'approved', name: 'approved', orderable: true, searchable: true, class: 'text-right text-bold'},
           {data: 'percentage', name: 'percentage', orderable: true, searchable: true, class: 'text-center text-bold'},

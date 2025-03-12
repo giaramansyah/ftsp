@@ -6,6 +6,7 @@ use App\Library\ExcelWriter;
 use App\Library\Response;
 use App\Library\SecureHelper;
 use App\Models\Data;
+use App\Models\MapData;
 use App\Models\MapNote;
 use App\Models\Note;
 use Illuminate\Http\Request;
@@ -149,7 +150,7 @@ class NoteController extends Controller
                 }
             }
 
-            $data = Note::select(['id', 'ma_id', 'program', 'amount', 'note_reff', 'note_date', 'amount_approved', 'amount_requested', 'status', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('ma_id');
+            $data = Note::select(['id', 'ma_id', 'regarding', 'amount', 'note_reff', 'note_date', 'amount_approved', 'amount_requested', 'status', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('ma_id');
             if (Auth::user()->staff_id != config('global.staff.code.admin')) {
                 $map = MapNote::where('staff_id',  Auth::user()->staff_id)->get()->toArray();
                 $map = array_column($map, 'note_id');
@@ -224,8 +225,17 @@ class NoteController extends Controller
 
             $year = $request->input('year');
             $division_id = $request->input('division_id');
+            $staff_id = $request->input('staff_id');
 
-            $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
+            if($division_id == config('global.division.code.fakultas') && $staff_id != null) {
+                $maps = MapData::whereIn('staff_id', $staff_id)->get()->toArray();
+                $data_ids = array_column($maps, 'data_id');
+                $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->whereIn('id', $data_ids)->orderBy('ma_id');
+
+            } else {
+                $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
+            }
+
             $table = DataTables::eloquent($data);
             $rawColumns = array('input');
 
