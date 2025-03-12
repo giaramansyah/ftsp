@@ -230,7 +230,7 @@ class NoteController extends Controller
             if($division_id == config('global.division.code.fakultas') && $staff_id != null) {
                 $maps = MapData::whereIn('staff_id', $staff_id)->get()->toArray();
                 $data_ids = array_column($maps, 'data_id');
-                $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->whereIn('id', $data_ids)->orderBy('ma_id');
+                $data = Data::distinct()->select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->whereIn('id', $data_ids)->orderBy('ma_id');
 
             } else {
                 $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
