@@ -85,6 +85,7 @@
 									<th class="text-center">#</th>
 									<th class="text-center">No. M.A.</th>
 									<th class="text-center">Program</th>
+									<th class="text-center">PIC</th>
 									<th class="text-center">Dana</th>
 								</tr>
 							</thead>
@@ -347,6 +348,13 @@
                         {
                             data: 'description',
                             name: 'description',
+                            orderable: true,
+                            searchable: true,
+                            class: "text-wrap"
+                        },
+                        {
+                            data: 'staff',
+                            name: 'staff',
                             orderable: true,
                             searchable: true,
                             class: "text-wrap"
