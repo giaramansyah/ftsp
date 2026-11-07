@@ -426,6 +426,7 @@ class DataController extends Controller
                     $data = Data::find($plainId);
 
                     if(isset($param['year']) && $param['year'] != '') $data->year = $param['year'];
+                    if(isset($param['amount']) && $param['amount'] != '') $data->amount = $param['amount'];
                     if(isset($param['description']) && $param['description'] != '') $data->description = $param['description'];
                     if(isset($param['division_id']) && $param['division_id'] != '') $data->division_id = $param['division_id'];
                     if(!is_array($param['staff_id'])) $param['staff_id'] = array($param['staff_id']);

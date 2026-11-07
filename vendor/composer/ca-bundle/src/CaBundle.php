@@ -24,8 +24,24 @@ class CaBundle
     private static $caPath;
     /** @var array<string, bool> */
     private static $caFileValidity = array();
-    /** @var bool|null */
-    private static $useOpensslParse;
+    /**
+     * SHA-256 of the DER encoded SubjectPublicKeyInfo of distrusted (e.g. compromised) intermediates
+     *
+     * Matching on the key also catches cross-signed copies of the same intermediate.
+     *
+     * @var array<string, string>
+     */
+    private static $distrustedSpkiSha256 = array(
+        // eMudhra intermediates with compromised keys, revoked 2026-10-18 (cross-signed by Sectigo's AAA Certificate Services)
+        'e0254c7fcdc265e2f0f8a428dabb75ab4ae039b4872d62f5ee57f0877d5a8a41' => 'EM EV TLS CA - G3B',
+        '43bffa19d6ef651451f6841e019931e96f6f2eaeff28ab4b6f1ce4576de2717b' => 'EM OV TLS CA - G3B',
+        'ebed6475c2c2d80fcb199f3fe8dd6e6b3ce60b77eb15d4e42c3dec0c6f5b5105' => 'EM DV TLS CA - G3B',
+        '5c0660a2b164910d8ff589c18e14552e9e0ec237dcefe2cb736d41a4811f81a0' => 'EM EV TLS CA - G3C',
+        '63ecefee431d49523bc1136c4e72d0206a477086caf606cd5cf025686c109cf8' => 'EM OV TLS CA - G3C',
+        '49dd353dc2b919a3770645117d0e60c16115e7d1bc259eefe734b00ea434fe5f' => 'EM DV TLS CA - G3C',
+        'ec4ffa1ad0ac88081314b7aaffef6a91f97cd57291bb5ba686c5415f5eb4f6b6' => 'EM OV CS CA - G3B',
+        '92c063d67e8f14db71d288e11266ffdaf69cbf115f7bab14f3bc2f68d25e0e30' => 'EM OV CS CA - G3C',
+    );
 
     /**
      * Returns the system CA bundle path, or a path to the bundled one
@@ -64,7 +80,7 @@ class CaBundle
      * @param  LoggerInterface $logger optional logger for information about which CA files were loaded
      * @return string          path to a CA bundle file or directory
      */
-    public static function getSystemCaRootBundlePath(LoggerInterface $logger = null)
+    public static function getSystemCaRootBundlePath(?LoggerInterface $logger = null)
     {
         if (self::$caPath !== null) {
             return self::$caPath;
@@ -83,23 +99,22 @@ class CaBundle
         $caBundlePaths[] = ini_get('openssl.capath');
 
         $otherLocations = array(
-            '/etc/pki/tls/certs/ca-bundle.crt', // Fedora, RHEL, CentOS (ca-certificates package)
+            '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem', // Fedora, RHEL, CentOS (ca-certificates package) - NEW
+            '/etc/pki/tls/certs/ca-bundle.crt', // Fedora, RHEL, CentOS (ca-certificates package) - Deprecated
             '/etc/ssl/certs/ca-certificates.crt', // Debian, Ubuntu, Gentoo, Arch Linux (ca-certificates package)
             '/etc/ssl/ca-bundle.pem', // SUSE, openSUSE (ca-certificates package)
-            '/usr/local/share/certs/ca-root-nss.crt', // FreeBSD (ca_root_nss_package)
             '/usr/ssl/certs/ca-bundle.crt', // Cygwin
             '/opt/local/share/curl/curl-ca-bundle.crt', // OS X macports, curl-ca-bundle package
             '/usr/local/share/curl/curl-ca-bundle.crt', // Default cURL CA bunde path (without --with-ca-bundle option)
             '/usr/share/ssl/certs/ca-bundle.crt', // Really old RedHat?
             '/etc/ssl/cert.pem', // OpenBSD
-            '/usr/local/etc/ssl/cert.pem', // FreeBSD 10.x
             '/usr/local/etc/openssl/cert.pem', // OS X homebrew, openssl package
             '/usr/local/etc/openssl@1.1/cert.pem', // OS X homebrew, openssl@1.1 package
+            '/opt/homebrew/etc/openssl@3/cert.pem', // macOS silicon homebrew, openssl@3 package
+            '/opt/homebrew/etc/openssl@1.1/cert.pem', // macOS silicon homebrew, openssl@1.1 package
+            '/etc/pki/tls/certs',
+            '/etc/ssl/certs', // FreeBSD
         );
-
-        foreach($otherLocations as $location) {
-            $otherLocations[] = dirname($location);
-        }
 
         $caBundlePaths = array_merge($caBundlePaths, $otherLocations);
 
@@ -158,7 +173,7 @@ class CaBundle
      *
      * @return bool
      */
-    public static function validateCaFile($filename, LoggerInterface $logger = null)
+    public static function validateCaFile($filename, ?LoggerInterface $logger = null)
     {
         static $warned = false;
 
@@ -168,19 +183,7 @@ class CaBundle
 
         $contents = file_get_contents($filename);
 
-        // assume the CA is valid if php is vulnerable to
-        // https://www.sektioneins.de/advisories/advisory-012013-php-openssl_x509_parse-memory-corruption-vulnerability.html
-        if (!static::isOpensslParseSafe()) {
-            if (!$warned && $logger) {
-                $logger->warning(sprintf(
-                    'Your version of PHP, %s, is affected by CVE-2013-6420 and cannot safely perform certificate validation, we strongly suggest you upgrade.',
-                    PHP_VERSION
-                ));
-                $warned = true;
-            }
-
-            $isValid = !empty($contents);
-        } elseif (is_string($contents) && strlen($contents) > 0) {
+        if (is_string($contents) && strlen($contents) > 0) {
             $contents = preg_replace("/^(\\-+(?:BEGIN|END))\\s+TRUSTED\\s+(CERTIFICATE\\-+)\$/m", '$1 $2', $contents);
             if (null === $contents) {
                 // regex extraction failed
@@ -209,100 +212,155 @@ class CaBundle
      */
     public static function isOpensslParseSafe()
     {
-        if (null !== self::$useOpensslParse) {
-            return self::$useOpensslParse;
-        }
+        return true;
+    }
 
-        if (PHP_VERSION_ID >= 50600) {
-            return self::$useOpensslParse = true;
-        }
-
-        // Vulnerable:
-        // PHP 5.3.0 - PHP 5.3.27
-        // PHP 5.4.0 - PHP 5.4.22
-        // PHP 5.5.0 - PHP 5.5.6
-        if (
-               (PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50328)
-            || (PHP_VERSION_ID < 50500 && PHP_VERSION_ID >= 50423)
-            || PHP_VERSION_ID >= 50507
-        ) {
-            // This version of PHP has the fix for CVE-2013-6420 applied.
-            return self::$useOpensslParse = true;
-        }
-
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            // Windows is probably insecure in this case.
-            return self::$useOpensslParse = false;
-        }
-
-        $compareDistroVersionPrefix = function ($prefix, $fixedVersion) {
-            $regex = '{^'.preg_quote($prefix).'([0-9]+)$}';
-
-            if (preg_match($regex, PHP_VERSION, $m)) {
-                return ((int) $m[1]) >= $fixedVersion;
+    /**
+     * Looks for distrusted intermediates in a certificate chain presented by a server
+     *
+     * The system CA store may still trust the roots above them, so they need to be rejected by the client.
+     *
+     * @param  array<mixed> $chain PEM strings, or X.509 certificates as captured by the peer_certificate_chain stream context option
+     * @return string|null  name of the first distrusted certificate found in the chain
+     */
+    public static function findDistrustedCertificate(array $chain)
+    {
+        foreach ($chain as $cert) {
+            if (self::isX509Certificate($cert)) {
+                if (!function_exists('openssl_x509_export') || !openssl_x509_export($cert, $pem)) {
+                    continue;
+                }
+                $cert = $pem;
+            } elseif (!is_string($cert)) {
+                continue;
             }
 
-            return false;
-        };
-
-        // Hard coded list of PHP distributions with the fix backported.
-        if (
-            $compareDistroVersionPrefix('5.3.3-7+squeeze', 18) // Debian 6 (Squeeze)
-            || $compareDistroVersionPrefix('5.4.4-14+deb7u', 7) // Debian 7 (Wheezy)
-            || $compareDistroVersionPrefix('5.3.10-1ubuntu3.', 9) // Ubuntu 12.04 (Precise)
-        ) {
-            return self::$useOpensslParse = true;
+            foreach (self::pemToDer($cert) as $der) {
+                $spki = self::extractSpki($der);
+                if (null !== $spki && isset(self::$distrustedSpkiSha256[$hash = hash('sha256', $spki)])) {
+                    return self::$distrustedSpkiSha256[$hash];
+                }
+            }
         }
 
-        // Symfony Process component is missing so we assume it is unsafe at this point
-        if (!class_exists('Symfony\Component\Process\PhpProcess')) {
-            return self::$useOpensslParse = false;
+        return null;
+    }
+
+    /**
+     * Checks for an OpenSSLCertificate (PHP 8+) or OpenSSL X.509 resource (PHP < 8)
+     *
+     * @param  mixed $cert
+     * @return bool
+     */
+    private static function isX509Certificate($cert)
+    {
+        return $cert instanceof \OpenSSLCertificate || (is_resource($cert) && get_resource_type($cert) === 'OpenSSL X.509');
+    }
+
+    /**
+     * @param  string       $pem one or more PEM encoded certificates
+     * @return list<string>
+     */
+    private static function pemToDer($pem)
+    {
+        $ders = array();
+        $offset = 0;
+        while (false !== ($start = strpos($pem, '-----BEGIN CERTIFICATE-----', $offset))) {
+            $start += strlen('-----BEGIN CERTIFICATE-----');
+            $end = strpos($pem, '-----END CERTIFICATE-----', $start);
+            if (false === $end) {
+                break;
+            }
+            $offset = $end + strlen('-----END CERTIFICATE-----');
+
+            $der = base64_decode(substr($pem, $start, $end - $start), true);
+            if (false !== $der) {
+                $ders[] = $der;
+            }
         }
 
-        // This is where things get crazy, because distros backport security
-        // fixes the chances are on NIX systems the fix has been applied but
-        // it's not possible to verify that from the PHP version.
-        //
-        // To verify exec a new PHP process and run the issue testcase with
-        // known safe input that replicates the bug.
+        return $ders;
+    }
 
-        // Based on testcase in https://github.com/php/php-src/commit/c1224573c773b6845e83505f717fbf820fc18415
-        // changes in https://github.com/php/php-src/commit/76a7fd893b7d6101300cc656058704a73254d593
-        $cert = 'LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVwRENDQTR5Z0F3SUJBZ0lKQUp6dThyNnU2ZUJjTUEwR0NTcUdTSWIzRFFFQkJRVUFNSUhETVFzd0NRWUQKVlFRR0V3SkVSVEVjTUJvR0ExVUVDQXdUVG05eVpISm9aV2x1TFZkbGMzUm1ZV3hsYmpFUU1BNEdBMVVFQnd3SApTOE9Ed3Jac2JqRVVNQklHQTFVRUNnd0xVMlZyZEdsdmJrVnBibk14SHpBZEJnTlZCQXNNRmsxaGJHbGphVzkxCmN5QkRaWEowSUZObFkzUnBiMjR4SVRBZkJnTlZCQU1NR0cxaGJHbGphVzkxY3k1elpXdDBhVzl1WldsdWN5NWsKWlRFcU1DZ0dDU3FHU0liM0RRRUpBUlliYzNSbFptRnVMbVZ6YzJWeVFITmxhM1JwYjI1bGFXNXpMbVJsTUhVWQpaREU1TnpBd01UQXhNREF3TURBd1dnQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBCkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUEKQUFBQUFBQVhEVEUwTVRFeU9ERXhNemt6TlZvd2djTXhDekFKQmdOVkJBWVRBa1JGTVJ3d0dnWURWUVFJREJOTwpiM0prY21obGFXNHRWMlZ6ZEdaaGJHVnVNUkF3RGdZRFZRUUhEQWRMdzRQQ3RteHVNUlF3RWdZRFZRUUtEQXRUClpXdDBhVzl1UldsdWN6RWZNQjBHQTFVRUN3d1dUV0ZzYVdOcGIzVnpJRU5sY25RZ1UyVmpkR2x2YmpFaE1COEcKQTFVRUF3d1liV0ZzYVdOcGIzVnpMbk5sYTNScGIyNWxhVzV6TG1SbE1Tb3dLQVlKS29aSWh2Y05BUWtCRmh0egpkR1ZtWVc0dVpYTnpaWEpBYzJWcmRHbHZibVZwYm5NdVpHVXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCCkR3QXdnZ0VLQW9JQkFRRERBZjNobDdKWTBYY0ZuaXlFSnBTU0RxbjBPcUJyNlFQNjV1c0pQUnQvOFBhRG9xQnUKd0VZVC9OYSs2ZnNnUGpDMHVLOURaZ1dnMnRIV1dvYW5TYmxBTW96NVBINlorUzRTSFJaN2UyZERJalBqZGhqaAowbUxnMlVNTzV5cDBWNzk3R2dzOWxOdDZKUmZIODFNTjJvYlhXczROdHp0TE11RDZlZ3FwcjhkRGJyMzRhT3M4CnBrZHVpNVVhd1Raa3N5NXBMUEhxNWNNaEZHbTA2djY1Q0xvMFYyUGQ5K0tBb2tQclBjTjVLTEtlYno3bUxwazYKU01lRVhPS1A0aWRFcXh5UTdPN2ZCdUhNZWRzUWh1K3ByWTNzaTNCVXlLZlF0UDVDWm5YMmJwMHdLSHhYMTJEWAoxbmZGSXQ5RGJHdkhUY3lPdU4rblpMUEJtM3ZXeG50eUlJdlZBZ01CQUFHalFqQkFNQWtHQTFVZEV3UUNNQUF3CkVRWUpZSVpJQVliNFFnRUJCQVFEQWdlQU1Bc0dBMVVkRHdRRUF3SUZvREFUQmdOVkhTVUVEREFLQmdnckJnRUYKQlFjREFqQU5CZ2txaGtpRzl3MEJBUVVGQUFPQ0FRRUFHMGZaWVlDVGJkajFYWWMrMVNub2FQUit2SThDOENhRAo4KzBVWWhkbnlVNGdnYTBCQWNEclk5ZTk0ZUVBdTZacXljRjZGakxxWFhkQWJvcHBXb2NyNlQ2R0QxeDMzQ2tsClZBcnpHL0t4UW9oR0QySmVxa2hJTWxEb214SE83a2EzOStPYThpMnZXTFZ5alU4QVp2V01BcnVIYTRFRU55RzcKbFcyQWFnYUZLRkNyOVRuWFRmcmR4R1ZFYnY3S1ZRNmJkaGc1cDVTanBXSDErTXEwM3VSM1pYUEJZZHlWODMxOQpvMGxWajFLRkkyRENML2xpV2lzSlJvb2YrMWNSMzVDdGQwd1lCY3BCNlRac2xNY09QbDc2ZHdLd0pnZUpvMlFnClpzZm1jMnZDMS9xT2xOdU5xLzBUenprVkd2OEVUVDNDZ2FVK1VYZTRYT1Z2a2NjZWJKbjJkZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K';
-        $script = <<<'EOT'
-
-error_reporting(-1);
-$info = openssl_x509_parse(base64_decode('%s'));
-var_dump(PHP_VERSION, $info['issuer']['emailAddress'], $info['validFrom_time_t']);
-
-EOT;
-        $script = '<'."?php\n".sprintf($script, $cert);
-
-        try {
-            $process = new PhpProcess($script);
-            $process->mustRun();
-        } catch (\Exception $e) {
-            // In the case of any exceptions just accept it is not possible to
-            // determine the safety of openssl_x509_parse and bail out.
-            return self::$useOpensslParse = false;
+    /**
+     * Walks the DER structure by hand as parsing the key with ext-openssl costs ~0.3ms per certificate
+     *
+     * Certificate ::= SEQUENCE { tbsCertificate SEQUENCE { [0] version OPTIONAL, serialNumber, signature, issuer, validity, subject, subjectPublicKeyInfo, ... }, ... }
+     *
+     * @param  string $der
+     * @return string|null
+     */
+    private static function extractSpki($der)
+    {
+        $offset = 0;
+        // enter Certificate and tbsCertificate
+        for ($i = 0; $i < 2; $i++) {
+            if (!self::isSequenceAt($der, $offset) || null === self::readDerHeader($der, $offset)) {
+                return null;
+            }
         }
 
-        $output = preg_split('{\r?\n}', trim($process->getOutput()));
-        $errorOutput = trim($process->getErrorOutput());
-
-        if (
-            is_array($output)
-            && count($output) === 3
-            && $output[0] === sprintf('string(%d) "%s"', strlen(PHP_VERSION), PHP_VERSION)
-            && $output[1] === 'string(27) "stefan.esser@sektioneins.de"'
-            && $output[2] === 'int(-1)'
-            && preg_match('{openssl_x509_parse\(\): illegal (?:ASN1 data type for|length in) timestamp in - on line \d+}', $errorOutput)
-        ) {
-            // This PHP has the fix backported probably by a distro security team.
-            return self::$useOpensslParse = true;
+        $fieldsToSkip = isset($der[$offset]) && ord($der[$offset]) === 0xA0 ? 6 : 5;
+        for ($i = 0; $i < $fieldsToSkip; $i++) {
+            $length = self::readDerHeader($der, $offset);
+            if (null === $length) {
+                return null;
+            }
+            $offset += $length;
         }
 
-        return self::$useOpensslParse = false;
+        $start = $offset;
+        if (!self::isSequenceAt($der, $offset)) {
+            return null;
+        }
+        $length = self::readDerHeader($der, $offset);
+        if (null === $length) {
+            return null;
+        }
+
+        return substr($der, $start, $offset - $start + $length);
+    }
+
+    /**
+     * @param  string $der
+     * @param  int    $offset
+     * @return bool
+     */
+    private static function isSequenceAt($der, $offset)
+    {
+        return isset($der[$offset]) && ord($der[$offset]) === 0x30;
+    }
+
+    /**
+     * Reads the tag and length at $offset, moving $offset to the start of the contents
+     *
+     * @param  string   $der
+     * @param  int      $offset
+     * @return int|null length of the contents
+     * @phpstan-impure
+     */
+    private static function readDerHeader($der, &$offset)
+    {
+        // high tag numbers (multi-byte tags) do not occur in the fields we walk
+        if (!isset($der[$offset + 1]) || (ord($der[$offset]) & 0x1F) === 0x1F) {
+            return null;
+        }
+
+        $length = ord($der[$offset + 1]);
+        $offset += 2;
+        if (($length & 0x80) !== 0) {
+            // max 3 length bytes (16MB) so the length cannot overflow on 32-bit PHP
+            $bytes = $length & 0x7F;
+            if ($bytes === 0 || $bytes > 3 || !isset($der[$offset + $bytes - 1])) {
+                return null;
+            }
+            $length = 0;
+            for ($i = 0; $i < $bytes; $i++) {
+                $length = ($length << 8) | ord($der[$offset++]);
+            }
+        }
+
+        return $offset + $length <= strlen($der) ? $length : null;
     }
 
     /**
@@ -313,7 +371,6 @@ EOT;
     {
         self::$caFileValidity = array();
         self::$caPath = null;
-        self::$useOpensslParse = null;
     }
 
     /**
@@ -338,12 +395,12 @@ EOT;
      * @param  LoggerInterface|null $logger
      * @return bool
      */
-    private static function caFileUsable($certFile, LoggerInterface $logger = null)
+    private static function caFileUsable($certFile, ?LoggerInterface $logger = null)
     {
         return $certFile
-            && static::isFile($certFile, $logger)
-            && static::isReadable($certFile, $logger)
-            && static::validateCaFile($certFile, $logger);
+            && self::isFile($certFile, $logger)
+            && self::isReadable($certFile, $logger)
+            && self::validateCaFile($certFile, $logger);
     }
 
     /**
@@ -351,12 +408,12 @@ EOT;
      * @param  LoggerInterface|null $logger
      * @return bool
      */
-    private static function caDirUsable($certDir, LoggerInterface $logger = null)
+    private static function caDirUsable($certDir, ?LoggerInterface $logger = null)
     {
         return $certDir
-            && static::isDir($certDir, $logger)
-            && static::isReadable($certDir, $logger)
-            && static::glob($certDir . '/*', $logger);
+            && self::isDir($certDir, $logger)
+            && self::isReadable($certDir, $logger)
+            && self::glob($certDir . '/*', $logger);
     }
 
     /**
@@ -364,7 +421,7 @@ EOT;
      * @param  LoggerInterface|null $logger
      * @return bool
      */
-    private static function isFile($certFile, LoggerInterface $logger = null)
+    private static function isFile($certFile, ?LoggerInterface $logger = null)
     {
         $isFile = @is_file($certFile);
         if (!$isFile && $logger) {
@@ -379,7 +436,7 @@ EOT;
      * @param  LoggerInterface|null $logger
      * @return bool
      */
-    private static function isDir($certDir, LoggerInterface $logger = null)
+    private static function isDir($certDir, ?LoggerInterface $logger = null)
     {
         $isDir = @is_dir($certDir);
         if (!$isDir && $logger) {
@@ -394,7 +451,7 @@ EOT;
      * @param  LoggerInterface|null $logger
      * @return bool
      */
-    private static function isReadable($certFileOrDir, LoggerInterface $logger = null)
+    private static function isReadable($certFileOrDir, ?LoggerInterface $logger = null)
     {
         $isReadable = @is_readable($certFileOrDir);
         if (!$isReadable && $logger) {
@@ -409,7 +466,7 @@ EOT;
      * @param  LoggerInterface|null $logger
      * @return bool
      */
-    private static function glob($pattern, LoggerInterface $logger = null)
+    private static function glob($pattern, ?LoggerInterface $logger = null)
     {
         $certs = glob($pattern);
         if ($certs === false) {

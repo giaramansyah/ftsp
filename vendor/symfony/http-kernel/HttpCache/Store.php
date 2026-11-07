@@ -314,7 +314,7 @@ class Store implements StoreInterface
             return [];
         }
 
-        return unserialize($entries) ?: [];
+        return unserialize($entries, ['allowed_classes' => false]) ?: [];
     }
 
     /**
@@ -475,7 +475,7 @@ class Store implements StoreInterface
     /**
      * Restores a Response from the HTTP headers and body.
      */
-    private function restoreResponse(array $headers, string $path = null): ?Response
+    private function restoreResponse(array $headers, ?string $path = null): ?Response
     {
         $status = $headers['X-Status'][0];
         unset($headers['X-Status']);

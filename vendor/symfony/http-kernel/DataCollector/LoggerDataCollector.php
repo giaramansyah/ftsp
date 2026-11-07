@@ -30,7 +30,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private $requestStack;
     private $processedLogs;
 
-    public function __construct(object $logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null)
+    public function __construct(?object $logger = null, ?string $containerPathPrefix = null, ?RequestStack $requestStack = null)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
             $this->logger = $logger;
@@ -43,7 +43,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         $this->currentRequest = $this->requestStack && $this->requestStack->getMainRequest() !== $request ? $request : null;
     }
@@ -207,7 +207,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
         $bootTime = filemtime($file);
         $logs = [];
-        foreach (unserialize($logContent) as $log) {
+        foreach (unserialize($logContent, ['allowed_classes' => false]) as $log) {
             $log['context'] = ['exception' => new SilencedErrorContext($log['type'], $log['file'], $log['line'], $log['trace'], $log['count'])];
             $log['timestamp'] = $bootTime;
             $log['timestamp_rfc3339'] = (new \DateTimeImmutable())->setTimestamp($bootTime)->format(\DateTimeInterface::RFC3339_EXTENDED);
@@ -222,9 +222,9 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $logs;
     }
 
-    private function getContainerCompilerLogs(string $compilerLogsFilepath = null): array
+    private function getContainerCompilerLogs(?string $compilerLogsFilepath = null): array
     {
-        if (!is_file($compilerLogsFilepath)) {
+        if (!$compilerLogsFilepath || !is_file($compilerLogsFilepath)) {
             return [];
         }
 

@@ -1,19 +1,20 @@
 <?php
 
 /**
- * Mockery (https://docs.mockery.io/)
+ * Mockery (https://docs.mockery.io/en/stable/)
  *
  * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
  * @license   https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
- * @link      https://github.com/mockery/mockery for the canonical source repository
+ * @see       https://github.com/mockery/mockery for the canonical source repository
  */
 
 namespace Mockery;
 
 class QuickDefinitionsConfiguration
 {
-    private const QUICK_DEFINITIONS_MODE_MOCK_AT_LEAST_ONCE = 'QUICK_DEFINITIONS_MODE_MOCK_AT_LEAST_ONCE';
     private const QUICK_DEFINITIONS_MODE_DEFAULT_EXPECTATION = 'QUICK_DEFINITIONS_MODE_DEFAULT_EXPECTATION';
+
+    private const QUICK_DEFINITIONS_MODE_MOCK_AT_LEAST_ONCE = 'QUICK_DEFINITIONS_MODE_MOCK_AT_LEAST_ONCE';
 
     /**
      * Defines what a quick definition should produce.
@@ -35,12 +36,12 @@ class QuickDefinitionsConfiguration
      */
     public function shouldBeCalledAtLeastOnce(?bool $newValue = null): bool
     {
-        if ($newValue !== null) {
+        if (null !== $newValue) {
             $this->_quickDefinitionsApplicationMode = $newValue
                 ? self::QUICK_DEFINITIONS_MODE_MOCK_AT_LEAST_ONCE
                 : self::QUICK_DEFINITIONS_MODE_DEFAULT_EXPECTATION;
         }
 
-        return $this->_quickDefinitionsApplicationMode === self::QUICK_DEFINITIONS_MODE_MOCK_AT_LEAST_ONCE;
+        return self::QUICK_DEFINITIONS_MODE_MOCK_AT_LEAST_ONCE === $this->_quickDefinitionsApplicationMode;
     }
 }

@@ -1,23 +1,32 @@
 <?php
 
 /**
- * Mockery (https://docs.mockery.io/)
+ * Mockery (https://docs.mockery.io/en/stable/)
  *
  * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
  * @license   https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
- * @link      https://github.com/mockery/mockery for the canonical source repository
+ * @see       https://github.com/mockery/mockery for the canonical source repository
  */
 
 namespace Mockery\Matcher;
 
+use Override;
+
+use ReturnTypeWillChange;
+
+use function array_replace_recursive;
+use function implode;
+use function is_array;
+
 class Subset extends MatcherAbstract
 {
     private $expected;
+
     private $strict = true;
 
     /**
      * @param array $expected Expected subset of data
-     * @param bool $strict Whether to run a strict or loose comparison
+     * @param bool  $strict   Whether to run a strict or loose comparison
      */
     public function __construct(array $expected, $strict = true)
     {
@@ -26,18 +35,18 @@ class Subset extends MatcherAbstract
     }
 
     /**
-     * @param array $expected Expected subset of data
+     * Return a string representation of this Matcher
      *
-     * @return Subset
+     * @return string
      */
-    public static function strict(array $expected)
+    #[ReturnTypeWillChange]
+    public function __toString()
     {
-        return new static($expected, true);
+        return '<Subset' . $this->formatArray($this->expected) . '>';
     }
 
     /**
-     * @param array $expected Expected subset of data
-     *
+     * @param  array  $expected Expected subset of data
      * @return Subset
      */
     public static function loose(array $expected)
@@ -48,36 +57,35 @@ class Subset extends MatcherAbstract
     /**
      * Check if the actual value matches the expected.
      *
-     * @param mixed $actual
+     * @param  mixed $actual
      * @return bool
      */
+    #[Override]
     public function match(&$actual)
     {
-        if (!is_array($actual)) {
+        if (! is_array($actual)) {
             return false;
         }
 
         if ($this->strict) {
-            return $actual === array_replace_recursive($actual, $this->expected);
+            return array_replace_recursive($actual, $this->expected) === $actual;
         }
 
-        return $actual == array_replace_recursive($actual, $this->expected);
+        return array_replace_recursive($actual, $this->expected) == $actual;
     }
 
     /**
-     * Return a string representation of this Matcher
-     *
-     * @return string
+     * @param  array  $expected Expected subset of data
+     * @return Subset
      */
-    public function __toString()
+    public static function strict(array $expected)
     {
-        return '<Subset' . $this->formatArray($this->expected) . ">";
+        return new static($expected, true);
     }
 
     /**
      * Recursively format an array into the string representation for this matcher
      *
-     * @param array $array
      * @return string
      */
     protected function formatArray(array $array)
@@ -86,6 +94,7 @@ class Subset extends MatcherAbstract
         foreach ($array as $k => $v) {
             $elements[] = $k . '=' . (is_array($v) ? $this->formatArray($v) : (string) $v);
         }
-        return "[" . implode(", ", $elements) . "]";
+
+        return '[' . implode(', ', $elements) . ']';
     }
 }

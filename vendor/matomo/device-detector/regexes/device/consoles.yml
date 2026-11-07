@@ -26,19 +26,32 @@ Microsoft:
       model: 'Xbox 360'
 
 Nintendo:
-  regex: 'Nintendo (([3]?DS[i]?)|Wii[U]?|Switch|GameBoy)'
+  regex: 'Nintendo (([3]?DS[i]?)|Wii[U]?|Switch|GameBoy)|Switch(?: Lite| OLED)?\)'
   device: 'console'
-  model: '$1'
+  models:
+    - regex: 'Nintendo (([3]?DS[i]?)|Wii[U]?|Switch(?: Lite| OLED)|GameBoy)'
+      model: '$1'
+    - regex: '(Switch(?: Lite| OLED)?)'
+      model: '$1'
 
 OUYA:
   regex: 'OUYA'
   device: 'console'
   model: 'OUYA'
 
-Sega:
-  regex: 'Dreamcast'
+Sanyo:
+  regex: 'Aplix_SANYO'
   device: 'console'
-  model: 'Dreamcast'
+  model: '3DO TRY'
+
+Sega:
+  regex: 'Dreamcast|Aplix_SEGASATURN'
+  device: 'console'
+  models:
+    - regex: 'Dreamcast'
+      model: 'Dreamcast'
+    - regex: 'Aplix_SEGASATURN'
+      model: 'Saturn'
 
 JXD:
   regex: 'JXD_S601WIFI'
@@ -46,12 +59,34 @@ JXD:
   model: 'S601 WiFi'
 
 Sony:
-  regex: 'PlayStation ?(2|3|4 Pro|4|5|Portable|Vita)'
+  regex: '(?:PlayStation ?(4 Pro|[2-5]|Portable|Vita)|sony_tv;ps5;|\(PS3\))'
   device: 'console'
-  model: 'PlayStation $1'
+  models:
+    - regex: 'sony_tv;ps5;'
+      model: 'PlayStation 5'
+    - regex: 'PlayStation 4 PRO'
+      model: 'PlayStation 4 Pro'
+    - regex: '\(PS3\)'
+      model: 'PlayStation 3'
+    - regex: 'PlayStation ?(4 Pro|[2-5]|Portable|Vita)'
+      model: 'PlayStation $1'
 
 # Retroid Pocket (www.goretroid.com)
 Retroid Pocket:
-  regex: 'Retroid Pocket 2(?:Plus|\+)'
+  regex: 'Retroid Pocket'
   device: 'console'
-  model: '2 Plus'
+  models:
+    - regex: 'Pocket ([23]) ?(?:Plus|\+)'
+      model: '$1 Plus'
+    - regex: 'Pocket 4 Pro'
+      model: '4 Pro'
+    - regex: 'Pocket ([235])'
+      model: '$1'
+
+# Valve Corporation (https://www.steamdeck.com/en/)
+Valve Corporation:
+  regex: 'Steam'
+  device: 'console'
+  models:
+    - regex: 'SteamDeck'
+      model: 'Steam Deck'

@@ -11,6 +11,7 @@
 
 namespace Jaybizzle\CrawlerDetect;
 
+use Jaybizzle\CrawlerDetect\Fixtures\AbstractProvider;
 use Jaybizzle\CrawlerDetect\Fixtures\Crawlers;
 use Jaybizzle\CrawlerDetect\Fixtures\Exclusions;
 use Jaybizzle\CrawlerDetect\Fixtures\Headers;
@@ -29,14 +30,14 @@ class CrawlerDetect
      *
      * @var array
      */
-    protected $httpHeaders = array();
+    protected $httpHeaders = [];
 
     /**
      * Store regex matches.
      *
      * @var array
      */
-    protected $matches = array();
+    protected $matches = [];
 
     /**
      * Crawlers object.
@@ -74,39 +75,74 @@ class CrawlerDetect
     protected $compiledExclusions;
 
     /**
+     * Cache of compiled regex strings keyed by fixture class name, shared
+     * across instances so per-request `new CrawlerDetect` calls don't
+     * re-implode the (~1500-entry) pattern list each time.
+     *
+     * @var array<string, string>
+     */
+    protected static $compileCache = [];
+
+    /**
      * Class constructor.
      */
-    public function __construct(array $headers = null, $userAgent = null)
+    public function __construct(?array $headers = null, $userAgent = null)
     {
-        $this->crawlers = new Crawlers();
-        $this->exclusions = new Exclusions();
-        $this->uaHttpHeaders = new Headers();
+        $this->crawlers = new Crawlers;
+        $this->exclusions = new Exclusions;
+        $this->uaHttpHeaders = new Headers;
 
-        $this->compiledRegex = $this->compileRegex($this->crawlers->getAll());
-        $this->compiledExclusions = $this->compileRegex($this->exclusions->getAll());
+        $this->compiledRegex = $this->compileFixtureRegex($this->crawlers);
+        $this->compiledExclusions = $this->compileFixtureRegex($this->exclusions);
 
         $this->setHttpHeaders($headers);
         $this->setUserAgent($userAgent);
     }
 
     /**
+     * Compile and memoize the regex for a fixture provider.
+     *
+     * The pattern list is a fixed class property, so the class name is a
+     * sufficient cache key — cheaper than hashing the patterns themselves.
+     *
+     * @return string
+     */
+    protected function compileFixtureRegex(AbstractProvider $fixture)
+    {
+        $class = get_class($fixture);
+
+        if (! isset(self::$compileCache[$class])) {
+            self::$compileCache[$class] = $this->compileRegex($fixture->getAll());
+        }
+
+        return self::$compileCache[$class];
+    }
+
+    /**
      * Compile the regex patterns into one regex string.
      *
-     * @param array
+     * A non-capturing group is used because callers only need the full
+     * match (preg_match's $matches[0]), not a back-reference.
      *
+     * @param  array  $patterns
      * @return string
      */
     public function compileRegex($patterns)
     {
-        return '('.implode('|', $patterns).')';
+        return '(?:'.implode('|', $patterns).')';
     }
 
     /**
      * Set HTTP headers.
      *
-     * @param array|null $httpHeaders
+     * Accepts either the _SERVER-style names PHP's SAPI produces
+     * (HTTP_USER_AGENT) or the real header names carried by a PSR-7 request,
+     * HttpFoundation, Swoole or a Lambda event ('User-Agent'). Both are stored
+     * under the canonical HTTP_ form so lookups stay uniform.
+     *
+     * @param  array|null  $httpHeaders
      */
-    public function setHttpHeaders($httpHeaders)
+    public function setHttpHeaders($httpHeaders = null)
     {
         // Use global _SERVER if $httpHeaders aren't defined.
         if (! is_array($httpHeaders) || ! count($httpHeaders)) {
@@ -114,15 +150,55 @@ class CrawlerDetect
         }
 
         // Clear existing headers.
-        $this->httpHeaders = array();
+        $this->httpHeaders = [];
 
-        // Only save HTTP headers. In PHP land, that means
-        // only _SERVER vars that start with HTTP_.
+        $uaHeaders = array_flip(
+            array_map([$this, 'normaliseHeaderName'], $this->getUaHttpHeaders())
+        );
+
+        // Only save HTTP headers. In PHP land, that means _SERVER vars that
+        // start with HTTP_ — plus, for non-SAPI sources, any key whose real
+        // header name is one we actually read.
         foreach ($httpHeaders as $key => $value) {
-            if (strpos($key, 'HTTP_') === 0) {
-                $this->httpHeaders[$key] = $value;
+            $name = $this->normaliseHeaderName($key);
+
+            if (strpos(strtoupper((string) $key), 'HTTP_') === 0 || isset($uaHeaders[$name])) {
+                $this->httpHeaders['HTTP_'.$name] = $this->normaliseHeaderValue($value);
             }
         }
+    }
+
+    /**
+     * Reduce a header name to its canonical form - uppercased, underscore
+     * separated, with any SAPI 'HTTP_' prefix removed.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function normaliseHeaderName($key)
+    {
+        $key = strtoupper((string) $key);
+
+        // Strip the prefix before folding hyphens, so only a genuine
+        // underscore-separated SAPI key loses it. A real header named
+        // 'Http-User-Agent' must not be mistaken for the user agent.
+        if (strpos($key, 'HTTP_') === 0) {
+            $key = substr($key, 5);
+        }
+
+        return str_replace('-', '_', $key);
+    }
+
+    /**
+     * Flatten a header value. PSR-7 and HttpFoundation both expose values as
+     * an array of strings, where the SAPI gives a single pre-joined string.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function normaliseHeaderValue($value)
+    {
+        return is_array($value) ? implode(', ', $value) : (string) $value;
     }
 
     /**
@@ -138,15 +214,22 @@ class CrawlerDetect
     /**
      * Set the user agent.
      *
-     * @param string|null $userAgent
+     * @param  string|null  $userAgent
      */
-    public function setUserAgent($userAgent)
+    public function setUserAgent($userAgent = null)
     {
         if (is_null($userAgent)) {
+            $userAgent = '';
+
             foreach ($this->getUaHttpHeaders() as $altHeader) {
                 if (isset($this->httpHeaders[$altHeader])) {
                     $userAgent .= $this->httpHeaders[$altHeader].' ';
                 }
+            }
+
+            // If no headers were found, keep it as null.
+            if ($userAgent === '') {
+                $userAgent = null;
             }
         }
 
@@ -156,23 +239,34 @@ class CrawlerDetect
     /**
      * Check user agent string against the regex.
      *
-     * @param string|null $userAgent
-     *
+     * @param  string|null  $userAgent
      * @return bool
      */
     public function isCrawler($userAgent = null)
     {
-        $agent = trim(preg_replace(
+        $this->matches = [];
+
+        $agent = preg_replace(
             "/{$this->compiledExclusions}/i",
             '',
             $userAgent ?: $this->userAgent ?: ''
-        ));
+        );
 
-        if ($agent === '') {
+        if ($agent === null || trim($agent) === '') {
             return false;
         }
 
-        return (bool) preg_match("/{$this->compiledRegex}/i", $agent, $this->matches);
+        $agent = trim($agent);
+
+        $result = preg_match("/{$this->compiledRegex}/i", $agent, $this->matches);
+
+        if ($result === false) {
+            $this->matches = [];
+
+            return false;
+        }
+
+        return (bool) $result;
     }
 
     /**
@@ -184,7 +278,6 @@ class CrawlerDetect
     {
         return isset($this->matches[0]) ? $this->matches[0] : null;
     }
-
 
     /**
      * @return string|null

@@ -58,7 +58,7 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string|string[]|null $ips
      * @param string|string[]|null $schemes
      */
-    public function __construct(string $path = null, string $host = null, $methods = null, $ips = null, array $attributes = [], $schemes = null, int $port = null)
+    public function __construct(?string $path = null, ?string $host = null, $methods = null, $ips = null, array $attributes = [], $schemes = null, ?int $port = null)
     {
         $this->matchPath($path);
         $this->matchHost($host);
@@ -91,7 +91,7 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * Adds a check for the the URL port.
+     * Adds a check for the URL port.
      *
      * @param int|null $port The port number to connect to
      */
@@ -140,6 +140,11 @@ class RequestMatcher implements RequestMatcherInterface
     public function matchMethod($method)
     {
         $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : [];
+
+        // HEAD requests are served by the GET handler, as the router does
+        if (\in_array('GET', $this->methods, true) && !\in_array('HEAD', $this->methods, true)) {
+            $this->methods[] = 'HEAD';
+        }
     }
 
     /**
@@ -173,7 +178,7 @@ class RequestMatcher implements RequestMatcherInterface
             }
         }
 
-        if (null !== $this->path && !preg_match('{'.$this->path.'}', rawurldecode($request->getPathInfo()))) {
+        if (null !== $this->path && !preg_match('{'.$this->path.'}s', rawurldecode($request->getPathInfo()))) {
             return false;
         }
 

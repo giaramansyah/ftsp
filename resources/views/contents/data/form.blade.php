@@ -36,7 +36,7 @@
                 <span class="input-group-text text-bold">Rp</span>
               </div>
               <input type="text" class="form-control form-control-sm text-right text-bold" maxlength="20"
-                name="amount" value="{{ isset($amount) ? $amount : '' }}" {{ isset($id) ? 'readonly' : '' }}>
+                name="amount" value="{{ isset($amount) ? $amount : '' }}">
             </div>
           </div>
         </div>

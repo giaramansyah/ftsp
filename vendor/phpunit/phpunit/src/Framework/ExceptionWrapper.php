@@ -12,7 +12,7 @@ namespace PHPUnit\Framework;
 use const PHP_VERSION_ID;
 use function array_keys;
 use function get_class;
-use function spl_object_hash;
+use function spl_object_id;
 use PHPUnit\Util\Filter;
 use Throwable;
 use WeakReference;
@@ -114,13 +114,13 @@ final class ExceptionWrapper extends Exception
      *
      * Approach works both for var_dump() and var_export() and print_r().
      */
-    private function originalException(Throwable $exceptionToStore = null): ?Throwable
+    private function originalException(?Throwable $exceptionToStore = null): ?Throwable
     {
         // drop once PHP 7.3 support is removed
         if (PHP_VERSION_ID < 70400) {
             static $originalExceptions;
 
-            $instanceId = spl_object_hash($this);
+            $instanceId = spl_object_id($this);
 
             if ($exceptionToStore) {
                 $originalExceptions[$instanceId] = $exceptionToStore;

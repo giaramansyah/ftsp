@@ -44,7 +44,13 @@ final class StreamWrapper
                 .'writable, or both.');
         }
 
-        return fopen('guzzle://stream', $mode, false, self::createStreamContext($stream));
+        $resource = @fopen('guzzle://stream', $mode, false, self::createStreamContext($stream));
+
+        if ($resource === false) {
+            throw new \RuntimeException('Unable to create stream resource');
+        }
+
+        return $resource;
     }
 
     /**
@@ -69,7 +75,7 @@ final class StreamWrapper
         }
     }
 
-    public function stream_open(string $path, string $mode, int $options, string &$opened_path = null): bool
+    public function stream_open(string $path, string $mode, int $options, ?string &$opened_path = null): bool
     {
         $options = stream_context_get_options($this->context);
 
@@ -91,6 +97,11 @@ final class StreamWrapper
     public function stream_write(string $data): int
     {
         return $this->stream->write($data);
+    }
+
+    public function stream_flush(): bool
+    {
+        return true;
     }
 
     public function stream_tell(): int
@@ -122,10 +133,28 @@ final class StreamWrapper
     }
 
     /**
-     * @return array<int|string, int>
+     * @return array{
+     *   dev: int,
+     *   ino: int,
+     *   mode: int,
+     *   nlink: int,
+     *   uid: int,
+     *   gid: int,
+     *   rdev: int,
+     *   size: int,
+     *   atime: int,
+     *   mtime: int,
+     *   ctime: int,
+     *   blksize: int,
+     *   blocks: int
+     * }|false
      */
-    public function stream_stat(): array
+    public function stream_stat()
     {
+        if ($this->stream->getSize() === null) {
+            return false;
+        }
+
         static $modeMap = [
             'r' => 33060,
             'rb' => 33060,
@@ -152,7 +181,21 @@ final class StreamWrapper
     }
 
     /**
-     * @return array<int|string, int>
+     * @return array{
+     *   dev: int,
+     *   ino: int,
+     *   mode: int,
+     *   nlink: int,
+     *   uid: int,
+     *   gid: int,
+     *   rdev: int,
+     *   size: int,
+     *   atime: int,
+     *   mtime: int,
+     *   ctime: int,
+     *   blksize: int,
+     *   blocks: int
+     * }
      */
     public function url_stat(string $path, int $flags): array
     {

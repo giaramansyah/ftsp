@@ -14,11 +14,11 @@ require 'src/Fixtures/Crawlers.php';
 require 'src/Fixtures/Exclusions.php';
 require 'src/Fixtures/Headers.php';
 
-$src = array(
+$src = [
     'Crawlers',
     'Exclusions',
     'Headers',
-);
+];
 
 foreach ($src as $class) {
     $class = "Jaybizzle\\CrawlerDetect\\Fixtures\\$class";
@@ -31,11 +31,11 @@ foreach ($src as $class) {
 function outputJson($object)
 {
     $className = (new ReflectionClass($object))->getShortName();
-    file_put_contents("raw/$className.json", json_encode($object->getAll()));
+    file_put_contents("raw/$className.json", json_encode($object->getAll()).PHP_EOL);
 }
 
 function outputTxt($object)
 {
     $className = (new ReflectionClass($object))->getShortName();
-    file_put_contents("raw/$className.txt", implode(PHP_EOL, $object->getAll()));
+    file_put_contents("raw/$className.txt", implode(PHP_EOL, $object->getAll()).PHP_EOL);
 }

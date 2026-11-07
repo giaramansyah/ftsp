@@ -1,23 +1,27 @@
 <?php
 
 /**
- * Mockery (https://docs.mockery.io/)
+ * Mockery (https://docs.mockery.io/en/stable/)
  *
  * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
  * @license   https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
- * @link      https://github.com/mockery/mockery for the canonical source repository
+ * @see       https://github.com/mockery/mockery for the canonical source repository
  */
 
 namespace Mockery\Matcher;
 
-abstract class MatcherAbstract
+/**
+ * @deprecated Implement \Mockery\Matcher\MatcherInterface instead of extending this class
+ * @see https://github.com/mockery/mockery/pull/1338
+ */
+abstract class MatcherAbstract implements MatcherInterface
 {
     /**
      * The expected value (or part thereof)
      *
      * @var mixed
      */
-    protected $_expected = null;
+    protected $_expected;
 
     /**
      * Set the expected value
@@ -28,21 +32,4 @@ abstract class MatcherAbstract
     {
         $this->_expected = $expected;
     }
-
-    /**
-     * Check if the actual value matches the expected.
-     * Actual passed by reference to preserve reference trail (where applicable)
-     * back to the original method parameter.
-     *
-     * @param mixed $actual
-     * @return bool
-     */
-    abstract public function match(&$actual);
-
-    /**
-     * Return a string representation of this Matcher
-     *
-     * @return string
-     */
-    abstract public function __toString();
 }

@@ -1,35 +1,48 @@
 <?php
 
 /**
- * Mockery (https://docs.mockery.io/)
+ * Mockery (https://docs.mockery.io/en/stable/)
  *
  * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
  * @license   https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
- * @link      https://github.com/mockery/mockery for the canonical source repository
+ * @see       https://github.com/mockery/mockery for the canonical source repository
  */
 
 namespace Mockery\Generator;
 
+use Override;
+
+use function array_key_exists;
+
 class CachingGenerator implements Generator
 {
+    /**
+     * @var array<string,string>
+     */
+    protected $cache = [];
+
+    /**
+     * @var Generator
+     */
     protected $generator;
-    protected $cache = array();
 
     public function __construct(Generator $generator)
     {
         $this->generator = $generator;
     }
 
+    /**
+     * @return string
+     */
+    #[Override]
     public function generate(MockConfiguration $config)
     {
         $hash = $config->getHash();
-        if (isset($this->cache[$hash])) {
+
+        if (array_key_exists($hash, $this->cache)) {
             return $this->cache[$hash];
         }
 
-        $definition = $this->generator->generate($config);
-        $this->cache[$hash] = $definition;
-
-        return $definition;
+        return $this->cache[$hash] = $this->generator->generate($config);
     }
 }

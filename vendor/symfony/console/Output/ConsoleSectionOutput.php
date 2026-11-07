@@ -43,7 +43,7 @@ class ConsoleSectionOutput extends StreamOutput
      *
      * @param int $lines Number of lines to clear. If null, then the entire output of this section is cleared
      */
-    public function clear(int $lines = null)
+    public function clear(?int $lines = null)
     {
         if (empty($this->content) || !$this->isDecorated()) {
             return;
@@ -138,6 +138,7 @@ class ConsoleSectionOutput extends StreamOutput
 
     private function getDisplayLength(string $text): int
     {
-        return Helper::width(Helper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $text)));
+        // formatting the line again would remove literal tags, so only the ANSI sequences are removed
+        return Helper::width(preg_replace(['/\e\[[^m]*m/', '/\e]8;[^;]*;[^\e]*\e\\\\/'], '', str_replace("\t", '        ', $text)));
     }
 }

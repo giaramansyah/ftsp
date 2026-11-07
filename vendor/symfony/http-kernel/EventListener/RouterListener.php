@@ -48,6 +48,7 @@ class RouterListener implements EventSubscriberInterface
     private $requestStack;
     private $projectDir;
     private $debug;
+    private $parentContexts = [];
 
     /**
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
@@ -55,7 +56,7 @@ class RouterListener implements EventSubscriberInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestStack $requestStack, RequestContext $context = null, LoggerInterface $logger = null, string $projectDir = null, bool $debug = true)
+    public function __construct($matcher, RequestStack $requestStack, ?RequestContext $context = null, ?LoggerInterface $logger = null, ?string $projectDir = null, bool $debug = true)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
@@ -73,7 +74,7 @@ class RouterListener implements EventSubscriberInterface
         $this->debug = $debug;
     }
 
-    private function setCurrentRequest(Request $request = null)
+    private function setCurrentRequest(?Request $request = null)
     {
         if (null !== $request) {
             try {
@@ -90,12 +91,35 @@ class RouterListener implements EventSubscriberInterface
      */
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        $this->setCurrentRequest($this->requestStack->getParentRequest());
+        $id = spl_object_id($event->getRequest());
+
+        if (!isset($this->parentContexts[$id])) {
+            return;
+        }
+
+        // The context of the parent is restored instead of being computed again:
+        // while a sub-request runs, its trusted proxies also apply to the parent request
+        $parentContext = $this->parentContexts[$id];
+        unset($this->parentContexts[$id]);
+
+        $this->context
+            ->setBaseUrl($parentContext->getBaseUrl())
+            ->setPathInfo($parentContext->getPathInfo())
+            ->setMethod($parentContext->getMethod())
+            ->setHost($parentContext->getHost())
+            ->setScheme($parentContext->getScheme())
+            ->setHttpPort($parentContext->getHttpPort())
+            ->setHttpsPort($parentContext->getHttpsPort())
+            ->setQueryString($parentContext->getQueryString());
     }
 
     public function onKernelRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
+
+        if (null !== $this->requestStack->getParentRequest()) {
+            $this->parentContexts[spl_object_id($request)] = clone $this->context;
+        }
 
         $this->setCurrentRequest($request);
 

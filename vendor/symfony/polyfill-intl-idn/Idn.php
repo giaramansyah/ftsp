@@ -11,8 +11,6 @@
 
 namespace Symfony\Polyfill\Intl\Idn;
 
-use Exception;
-use Normalizer;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\DisallowedRanges;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
@@ -62,6 +60,21 @@ final class Idn
     public const INITIAL_N = 128;
     public const DELIMITER = '-';
     public const MAX_INT = 2147483647;
+
+    /**
+     * Punycode decoding does work quadratic in the payload length. Valid ACE
+     * labels are limited to 63 bytes, so payloads beyond this (generous) bound
+     * are rejected without being decoded to keep the work bounded.
+     */
+    private const MAX_DECODE_PAYLOAD_SIZE = 1024;
+
+    /**
+     * Encoding is quadratic the same way: it is O(n*r) in the length of a label
+     * and in its number of distinct code points. ext-intl never runs it on a
+     * domain this large, because it fails before converting when the result
+     * would not fit its own output buffer.
+     */
+    private const MAX_CODE_POINTS = 255;
 
     /**
      * Contains the numeric value of a basic code point (for use in representing integers) in the
@@ -147,8 +160,20 @@ final class Idn
      */
     public static function idn_to_ascii($domainName, $options = self::IDNA_DEFAULT, $variant = self::INTL_IDNA_VARIANT_UTS46, &$idna_info = [])
     {
-        if (\PHP_VERSION_ID >= 70200 && self::INTL_IDNA_VARIANT_2003 === $variant) {
+        if (\PHP_VERSION_ID > 80400 && '' === $domainName) {
+            throw new \ValueError('idn_to_ascii(): Argument #1 ($domain) cannot be empty');
+        }
+
+        if (self::INTL_IDNA_VARIANT_2003 === $variant) {
             @trigger_error('idn_to_ascii(): INTL_IDNA_VARIANT_2003 is deprecated', \E_USER_DEPRECATED);
+        }
+
+        // The ASCII form is at least as long as the number of code points in the
+        // domain, so beyond this many code points no result can fit in the output
+        // buffer ext-intl uses: it returns false there without reporting details,
+        // and so do we, rather than Punycode-encoding a label that cannot be used.
+        if (self::MAX_CODE_POINTS < \strlen((string) $domainName) && self::MAX_CODE_POINTS < self::countCodePoints((string) $domainName)) {
+            return false;
         }
 
         $options = [
@@ -167,7 +192,7 @@ final class Idn
             if (1 === preg_match('/[^\x00-\x7F]/', $label)) {
                 try {
                     $label = 'xn--'.self::punycodeEncode($label);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $info->errors |= self::ERROR_PUNYCODE;
                 }
 
@@ -200,7 +225,11 @@ final class Idn
      */
     public static function idn_to_utf8($domainName, $options = self::IDNA_DEFAULT, $variant = self::INTL_IDNA_VARIANT_UTS46, &$idna_info = [])
     {
-        if (\PHP_VERSION_ID >= 70200 && self::INTL_IDNA_VARIANT_2003 === $variant) {
+        if (\PHP_VERSION_ID > 80400 && '' === $domainName) {
+            throw new \ValueError('idn_to_utf8(): Argument #1 ($domain) cannot be empty');
+        }
+
+        if (self::INTL_IDNA_VARIANT_2003 === $variant) {
             @trigger_error('idn_to_utf8(): INTL_IDNA_VARIANT_2003 is deprecated', \E_USER_DEPRECATED);
         }
 
@@ -232,12 +261,15 @@ final class Idn
             self::$virama = require __DIR__.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'unidata'.\DIRECTORY_SEPARATOR.'virama.php';
         }
 
-        $offset = 0;
+        $offset = $joinerOffset = 0;
 
         foreach ($codePoints as $i => $codePoint) {
             if (0x200C !== $codePoint && 0x200D !== $codePoint) {
                 continue;
             }
+
+            $currentOffset = strpos($label, 0x200C === $codePoint ? "\xE2\x80\x8C" : "\xE2\x80\x8D", $joinerOffset);
+            $joinerOffset = $currentOffset + 3;
 
             if (!isset($codePoints[$i - 1])) {
                 return false;
@@ -245,14 +277,18 @@ final class Idn
 
             // If Canonical_Combining_Class(Before(cp)) .eq. Virama Then True;
             if (isset(self::$virama[$codePoints[$i - 1]])) {
+                $offset = $joinerOffset;
+
                 continue;
             }
 
             // If RegExpMatch((Joining_Type:{L,D})(Joining_Type:T)*\u200C(Joining_Type:T)*(Joining_Type:{R,D})) Then
             // True;
             // Generated RegExp = ([Joining_Type:{L,D}][Joining_Type:T]*\u200C[Joining_Type:T]*)[Joining_Type:{R,D}]
-            if (0x200C === $codePoint && 1 === preg_match(Regex::ZWNJ, $label, $matches, \PREG_OFFSET_CAPTURE, $offset)) {
-                $offset += \strlen($matches[1][0]);
+            if (0x200C === $codePoint
+                && preg_match(Regex::ZWNJ, $label, $matches, \PREG_OFFSET_CAPTURE, $offset)
+                && $currentOffset === $matches[1][1] + strpos($matches[1][0], "\xE2\x80\x8C")) {
+                $offset = $matches[1][1] + \strlen($matches[1][0]);
 
                 continue;
             }
@@ -282,10 +318,6 @@ final class Idn
 
             switch ($data['status']) {
                 case 'disallowed':
-                    $info->errors |= self::ERROR_DISALLOWED;
-
-                    // no break.
-
                 case 'valid':
                     $str .= mb_chr($codePoint, 'utf-8');
 
@@ -296,7 +328,7 @@ final class Idn
                     break;
 
                 case 'mapped':
-                    $str .= $data['mapping'];
+                    $str .= $transitional && 0x1E9E === $codePoint ? 'ss' : $data['mapping'];
 
                     break;
 
@@ -335,8 +367,8 @@ final class Idn
         $domain = self::mapCodePoints($domain, $options, $info);
 
         // Step 2. Normalize the domain name string to Unicode Normalization Form C.
-        if (!Normalizer::isNormalized($domain, Normalizer::FORM_C)) {
-            $domain = Normalizer::normalize($domain, Normalizer::FORM_C);
+        if (!\Normalizer::isNormalized($domain, \Normalizer::FORM_C)) {
+            $domain = \Normalizer::normalize($domain, \Normalizer::FORM_C);
         }
 
         // Step 3. Break the string into labels at U+002E (.) FULL STOP.
@@ -348,10 +380,39 @@ final class Idn
             $validationOptions = $options;
 
             if ('xn--' === substr($label, 0, 4)) {
+                // Step 4.1. If the label contains any non-ASCII code point (i.e., a code point greater than U+007F),
+                // record that there was an error, and continue with the next label.
+                if (preg_match('/[^\x00-\x7F]/', $label)) {
+                    $info->errors |= self::ERROR_PUNYCODE;
+
+                    continue;
+                }
+
+                // The decoder does work quadratic in the payload length. Valid
+                // labels are at most 63 bytes long, so a payload beyond this
+                // bound is always invalid input: reject it without decoding,
+                // like ext-intl does, to avoid spending unbounded time on it.
+                if (\strlen($label) - 4 > self::MAX_DECODE_PAYLOAD_SIZE) {
+                    $info->errors |= self::ERROR_PUNYCODE;
+
+                    continue;
+                }
+
+                // Step 4.2. Attempt to convert the rest of the label to Unicode according to Punycode [RFC3492]. If
+                // that conversion fails, record that there was an error, and continue
+                // with the next label. Otherwise replace the original label in the string by the results of the
+                // conversion. Per UTS #46 revision 33, if the conversion succeeds but the result is empty or
+                // contains only ASCII code points, record that there was an error and continue with the next label.
                 try {
                     $label = self::punycodeDecode(substr($label, 4));
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $info->errors |= self::ERROR_PUNYCODE;
+
+                    continue;
+                }
+
+                if ('' === $label || 1 !== preg_match('/[^\x00-\x7F]/', $label)) {
+                    $info->errors |= self::ERROR_INVALID_ACE_LABEL;
 
                     continue;
                 }
@@ -496,7 +557,7 @@ final class Idn
         }
 
         // Step 1. The label must be in Unicode Normalization Form C.
-        if (!Normalizer::isNormalized($label, Normalizer::FORM_C)) {
+        if (!\Normalizer::isNormalized($label, \Normalizer::FORM_C)) {
             $info->errors |= self::ERROR_INVALID_ACE_LABEL;
         }
 
@@ -518,6 +579,8 @@ final class Idn
             if ('-' === substr($label, -1, 1)) {
                 $info->errors |= self::ERROR_TRAILING_HYPHEN;
             }
+        } elseif ('xn--' === substr($label, 0, 4)) {
+            $info->errors |= self::ERROR_PUNYCODE;
         }
 
         // Step 4. The label must not contain a U+002E (.) FULL STOP.
@@ -583,7 +646,7 @@ final class Idn
 
         for ($j = 0; $j < $b; ++$j) {
             if ($bytes[$j] > 0x7F) {
-                throw new Exception('Invalid input');
+                throw new \Exception('Invalid input');
             }
 
             $output[$out++] = $input[$j];
@@ -599,17 +662,17 @@ final class Idn
 
             for ($k = self::BASE; /* no condition */; $k += self::BASE) {
                 if ($in >= $inputLength) {
-                    throw new Exception('Invalid input');
+                    throw new \Exception('Invalid input');
                 }
 
                 $digit = self::$basicToDigit[$bytes[$in++] & 0xFF];
 
                 if ($digit < 0) {
-                    throw new Exception('Invalid input');
+                    throw new \Exception('Invalid input');
                 }
 
                 if ($digit > intdiv(self::MAX_INT - $i, $w)) {
-                    throw new Exception('Integer overflow');
+                    throw new \Exception('Integer overflow');
                 }
 
                 $i += $digit * $w;
@@ -629,7 +692,7 @@ final class Idn
                 $baseMinusT = self::BASE - $t;
 
                 if ($w > intdiv(self::MAX_INT, $baseMinusT)) {
-                    throw new Exception('Integer overflow');
+                    throw new \Exception('Integer overflow');
                 }
 
                 $w *= $baseMinusT;
@@ -639,11 +702,16 @@ final class Idn
             $bias = self::adaptBias($i - $oldi, $outPlusOne, 0 === $oldi);
 
             if (intdiv($i, $outPlusOne) > self::MAX_INT - $n) {
-                throw new Exception('Integer overflow');
+                throw new \Exception('Integer overflow');
             }
 
             $n += intdiv($i, $outPlusOne);
             $i %= $outPlusOne;
+
+            if ($n > 0x10FFFF || ($n >= 0xD800 && $n <= 0xDFFF)) {
+                throw new \Exception('Invalid code point');
+            }
+
             array_splice($output, $i++, 0, [mb_chr($n, 'utf-8')]);
         }
 
@@ -694,7 +762,7 @@ final class Idn
             }
 
             if ($m - $n > intdiv(self::MAX_INT - $delta, $h + 1)) {
-                throw new Exception('Integer overflow');
+                throw new \Exception('Integer overflow');
             }
 
             $delta += ($m - $n) * ($h + 1);
@@ -702,7 +770,7 @@ final class Idn
 
             foreach ($iter as $codePoint) {
                 if ($codePoint < $n && 0 === ++$delta) {
-                    throw new Exception('Integer overflow');
+                    throw new \Exception('Integer overflow');
                 }
 
                 if ($codePoint === $n) {
@@ -741,6 +809,24 @@ final class Idn
         }
 
         return $output;
+    }
+
+    /**
+     * Counts the code points of a UTF-8 string, malformed bytes included.
+     *
+     * This is the expression Mbstring::mb_strlen() falls back to in
+     * symfony/polyfill-mbstring, inlined because this package does not depend on it.
+     * Counting only the bytes that can start a sequence would be shorter, but then a
+     * run of continuation bytes would pad a label without being counted, which is the
+     * one thing this bound has to prevent.
+     *
+     * @param string $input
+     *
+     * @return int
+     */
+    private static function countCodePoints($input)
+    {
+        return preg_match_all('/[\x00-\x7F]|[\xC0-\xDF][\x80-\xBF]?|[\xE0-\xEF][\x80-\xBF]{0,2}|[\xF0-\xF7][\x80-\xBF]{0,3}|[\xF8-\xFB][\x80-\xBF]{0,4}|[\xFC-\xFD][\x80-\xBF]{0,5}|[\x80-\xBF\xFE\xFF]/s', $input);
     }
 
     /**

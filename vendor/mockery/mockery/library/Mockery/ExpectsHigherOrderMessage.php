@@ -1,24 +1,30 @@
 <?php
 
 /**
- * Mockery (https://docs.mockery.io/)
+ * Mockery (https://docs.mockery.io/en/stable/)
  *
  * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
  * @license   https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
- * @link      https://github.com/mockery/mockery for the canonical source repository
+ * @see       https://github.com/mockery/mockery for the canonical source repository
  */
 
 namespace Mockery;
+
+use Override;
 
 class ExpectsHigherOrderMessage extends HigherOrderMessage
 {
     public function __construct(MockInterface $mock)
     {
-        parent::__construct($mock, "shouldReceive");
+        parent::__construct($mock, 'shouldReceive');
     }
+
     /**
-     * @return \Mockery\Expectation
+     * @param  string                                              $method
+     * @param  list<mixed>                                         $args
+     * @return Expectation|ExpectationInterface|HigherOrderMessage
      */
+    #[Override]
     public function __call($method, $args)
     {
         $expectation = parent::__call($method, $args);

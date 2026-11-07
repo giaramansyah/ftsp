@@ -47,7 +47,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null): array
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?int $start = null, ?int $end = null, ?string $statusCode = null): array
     {
         $file = $this->getIndexFilename();
 
@@ -60,7 +60,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
         $result = [];
         while (\count($result) < $limit && $line = $this->readLineFromFile($file)) {
-            $values = str_getcsv($line);
+            $values = str_getcsv($line, ',', '"', '\\');
 
             if (7 !== \count($values)) {
                 // skip invalid lines
@@ -187,7 +187,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getTime(),
                 $profile->getParentToken(),
                 $profile->getStatusCode(),
-            ]);
+            ], ',', '"', '\\');
             fclose($file);
         }
 
@@ -198,9 +198,15 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * Gets filename to store data, associated to the token.
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException when the token cannot be used as a file name
      */
     protected function getFilename(string $token)
     {
+        if (!self::isValidToken($token)) {
+            throw new \InvalidArgumentException(sprintf('The profiler token "%s" is invalid: only letters, digits, dashes and underscores are allowed.', $token));
+        }
+
         // Uses 4 last characters, because first are mostly the same.
         $folderA = substr($token, -2, 2);
         $folderB = substr($token, -4, 2);
@@ -265,7 +271,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return '' === $line ? null : $line;
     }
 
-    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
+    protected function createProfileFromData(string $token, array $data, ?Profile $parent = null)
     {
         $profile = new Profile($token);
         $profile->setIp($data['ip']);
@@ -292,9 +298,9 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return $profile;
     }
 
-    private function doRead($token, Profile $profile = null): ?Profile
+    private function doRead($token, ?Profile $profile = null): ?Profile
     {
-        if (!$token || !file_exists($file = $this->getFilename($token))) {
+        if (!$token || !self::isValidToken($token) || !file_exists($file = $this->getFilename($token))) {
             return null;
         }
 
@@ -313,5 +319,10 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         return $this->createProfileFromData($token, $data, $profile);
+    }
+
+    private static function isValidToken(string $token): bool
+    {
+        return preg_match('/^[a-zA-Z0-9_-]++$/D', $token);
     }
 }

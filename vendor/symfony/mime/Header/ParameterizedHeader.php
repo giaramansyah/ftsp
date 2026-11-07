@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Header;
 
 use Symfony\Component\Mime\Encoder\Rfc2231Encoder;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * @author Chris Corbyn
@@ -56,6 +57,12 @@ final class ParameterizedHeader extends UnstructuredHeader
      */
     public function setParameters(array $parameters)
     {
+        foreach ($parameters as $k => $v) {
+            if (!preg_match('/^'.self::TOKEN_REGEX.'$/D', $k)) {
+                throw new RfcComplianceException(sprintf('The parameter name "%s" contains non-token characters.', $k));
+            }
+        }
+
         $this->parameters = $parameters;
     }
 
@@ -85,7 +92,7 @@ final class ParameterizedHeader extends UnstructuredHeader
      * This doesn't need to be overridden in theory, but it is for implementation
      * reasons to prevent potential breakage of attributes.
      */
-    protected function toTokens(string $string = null): array
+    protected function toTokens(?string $string = null): array
     {
         $tokens = parent::toTokens(parent::getBodyAsString());
 
@@ -117,7 +124,7 @@ final class ParameterizedHeader extends UnstructuredHeader
         if (!preg_match('/^'.self::TOKEN_REGEX.'$/D', $value)) {
             // TODO: text, or something else??
             // ... and it's not ascii
-            if (!preg_match('/^[\x00-\x08\x0B\x0C\x0E-\x7F]*$/D', $value)) {
+            if (!preg_match('/^[\x20-\x7E]*$/D', $value)) {
                 $encoded = true;
                 // Allow space for the indices, charset and language
                 $maxValueLength = $this->getMaxLineLength() - \strlen($name.'*N*="";') - 1;
@@ -176,7 +183,7 @@ final class ParameterizedHeader extends UnstructuredHeader
     {
         $forceHttpQuoting = 'form-data' === $this->getValue() && 'content-disposition' === strtolower($this->getName());
         if ($forceHttpQuoting || !preg_match('/^'.self::TOKEN_REGEX.'$/D', $value)) {
-            $value = '"'.$value.'"';
+            $value = '"'.addcslashes($value, '"\\').'"';
         }
         $prepend = '=';
         if ($encoded) {

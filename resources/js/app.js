@@ -1,7 +1,7 @@
 function preventAlpha(event) {
     var regex = new RegExp("^[a-zA-Z]+$");
     var str = String.fromCharCode(
-        !event.charCode ? event.which : event.charCode
+        !event.charCode ? event.which : event.charCode,
     );
     if (!regex.test(str)) {
         return true;
@@ -63,7 +63,7 @@ function amountText(value, target = null) {
         "0",
         "0",
         "0",
-        "0"
+        "0",
     );
     let kata = new Array(
         "",
@@ -75,7 +75,7 @@ function amountText(value, target = null) {
         "Enam",
         "Tujuh",
         "Delapan",
-        "Sembilan"
+        "Sembilan",
     );
     let tingkat = new Array("", "Ribu", "Juta", "Milyar", "Triliun");
 
@@ -153,8 +153,12 @@ function amountText(value, target = null) {
         kalimat = kalimat.replace("Satu Ribu", "Seribu");
     }
 
-    var result = kalimat.trim().replace(/\s{2,}/g, " ") + " Rupiah";
-    if(target != null) {
+    var word = kalimat.trim().replace(/\s{2,}/g, " ");
+    var result = "";
+    if (word != "") {
+        result = kalimat.trim().replace(/\s{2,}/g, " ") + " Rupiah";
+    }
+    if (target != null) {
         $(target).val(result);
         return;
     } else {
@@ -163,48 +167,50 @@ function amountText(value, target = null) {
 }
 
 function multidata(element) {
-    var checkboxes = $(element).attr('name')
-    var id = $(element).attr('id')
+    var checkboxes = $(element).attr("name");
+    var id = $(element).attr("id");
     var count = 0;
     var available = 0;
     var checked = [];
     var data_id = [];
-    $('input[name="'+checkboxes+'"]').each(function(){
-        if($(this).is(':checked')) {
+    $('input[name="' + checkboxes + '"]').each(function () {
+        if ($(this).is(":checked")) {
             count += 1;
-            checked.push($(this))
+            checked.push($(this));
         }
-    })
+    });
 
-    if(count > 1) {
-        $.each(checked, function(index,value){
-            if(value.attr('id') != id) {
-                $('input[name="'+checkboxes+'"]:not(#' + id + ')').each(function(){
-                    $(this).prop('checked', false)
-                })
+    if (count > 1) {
+        $.each(checked, function (index, value) {
+            if (value.attr("id") != id) {
+                $('input[name="' + checkboxes + '"]:not(#' + id + ")").each(
+                    function () {
+                        $(this).prop("checked", false);
+                    },
+                );
                 count = 1;
-                available = $(element).data('available')
+                available = $(element).data("available");
                 data_id.push($(element).val());
             } else {
-                available += $(this).data('available')
+                available += $(this).data("available");
                 data_id.push($(this).val());
             }
-        })
+        });
     } else {
-        available = $(element).data('available')
+        available = $(element).data("available");
         data_id.push($(element).val());
     }
 
-    if(count > 1) {
-        $('input[name=is_multiple]').val(1)
+    if (count > 1) {
+        $("input[name=is_multiple]").val(1);
     } else {
-        $('input[name=is_multiple]').val(0)
+        $("input[name=is_multiple]").val(0);
     }
 
     return {
-        data_id :data_id.join('|'),
-        amount : $(element).data('amount'),
-        available : available,
-        ma : $(element).data('ma')
-    }
+        data_id: data_id.join("|"),
+        amount: $(element).data("amount"),
+        available: available,
+        ma: $(element).data("ma"),
+    };
 }

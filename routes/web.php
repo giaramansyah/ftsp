@@ -93,7 +93,7 @@ Route::group(['middleware' => ['auth']], function() {
     
     //data
     Route::get('/data/reff/{year?}', [DataController::class, 'index'])->name('master.data.index');
-    Route::get('/data/list', [DataController::class, 'getList'])->name('master.data.list');
+    Route::post('/data/list', [DataController::class, 'getList'])->name('master.data.list');
     Route::get('/data/view/{id}', [DataController::class, 'view'])->name('master.data.view');
     Route::get('/data/add', [DataController::class, 'add'])->name('master.data.add');
     Route::get('/data/upload', [DataController::class, 'upload'])->name('master.data.upload');
@@ -181,7 +181,7 @@ Route::group(['middleware' => ['auth']], function() {
 
     //note
     Route::get('/note/reff/{year?}', [NoteController::class, 'index'])->name('master.note.index');
-    Route::get('/note/list', [NoteController::class, 'getList'])->name('master.note.list');
+    Route::post('/note/list', [NoteController::class, 'getList'])->name('master.note.list');
     Route::get('/note/data', [NoteController::class, 'getData'])->name('master.note.data');
     Route::get('/note/view/{id}', [NoteController::class, 'view'])->name('master.note.view');
     Route::get('/note/add', [NoteController::class, 'add'])->name('master.note.add');
