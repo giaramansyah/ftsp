@@ -136,7 +136,7 @@
               </li>
               <li class="list-group-item">
                 <b>{{ __('Keterangan') }}</b>
-                <p class="float-right mb-0 text-bold">{{ empty($notes) ? '-' : $notes }}</p>
+                <p class="float-right mb-0">{{ empty($notes) ? '-' : $notes }}</p>
               </li>
             </ul>
           </div>
