@@ -32,7 +32,8 @@ return [
         'form' => [
             'add' => 'new',
             'edit' => 'modify',
-            'delete' => 'remove'
+            'delete' => 'remove',
+            'status' => 'status'
         ],
         'password' => [
             'add' => 'new',
@@ -421,5 +422,37 @@ return [
         ]
     ],
 
-    
+    'application_status' => [
+        'code' => [
+            'filter' => 1,
+            'wait' => 2,
+            'coor' => 3,
+            'process' => 4,
+            'approve' => 5,
+            'reject' => 6,
+            'revision' => 7,
+        ],
+        'desc' => [
+            'filter' => 'Filtering',
+            'wait' => 'Waiting',
+            'coor' => 'Koordinasi',
+            'process' => 'On Proses',
+            'approve' => 'Approval',
+            'reject' => 'Rejected',
+            'revision' => 'Menunggu Revisi',
+        ]
+    ],
+
+    'fund_type' => [
+        'code' => [
+            'tukin' => 1,
+            'umd' => 2,
+            'receipt' => 3,
+        ],
+        'desc' => [
+            'tukin' => 'Tukin',
+            'umd' => 'UMD',
+            'receipt' => 'Proses Kwitansi',
+        ]
+    ]
 ];

@@ -213,6 +213,34 @@ class Controller extends BaseController
         }
     }
 
+    public function getApplicationStatus()
+    {
+        $staff = array_combine(config('global.application_status.code'), config('global.application_status.desc'));
+        $result = array();
+        foreach($staff as $key => $value) {
+            $result[] = array(
+                'id' => $key,
+                'name' => Str::ucfirst($value),
+            );
+        }
+
+        return $result;
+    }
+
+    public function getFundType()
+    {
+        $staff = array_combine(config('global.fund_type.code'), config('global.fund_type.desc'));
+        $result = array();
+        foreach($staff as $key => $value) {
+            $result[] = array(
+                'id' => $key,
+                'name' => Str::ucfirst($value),
+            );
+        }
+
+        return $result;
+    }
+
     public function getFile($filename, $path) {
         $arr = explode('_', $filename);
         $arrDate = Arr::only($arr, [0, 1, 2]);

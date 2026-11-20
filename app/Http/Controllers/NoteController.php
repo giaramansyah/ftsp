@@ -123,7 +123,16 @@ class NoteController extends Controller
         $data['amount_difference'] = $amount_approved > 0 ? $this->convertAmount($amount_difference) : '-';
         $data['ammount_remain'] = $amount_approved > 0 ? $this->convertAmount($ammount_remain) : '-';
 
-        $view = ['is_update' => $this->hasPrivilege($this->_update), 'is_delete' => $this->hasPrivilege($this->_delete), 'modal_action' => route('master.note.post', ['action' => config('global.action.form.edit'), 'id' => $id])];
+        $view = [
+            'is_update' => $this->hasPrivilege($this->_update),
+            'is_delete' => $this->hasPrivilege($this->_delete),
+            'applicationStatusArr' => $this->getApplicationStatus(),
+            'fundTypeArr' => $this->getFundType(),
+            'modal_action' => route('master.note.post', [
+                'action' => config('global.action.form.status'),
+                'id' => $id
+            ])
+        ];
 
         $this->writeAppLog($this->_readid, 'Note : ' . $data['ma_id']);
 
@@ -150,7 +159,7 @@ class NoteController extends Controller
                 }
             }
 
-            $data = Note::select(['id', 'ma_id', 'regarding', 'amount', 'note_reff', 'note_date', 'amount_approved', 'amount_requested', 'status', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('ma_id');
+            $data = Note::select(['id', 'ma_id', 'regarding', 'amount', 'note_reff', 'note_date', 'amount_approved', 'amount_requested', 'status', 'application_status', 'updated_at'])->where('is_trash', 0)->where('year', $year)->where('division_id', $division)->orderBy('ma_id');
             if (Auth::user()->staff_id != config('global.staff.code.admin')) {
                 $map = MapNote::where('staff_id',  Auth::user()->staff_id)->get()->toArray();
                 $map = array_column($map, 'note_id');
@@ -186,8 +195,8 @@ class NoteController extends Controller
                 $amount_requested = $this->convertAmount($row->amount_requested, true);
 
                 $column = '0%';
-                if($amount != null && $amount > 0) {
-                    $column = round(($amount_requested/$amount)*100, 2) . '%';
+                if ($amount != null && $amount > 0) {
+                    $column = round(($amount_requested / $amount) * 100, 2) . '%';
                 }
 
                 return $column;
@@ -204,6 +213,15 @@ class NoteController extends Controller
                 }
 
                 return $column;
+            });
+
+            $table->addColumn('application_status_desc', function ($row) {
+                $arrStatus = array_combine(config('global.application_status.code'), config('global.application_status.desc'));
+                if (isset($arrStatus[$row->application_status])) {
+                    return $arrStatus[$row->application_status];
+                }
+
+                return 'N/A';
             });
 
             $table->rawColumns($rawColumns);
@@ -227,11 +245,10 @@ class NoteController extends Controller
             $division_id = $request->input('division_id');
             $staff_id = $request->input('staff_id');
 
-            if($division_id == config('global.division.code.fakultas') && $staff_id != null) {
+            if ($division_id == config('global.division.code.fakultas') && $staff_id != null) {
                 $maps = MapData::whereIn('staff_id', $staff_id)->get()->toArray();
                 $data_ids = array_column($maps, 'data_id');
                 $data = Data::distinct()->select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->whereIn('id', $data_ids)->orderBy('ma_id');
-
             } else {
                 $data = Data::select(['id', 'ma_id', 'description', 'amount'])->where('year', $year)->where('division_id', $division_id)->where('is_trash', 0)->orderBy('ma_id');
             }
@@ -263,7 +280,7 @@ class NoteController extends Controller
             return response()->json($response->responseJson());
         }
 
-        if (in_array($action, Arr::only(config('global.action.form'), ['add', 'edit']))) {
+        if (in_array($action, Arr::only(config('global.action.form'), ['add', 'edit', 'status']))) {
             $param = SecureHelper::unpack($request->input('json'));
 
             if (!is_array($param)) {
@@ -401,6 +418,50 @@ class NoteController extends Controller
                     }
                 }
             }
+
+            if ($action === config('global.action.form.status')) {
+
+                if (!$this->hasPrivilege($this->_update)) {
+                    $response = new Response(false, __('Sorry, You are not authorized for this action'), 2);
+                    return response()->json($response->responseJson());
+                }
+
+                $plainId = SecureHelper::unsecure($id);
+
+                if (!$plainId) {
+                    $response = new Response();
+                    return response()->json($response->responseJson());
+                }
+
+                $data = Note::find($plainId);
+
+                if ($data) {
+                    $application_status = $param['application_status'];
+                    if (isset($param['application_status'])) $data->application_status = $application_status;
+
+                    if ($application_status == config('global.application_status.code.approve')) {
+                        if (isset($param['fund_type'])) $data->fund_type = $param['fund_type'];
+                        if (isset($param['amount_approved'])) $data->amount_approved = $param['amount_approved'];
+                        if (isset($param['disbursed_date'])) $data->disbursed_date = $param['disbursed_date'];
+                        $data->status = config('global.status.code.finished');
+                    }
+
+                    if (isset($param['notes'])) $data->notes = $param['notes'];
+
+                    $data->updated_by = Auth::user()->username;
+
+                    if ($data->save()) {
+                        $response = new Response(true, __('Note updated successfuly'), 1);
+                        $response->setRedirect(route('master.note.index'));
+
+                        $this->writeAppLog($this->_update, 'Note : ' . $param['ma_id']);
+                    } else {
+                        $response = new Response(false, __('Note update failed. Please try again'));
+                    }
+                } else {
+                    $response = new Response(false, __('Application letter not found'), 2);
+                }
+            }
         }
 
         if ($action === config('global.action.form.delete')) {
@@ -441,7 +502,7 @@ class NoteController extends Controller
         }
 
         $data = Note::where('year', $year)->where('is_trash', 0)->orderBy('division_id', 'asc')->get()->toArray();
-        
+
         $export = array();
         $division_flip = array_flip(config('global.division.code'));
         foreach ($data as $value) {
@@ -459,7 +520,7 @@ class NoteController extends Controller
                 'link' => $value['link_url'],
                 'requested' => $this->convertAmount($value['amount_requested'], true),
                 'approved' => $this->convertAmount($value['amount_approved'], true),
-                'percentage' => round(($this->convertAmount($value['amount_requested'], true)/$this->convertAmount($value['amount'], true))*100, 2),
+                'percentage' => round(($this->convertAmount($value['amount_requested'], true) / $this->convertAmount($value['amount'], true)) * 100, 2),
                 'diff' => $this->convertAmount($value['amount_requested'], true) - $this->convertAmount($value['amount_approved'], true),
                 'remain' => $this->convertAmount($value['amount'], true) - $this->convertAmount($value['amount_approved'], true),
                 'status' => $value['status_desc'],
@@ -478,7 +539,8 @@ class NoteController extends Controller
         return response()->json($response->responseJson());
     }
 
-    public function download($id) {
+    public function download($id)
+    {
         $param = SecureHelper::unpack($id);
 
         if (!is_array($param)) {

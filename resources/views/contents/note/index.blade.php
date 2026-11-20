@@ -56,6 +56,7 @@
                     <th>Pengajuan</th>
                     <th>Realisasi</th>
                     <th>Persentase</th>
+                    <th>Status Pengajuan</th>
                     <th>Status</th>
                     <th>Updated</th>
                   </tr>
@@ -164,6 +165,12 @@
             orderable: true,
             searchable: true,
             class: 'text-center text-bold'
+          },
+          {
+            data: 'application_status_desc',
+            name: 'application_status_desc',
+            orderable: true,
+            searchable: true
           },
           {
             data: 'status_desc',

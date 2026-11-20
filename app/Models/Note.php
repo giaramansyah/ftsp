@@ -13,7 +13,7 @@ class Note extends Model
 
     protected $table = 'ms_note';
 
-    protected $appends = ['staff', 'staff_id', 'staff_export', 'years', 'division', 'status_desc', 'note_date_format', 'note_upload_format'];
+    protected $appends = ['staff', 'staff_id', 'staff_export', 'years', 'division', 'status_desc', 'note_date_format', 'note_upload_format', 'application_status_desc', 'fund_type_desc', 'disbursed_date_format'];
 
     protected $fillable = [
         'year',
@@ -29,6 +29,10 @@ class Note extends Model
         'amount_requested',
         'amount_approved',
         'status',
+        'application_status',
+        'fund_type',
+        'disbursed_date',
+        'notes',
         'is_trash',
         'created_by',
         'updated_by',
@@ -143,6 +147,26 @@ class Note extends Model
         return '';
     }
 
+    public function getApplicationStatusDescAttribute()
+    {   
+        if(isset($this->attributes['application_status'])) {
+            $arrStatus = array_combine(config('global.application_status.code'), config('global.application_status.desc'));
+            return $arrStatus[$this->attributes['application_status']];
+        }
+
+        return '-';
+    }
+
+    public function getFundTypeDescAttribute()
+    {   
+        if(isset($this->attributes['fund_type'])) {
+            $arrStatus = array_combine(config('global.fund_type.code'), config('global.fund_type.desc'));
+            return $arrStatus[$this->attributes['fund_type']];
+        }
+
+        return '-';
+    }
+
     public function getNoteDateFormatAttribute()
     {
         if(isset($this->attributes['note_date'])) {
@@ -150,6 +174,15 @@ class Note extends Model
             return $date->format('d M Y');
         }
         return '';
+    }
+
+    public function getDisbursedDateFormatAttribute()
+    {
+        if(isset($this->attributes['disbursed_date'])) {
+            $date = Carbon::createFromFormat('Y-m-d', $this->attributes['disbursed_date']);
+            return $date->format('d M Y');
+        }
+        return '-';
     }
 
     public function getNoteUploadFormatAttribute()
